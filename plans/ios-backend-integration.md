@@ -64,7 +64,11 @@ Do not: commit; add a dependency; change the contract without the owner (P6).
 6. **`BackendService` behind the repositories.** Guest token on demand (first Feed read), claim from
    "Join the Feed", session from the secret at launch when one exists, sign out everywhere and delete
    from Settings → Account. The outbox transport uses `APIClient`, so a retried message is signed anew.
-7. **On a Personal Team iPhone** against the Mac: claim, relaunch, reinstall, then a second device
+7. **Privacy manifest and label.** The first call that sends anything to the backend (the claim,
+   then publishing) declares what it sends in `NSPrivacyCollectedDataTypes` of
+   `Carodo/Resources/PrivacyInfo.xcprivacy` (empty today: the app makes no network call), and the
+   App Store privacy label says the same (`carodo-ios/docs/privacy.md`, Privacy manifest).
+8. **On a Personal Team iPhone** against the Mac: claim, relaunch, reinstall, then a second device
    signed in to the same iCloud account if one is at hand.
 
 ## Afterwards

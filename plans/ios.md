@@ -123,10 +123,21 @@ The brief for onboarding → first drive (mockups, then code) is [`first-run.md`
 |---|---|---|
 | Version and build number | `MARKETING_VERSION` stays in `project.yml`; the build number is derived (e.g. `git rev-list --count HEAD`), never kept in a per-machine file, so two machines never upload the same number | Later |
 | `task archive` + `task testflight` | `xcodebuild archive` and `-exportArchive` with `ExportOptions.plist`, upload with an App Store Connect API key: key ID and issuer ID in `.env`, the `.p8` outside the repo (`~/.appstoreconnect/private_keys/`; `*.p8` is gitignored) | Later |
+| Privacy Report from the archive | Organizer → **Generate Privacy Report** on the archive: the app's `PrivacyInfo.xcprivacy` and GRDB's both listed, and they match the App Store privacy label (`carodo-ios/docs/privacy.md`, Before release). An undeclared required-reason API fails the upload (ITMS-91053) | Later |
 | `task screenshots` | Capture App Store screenshots straight from a 6.9" simulator (`xcrun simctl io <SIM_ID> screenshot`) with sample data and the QA launch arguments, at the required size: no resizing or padding | Later |
 
 Considered from an iOS template and not taken: generating icon sizes (one 1024 icon is enough; ours
 come from the brand source) and resizing screenshots with white padding.
+
+## Release scope (decide before the first TestFlight build)
+
+Found by a pre-release review on 2026-11-07. Each is a risk at App Review (incomplete or
+misleading features, App Review Guidelines 2.1 and 2.3), not a crash.
+
+| Item | Today | Options | Status |
+|---|---|---|---|
+| **Feed in v1** (owner's product decision) | Release builds show sample data: `DependencyContainer.live()` never passes a community repository, so the default `SampleCommunityRepository` is used; Join the Feed only says it is not open yet | (a) hide the Feed tab, Profile and leaderboard in Release until the backend is wired (DEBUG and QA keep them); (b) finish identity and publishing ([`ios-backend-integration.md`](ios-backend-integration.md)) before the first release. Never ship sample people as if real | Open: owner decides |
+| **Widget status** | `CarodoStatusWidget` always says "Ready to drive": it reads neither the Location permission nor the recording state, and its timeline is `.never` | (a) a real state: the app writes a small status (permission, recording, Auto Mode) where the extension can read it and calls `WidgetCenter.reloadTimelines` when it changes; an App Group is an entitlement (P6) and the widget spec follows; (b) narrow the widget to a Start Drive shortcut that claims no state; (c) leave it out of v1 | Open |
 
 ## Phase 5 — Next
 
