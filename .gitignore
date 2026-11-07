@@ -1,0 +1,45 @@
+# macOS
+.DS_Store
+
+# Editor and local tool state
+.idea/
+.vscode/
+.remember/
+
+# Location traces: real drives are never committed (AGENTS.md invariant P5)
+*.gpx
+*.kml
+
+# Screenshots of other apps: private reference material, never committed (they can show
+# accounts, places and routes). Only the folder's README is tracked.
+references/screens/*
+!references/screens/README.md
+
+# Local study material for an app we study (API captures, responses, exports): never committed,
+# they hold our own device and account ids and other people's data. One folder per app,
+# apps/<app>/; the app's note, apps/<app>.md, is what is committed.
+references/apps/*/
+
+# Credentials and signing assets stay local; examples contain placeholders only.
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p8
+*.p12
+*.cer
+*.mobileprovision
+*.provisionprofile
+
+# Private drive exports, local databases and generated Python caches.
+drive-data/
+*.sqlite
+*.sqlite-*
+*.sqlite3
+*.sqlite3-*
+*.db
+*.db-*
+*.carodo
+__pycache__/
+*.pyc

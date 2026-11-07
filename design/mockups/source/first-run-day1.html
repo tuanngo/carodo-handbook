@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>First run · Day 1</title>
+<!-- Mockup for carodo-ios docs/specs/drive-recording.md (Panels, One-tap start) and journeys.md (Detail).
+     Rendered to ../onboarding/first-run-day1.png by render.sh. Ideas, not specs: the spec wins. Place names are
+     generic wards, the route is synthetic (P5). -->
+<script src="first-run-kit.js"></script>
+</head>
+<body>
+<script>
+const dim = '<div style="position:absolute;inset:0;background:rgba(0,0,0,.18);z-index:4"></div>';
+
+const startPanel = ({ theme, vehicle = 'one', gps = 'ask', menu = false, ax = false }) => {
+  const v = vehicle === 'none'
+    ? vcard({ kind: 'none', name: 'No vehicle', sub: 'Drive without one, or add your car.', small: true, trailing: `<span class="acc" style="font-weight:600">${I.plus} Add</span>` })
+    : vcard({ name: 'My car', sub: 'Car', small: true, trailing: `<span class="acc" style="font-weight:600;font-size:15px">Change ${I.updown}</span>` });
+  const loc = gps === 'ask'
+    ? `<span class="v miss">${I.loc} Ask first</span>`
+    : `<span class="v acc">${I.check} Allowed</span>`;
+  return phone(theme + (ax ? ' ax' : ''), `
+  <div class="map">${mapSvg()}</div><div class="me" style="left:178px;top:300px"></div>${dim}
+  <div class="panel float">
+    <div class="hd"><b>${I.car} Ready to Drive</b><span class="xbtn">${I.x}</span></div>
+    <div class="box">${v}</div>
+    <div class="box">
+      <div class="kv"><span class="k">${I.loc}&nbsp; Location</span>${loc}</div>
+      ${ax ? '' : `<div class="kv"><span class="k">${I.flag}&nbsp; Auto finish</span><span class="v">On</span></div>`}
+    </div>
+    <div class="seg wide" style="margin-top:10px"><span class="on">${I.hand} Manual</span><span>${I.auto} Auto Mode</span></div>
+    <div class="btnp">${I.play} ${gps === 'ask' ? 'Allow Location & Start' : 'Start Drive'}</div>
+    ${ax ? '' : `<div class="foot">${gps === 'ask'
+      ? 'Carodo asks for your location only while the app is open. Your drives stay on this iPhone.'
+      : 'Next time, one tap on Start begins with My car. Hold it to come back here.'}</div>`}
+  </div>
+  ${menu ? `<div class="menu" style="left:96px;top:${ax ? 200 : 360}px">
+    <div><span class="ck">${I.check}</span>My car<span class="mi">${I.car}</span></div>
+    <div><span class="ck"></span>Daily<span class="mi">${I.moto}</span></div>
+    <div class="sep"><span class="ck"></span>No vehicle</div>
+    <div><span class="ck"></span>Add vehicle<span class="mi">${I.plus}</span></div></div>` : ''}
+  ${bar(0)}`);
+};
+
+const compact = ({ theme, undo = true }) => phone(theme, `
+  <div class="map">${mapSvg({ route: 'M115 560 C 140 520 175 470 178 410 S 175 330 180 300', routeWidth: 6 })}</div>
+  <div class="me" style="left:170px;top:290px"></div>
+  ${mapChrome(`<span class="t2">${I.map}</span>No drives yet`)}
+  <div class="compact float">
+    <div style="display:flex;align-items:center;gap:8px">
+      <span class="recdot"></span><b style="font-size:16px">Recording</b><span class="t2">·</span>
+      <span class="vpill"><span class="acc">${I.car}</span>My car <span class="t2" style="font-size:12px">${I.updown}</span></span>
+      <span style="flex:1"></span>
+      ${undo ? `<span class="undo">${I.undo} Undo <span style="font-variant-numeric:tabular-nums;opacity:.7">4</span></span>` : `<span class="t2">${I.chev}</span>`}
+    </div>
+    <div class="metrics">
+      <div><b>${undo ? '0:01' : '12:48'}</b><small>Elapsed</small></div>
+      <div><b>${undo ? '0.0' : '6.1'} <span style="font-size:14px">km</span></b><small>GPS distance</small></div>
+      <div><b>${undo ? '8' : '42'} <span style="font-size:14px">km/h</span></b><small>Speed</small></div>
+    </div>
+  </div>
+  ${bar(0, 'stop')}`);
+
+const journeys = (theme) => phone(theme, `
+  <div class="nav"><span class="navbtn float acc">${I.stamp}</span>
+    <div class="segn"><span class="on">List</span><span>Activity</span></div><span style="width:40px"></span></div>
+  <div class="content">
+    <span class="fmenu">All ${I.down}</span>
+    <div class="sum"><div><b>12.4 km</b><small>GPS distance</small></div><div><b>1</b><small>Drive</small></div><div><b>24 min</b><small>Driving time</small></div></div>
+    <div class="dayh">Today · Tue 3 Nov · 1 drive · 12.4 km</div>
+    <div class="jrow">
+      <div class="thumb"><svg viewBox="80 90 270 500" width="64" height="64"><path d="${routeD}" fill="none" stroke="var(--acc)" stroke-width="22" stroke-linecap="round"/></svg></div>
+      <div style="flex:1"><div class="newtag">First drive</div><div class="tt">Morning drive</div><div class="mm">12.4 km · 24 min · 07:42 · My car</div></div>
+      <span class="t2">${I.chev}</span>
+    </div>
+  </div>
+  ${bar(1)}`);
+
+const detail = ({ theme, after }) => phone(theme, `
+  <div class="dmap">${mapSvg()}<svg viewBox="0 0 390 844" preserveAspectRatio="xMidYMid slice" style="position:absolute;inset:0;width:100%;height:100%"><g transform="translate(35,149) scale(.82)">${speedRoute()}</g></svg></div>
+  <span class="mapbtn float" style="left:16px">${I.back}</span>
+  <span class="mapbtn float" style="right:64px">${I.share}</span><span class="mapbtn float" style="right:16px">${I.dots}</span>
+  <span class="float" style="position:absolute;left:16px;top:384px;border-radius:18px;padding:8px 14px;font-weight:600;font-size:14px;z-index:4">${I.play} Replay</span>
+  <div class="dsheet">
+    <h2>${after ? 'P. Hải Châu → P. Sơn Trà' : 'Morning drive'}</h2>
+    <div class="when">Tue 3 Nov · 07:42 – 08:06</div>
+    ${after
+      ? `<div class="narr"><span class="acc">${I.auto}</span> A 12.4 km morning drive from P. Hải Châu to P. Sơn Trà, mostly at 30–60 km/h.</div>`
+      : `<div style="margin-bottom:16px"><div class="skel" style="width:92%"></div><div class="skel" style="width:64%"></div></div>`}
+    <div class="tiles"><div><b>12.4 km</b><small>GPS distance</small></div><div><b>24 min</b><small>Drive time</small></div><div><b>31 km/h</b><small>Average</small></div></div>
+    <div class="vsec">${vcard({ name: 'My car', sub: 'Car · no odometer yet', small: true, trailing: `<span class="t2">${I.chev}</span>` })}</div>
+  </div>`);
+
+mount(`<div class="sheet">
+<h1>First run · Day 1: the first drive</h1>
+<p class="lede">Mockups for <b>first-run.md</b> (Day 1 rows; Replay is a non-goal here). The Start panel asks only for what is missing; after the first start, one tap starts with the last-used vehicle. The spec wins over this picture.</p>
+
+<section>
+<h2>1 · The first tap on Start: the Start panel</h2>
+<p class="sub">Three blocks, top to bottom: the vehicle (the shared vehicle card), readiness (Location, Auto finish), the mode. What is missing is in copper and the button says what it will do. The map stays visible above, dimmed a little.</p>
+<div class="row">
+  <div>${startPanel({ theme: 'light', vehicle: 'none', gps: 'ask' })}<div class="cap"><b>No vehicle, location not asked.</b> "Add" opens the vehicle form as a sheet; driving without one is fine. The button asks for location, then starts.</div></div>
+  <div>${startPanel({ theme: 'light', vehicle: 'one', gps: 'ok' })}<div class="cap"><b>One vehicle, location allowed.</b> Chosen for you. The footnote tells, once, that the next tap starts at once.</div></div>
+  <div>${startPanel({ theme: 'dark', vehicle: 'one', gps: 'ok', menu: true })}<div class="cap"><b>Dark · several vehicles.</b> "Change" is a native menu: every vehicle with its kind symbol, then No vehicle and Add vehicle.</div></div>
+  <div>${startPanel({ theme: 'light', vehicle: 'one', gps: 'ask', ax: true })}<div class="cap"><b>Largest Dynamic Type.</b> The panel grows upward and scrolls; Auto finish and the footnote move below the fold.</div></div>
+</div>
+</section>
+
+<section>
+<h2>2 · Recording: the compact panel</h2>
+<p class="sub">"Recording · My car" from the first second. The vehicle is a pill that opens the same menu (a change mid-drive is kept, garage.md). Undo counts down its ~5 s, then gives way to the chevron that opens the controls. A plain tap never stops the drive.</p>
+<div class="row">
+  <div>${compact({ theme: 'light', undo: true })}<div class="cap"><b>Light · the first seconds.</b> Undo with its countdown; nothing is saved or asked if tapped.</div></div>
+  <div>${compact({ theme: 'dark', undo: false })}<div class="cap"><b>Dark · after the Undo window.</b> Elapsed, GPS distance, speed; tap or drag up to expand.</div></div>
+  <div class="notes">
+    <h3>Proposed copy (en · vi)</h3>
+    <ul>
+      <li>No vehicle · <i>Không chọn xe</i> — Drive without one, or add your car. · <i>Lái không cần xe, hoặc thêm xe của bạn.</i> — Add · <i>Thêm</i></li>
+      <li>Change · <i>Đổi</i> · Add vehicle · <i>Thêm xe</i></li>
+      <li>Location · <i>Vị trí</i> (replaces the "GPS" hard-coded today)</li>
+      <li>Next time, one tap on Start begins with My car. Hold it to come back here. · <i>Lần sau, chạm Bắt đầu một lần là lái với My car. Giữ nút để quay lại đây.</i></li>
+      <li>First drive · <i>Chuyến đầu tiên</i> (Journeys row tag, first drive only)</li>
+    </ul>
+    <h3>Rules</h3>
+    <ul>
+      <li>"Not ready" = location not allowed, or no last-used choice yet (vehicles exist but none picked). Choosing "No vehicle" once is a choice: one tap then starts with none.</li>
+      <li>The footnote shows on the first panel that can start at once, never again.</li>
+    </ul>
+  </div>
+</div>
+</section>
+
+<section>
+<h2>3 · The first drive saved</h2>
+<p class="sub">It lands in Journeys at once. The detail reads well before its place names and summary arrive (the part-of-day title, two faint lines where the sentence will be), and after (places in the title, the sentence with its sparkle when Apple Intelligence wrote it). The figures never wait.</p>
+<div class="row">
+  <div>${journeys('light')}<div class="cap"><b>Journeys with one drive.</b> Summary for All, today's heading, the row with "First drive".</div></div>
+  <div>${detail({ theme: 'light', after: false })}<div class="cap"><b>Detail, just saved.</b> Title from the part of day; the sentence is a placeholder, not "Loading…".</div></div>
+  <div>${detail({ theme: 'dark', after: true })}<div class="cap"><b>Dark · after naming and the summary.</b> The title becomes the places; the vehicle card is the same object again.</div></div>
+</div>
+</section>
+</div>`);
+</script>
+</body>
+</html>

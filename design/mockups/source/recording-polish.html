@@ -1,0 +1,347 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Recording polish</title>
+<!-- Mockup for carodo-handbook/plans/recording-polish.md (decisions 2026-11-03) and carodo-ios
+     docs/specs/drive-recording.md, journeys.md, navigation.md. Rendered to ../drive/recording-polish.png by
+     render.sh. Ideas, not specs: the spec wins. The map, routes and place names are synthetic (P5). -->
+<script src="first-run-kit.js"></script>
+<style>
+  .autobtn.on { color:var(--acc); }
+  .autobtn.live { background:var(--copper); color:var(--charcoal); position:relative; }
+  .autobtn.live::after { content:''; position:absolute; top:7px; right:7px; width:8px; height:8px; border-radius:4px; background:#E0533D; border:1.5px solid var(--el); }
+  .srcglyph { display:inline-flex; align-items:center; justify-content:center; width:24px; height:24px; border-radius:12px; background:var(--card); color:var(--acc); font-size:13px; }
+  .cd { display:flex; align-items:center; gap:8px; margin-top:10px; padding:9px 11px; border-radius:12px; font-size:15px; font-weight:600;
+    background:color-mix(in srgb,var(--acc) 13%,var(--card)); color:var(--t1); }
+  .cd .n { font-variant-numeric:tabular-nums; color:var(--acc); }
+  .cd .ic { color:var(--acc); font-size:17px; flex:none; }
+  .toast { position:absolute; left:16px; right:16px; top:58px; border-radius:20px; padding:12px 14px; display:flex; align-items:center; gap:12px; z-index:14; }
+  .toast .tt { flex:1; line-height:1.25; font-size:15px; } .toast .tt b { display:block; font-size:16px; }
+  .toast .sa { color:var(--acc); font-weight:600; font-size:16px; }
+  .dropped { display:flex; align-items:center; gap:12px; border-radius:18px; padding:12px; margin-bottom:10px; font-size:14.5px;
+    border:1.5px dashed color-mix(in srgb,var(--t2) 45%,transparent); color:var(--t2); }
+  .dropped .k { color:var(--acc); font-weight:600; font-size:15px; white-space:nowrap; }
+  .rsrc { color:var(--t2); font-size:15px; margin-left:4px; }
+  .srcline { display:flex; align-items:flex-start; gap:7px; color:var(--t2); font-size:14px; margin:-6px 0 12px; }
+  .srcline .ic { color:var(--acc); flex:none; margin-top:2px; }
+  .tile2 { flex:1; background:var(--card); border-radius:14px; padding:10px 12px; }
+  .tile2 b { display:block; font-size:18px; font-variant-numeric:tabular-nums; } .tile2 small { color:var(--t2); font-size:11.5px; }
+  .roundb { flex:1; display:flex; flex-direction:column; align-items:center; gap:6px; font-size:12.5px; font-weight:600; color:var(--t2); }
+  .roundb span { width:58px; height:58px; border-radius:29px; background:var(--card); display:grid; place-items:center; font-size:22px; color:var(--t1); }
+  .roundb.p span { background:var(--copper); color:var(--charcoal); }
+  .axp .compact { padding:14px 16px; }
+  .axp .compact .hd1 { display:flex; align-items:center; gap:10px; font-size:25px; font-weight:700; }
+  .axp .cd { font-size:22px; align-items:flex-start; line-height:1.25; } .axp .cd .ic { font-size:25px; margin-top:2px; }
+  .axp .metrics b { font-size:32px; } .axp .metrics small { font-size:17px; }
+  .axp .vpill { font-size:21px; margin-top:10px; display:inline-flex; }
+  .axp .dropped { font-size:21px; flex-direction:column; align-items:stretch; gap:10px; }
+  .axp .dropped .k { font-size:22px; } .axp .dropped small { font-size:18px; }
+  .axp .srcglyph { width:34px; height:34px; border-radius:17px; font-size:19px; }
+  .tokrow { display:flex; gap:8px; margin:2px 0 12px; }
+  .tok { display:inline-flex; align-items:center; gap:6px; padding:6px 12px; border-radius:15px; font-size:14px; font-weight:600; background:var(--el); border:.5px solid var(--stroke); }
+  .tok.on { background:color-mix(in srgb,var(--acc) 16%,var(--card)); color:var(--acc); border-color:color-mix(in srgb,var(--acc) 40%,transparent); }
+</style>
+</head>
+<body>
+<script>
+// Extra SF Symbol stand-ins for this board.
+I.timer = '<svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="13.5" r="7.5"/><path d="M12 13.5V9.5M9.5 2.8h5M18.5 6.5l1.4-1.4"/></svg>'; // timer
+I.audiooff = '<svg class="ic" viewBox="0 0 24 24"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4zM16 9.5l5 5M21 9.5l-5 5"/></svg>'; // speaker.slash
+I.shortcut = '<svg class="ic" viewBox="0 0 24 24"><path d="M12 3.5l8.5 4.6-8.5 4.6-8.5-4.6z"/><path d="M3.5 12.2l8.5 4.6 8.5-4.6M3.5 16.2l8.5 4.6 8.5-4.6" opacity=".7"/></svg>'; // square.2.layers.3d
+I.pause = '<svg class="ic fill" viewBox="0 0 24 24"><rect x="6" y="5" width="4" height="14" rx="1.3"/><rect x="14" y="5" width="4" height="14" rx="1.3"/></svg>';
+I.north = '<svg class="ic fill" viewBox="0 0 24 24"><path d="M12 2.5l6 17-6-3.6-6 3.6z"/></svg>';
+I.bars = '<svg class="ic fill" viewBox="0 0 24 24"><rect x="3" y="14" width="4.5" height="7" rx="1"/><rect x="9.75" y="9" width="4.5" height="12" rx="1"/><rect x="16.5" y="4" width="4.5" height="17" rx="1"/></svg>';
+I.slider = '<svg class="ic" viewBox="0 0 24 24"><path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/></svg>';
+
+const src = { hand: I.hand, auto: I.auto, shortcut: I.shortcut };
+const srcName = { hand: 'By hand', auto: 'Auto Mode', shortcut: 'Shortcut' };
+
+// Earlier drives, faint, under the live line (the heat map while recording).
+const past = `
+  <g fill="none" stroke-linecap="round" opacity=".55">
+    <path d="M-10 250 C 120 230 260 280 400 240" stroke="var(--t2)" stroke-width="3"/>
+    <path d="M60 -10 L30 860" stroke="var(--t2)" stroke-width="2.5"/>
+    <path d="M170 -10 C 160 200 200 420 150 860" stroke="var(--t2)" stroke-width="3.5"/>
+  </g>`;
+const liveD = 'M115 760 C 140 700 175 640 178 560 S 175 470 180 430';
+const liveMap = (stopped = false) => `
+  <div class="map"><svg viewBox="0 0 390 844" preserveAspectRatio="xMidYMid slice">${mapSvg().replace(/^\s*<svg[^>]*>|<\/svg>\s*$/g, '')}${past}
+    <path d="${liveD}" fill="none" stroke="var(--ivory)" stroke-width="12" stroke-linecap="round"/>
+    <path d="${liveD}" fill="none" stroke="var(--copper)" stroke-width="8" stroke-linecap="round"/>
+  </svg></div>
+  <div class="me" style="left:170px;top:420px;box-shadow:0 0 0 ${stopped ? 18 : 30}px color-mix(in srgb,var(--copper) 14%,transparent),0 2px 6px rgba(0,0,0,.3)"></div>`;
+
+const recChrome = (chip, live = true, paused = false) => `
+  <div class="chip float">${paused ? `<span class="t2">${I.pause}</span>` : '<span class="recdot"></span>'}${chip}</div>
+  <div class="ctrls float">
+    <span class="autobtn ${live ? 'live' : 'on'}" style="border-radius:23px 23px 0 0">${I.auto}</span>
+    <span>${I.map}</span><span class="acc">${I.loc}</span><span style="font-size:13px;font-weight:700">3D</span></div>`;
+
+// The compact panel. source: hand | auto | shortcut; cd: countdown html or ''.
+const compactP = ({ source = 'auto', time = '12:48', km = '6.1', kmh = '42', cd = '', paused = false, vehicle = 'My car', kind = 'car' }) => `
+  <div class="compact float">
+    <div style="display:flex;align-items:center;gap:8px">
+      ${paused ? `<span class="t2">${I.pause}</span><b style="font-size:16px">Paused</b>` : `<span class="recdot"></span><b style="font-size:16px">Recording</b>`}
+      <span class="srcglyph" title="${srcName[source]}">${src[source]}</span>
+      <span class="vpill"><span class="acc">${kind === 'moto' ? I.moto : I.car}</span>${vehicle} <span class="t2" style="font-size:12px">${I.updown}</span></span>
+      <span style="flex:1"></span><span class="t2">${I.chev}</span>
+    </div>
+    ${cd}
+    <div class="metrics">
+      <div><b>${time}</b><small>Elapsed</small></div>
+      <div><b>${km} <span style="font-size:14px">km</span></b><small>GPS distance</small></div>
+      <div><b>${kmh} <span style="font-size:14px">km/h</span></b><small>Speed</small></div>
+    </div>
+  </div>`;
+
+const cdStop = (n = '3:20') => `<div class="cd">${I.timer}<span>Ends by itself in <span class="n">${n}</span> unless you move</span></div>`;
+const cdAudio = (n = '1:10') => `<div class="cd">${I.audiooff}<span>Car audio off: ends in <span class="n">${n}</span></span></div>`;
+
+const mapRec = ({ theme, state = 'moving' }) => phone(theme, `
+  ${liveMap(state !== 'moving')}
+  ${recChrome('Recording · Auto Mode')}
+  ${compactP({
+    source: 'auto', time: state === 'moving' ? '12:48' : '14:02', km: state === 'moving' ? '6.1' : '6.4', kmh: state === 'moving' ? '42' : '0',
+    cd: state === 'stopped' ? cdStop() : state === 'audio' ? cdAudio() : '',
+  })}
+  ${bar(0, 'stop')}`);
+
+const expanded = ({ theme, source = 'auto', cd = '' }) => phone(theme, `
+  ${liveMap(true)}
+  ${recChrome('Recording · Auto Mode')}
+  <div class="panel float" style="padding:16px 16px 18px">
+    <div class="hd"><b><span class="recdot"></span> Recording</b><span class="xbtn">${I.down}</span></div>
+    <div class="srcline" style="margin:-8px 0 12px">${src[source]} Started by ${source === 'hand' ? 'hand' : source === 'auto' ? 'Auto Mode' : 'a Shortcut'} · 07:42</div>
+    <div class="metrics" style="margin:0 0 4px">
+      <div><b>14:02</b><small>Elapsed</small></div><div><b>6.4 <span style="font-size:14px">km</span></b><small>GPS distance</small></div><div><b>0 <span style="font-size:14px">km/h</span></b><small>Speed</small></div>
+    </div>
+    ${cd}
+    <div style="display:flex;gap:8px;margin-top:10px">
+      <div class="tile2"><b><span class="acc" style="font-size:15px">${I.north}</span> NE</b><small>Heading</small></div>
+      <div class="tile2"><b><span class="acc" style="font-size:15px">${I.bars}</span> Good</b><small>GPS</small></div>
+    </div>
+    <div class="box" style="margin-top:10px">${vcard({ name: 'My car', sub: 'Car', small: true, trailing: `<span class="acc" style="font-weight:600;font-size:15px">Change ${I.updown}</span>` })}</div>
+    <div style="display:flex;margin-top:14px">
+      <div class="roundb"><span>${I.pause}</span>Pause</div>
+      <div class="roundb p"><span>${I.stop}</span>Hold to finish</div>
+    </div>
+  </div>
+  ${bar(0, 'stop')}`);
+
+const compactOnly = ({ theme, source, paused = false, cd = '', ax = false, vehicle, kind }) => phone(theme + (ax ? ' ax' : ''), `
+  ${liveMap(paused)}
+  ${recChrome(paused ? 'Paused' : source === 'hand' ? 'Recording' : `Recording · ${srcName[source]}`, source === 'auto', paused)}
+  ${compactP({ source, paused, cd, time: paused ? '21:30' : '3:05', km: paused ? '9.0' : '1.2', kmh: paused ? '0' : '27', vehicle, kind })}
+  ${bar(0, 'stop')}`);
+
+// After an automatic end.
+const mapToast = (theme) => phone(theme, `
+  <div class="map">${mapSvg()}</div>
+  <div class="map" style="background:transparent"><svg viewBox="0 0 390 844" preserveAspectRatio="xMidYMid slice" style="width:100%;height:100%">${past}
+    <path d="${liveD}" fill="none" stroke="var(--acc)" stroke-width="5" stroke-linecap="round" opacity=".9"/></svg></div>
+  <div class="me" style="left:170px;top:420px"></div>
+  <div class="toast float"><span class="badge sm">${I.auto}</span>
+    <span class="tt"><b>Drive saved</b>12.4 km · ended 07:58, 5 min after you stopped</span><span class="sa">Open</span></div>
+  <div class="ctrls float" style="top:150px"><span class="autobtn on">${I.auto}</span><span>${I.map}</span><span class="acc">${I.loc}</span><span style="font-size:13px;font-weight:700">3D</span></div>
+  ${bar(0)}`);
+
+const jrow = ({ title, meta, source, thumb = true, tag = '' }) => `
+  <div class="jrow" style="margin-bottom:10px">
+    <div class="thumb">${thumb ? `<svg viewBox="80 90 270 500" width="64" height="64"><path d="${routeD}" fill="none" stroke="var(--acc)" stroke-width="22" stroke-linecap="round"/></svg>` : ''}</div>
+    <div style="flex:1;min-width:0">${tag}<div class="tt">${title}</div><div class="mm">${source && source !== 'hand' ? `<span class="acc" title="${srcName[source]}">${src[source]}</span> ` : ''}${meta}</div></div>
+    <span class="t2">${I.chev}</span>
+  </div>`;
+
+const journeysList = ({ theme, dropped = true, filter = false, toast = false }) => phone(theme, `
+  <div class="nav"><span class="navbtn float acc">${I.stamp}</span>
+    <div class="segn"><span class="on">List</span><span>Activity</span></div><span style="width:40px"></span></div>
+  <div class="content">
+    <span class="fmenu">${filter ? `<span class="acc">${I.auto}</span> Auto Mode` : 'All'} ${I.down}</span>
+    <div class="sum"><div><b>${filter ? '31.0 km' : toast ? '43.7 km' : '43.4 km'}</b><small>GPS distance</small></div><div><b>${filter ? 2 : toast ? 4 : 3}</b><small>Drives</small></div><div><b>${filter ? '1 h 02' : '1 h 26'}</b><small>Driving time</small></div></div>
+    <div class="dayh">Today · Tue 3 Nov · ${filter ? '2 drives · 31.0 km' : toast ? '4 drives · 43.7 km' : '3 drives · 43.4 km'}</div>
+    ${dropped ? `<div class="dropped"><span style="font-size:18px">${I.auto}</span><span style="flex:1;line-height:1.3">A 0.3 km drive at 17:20 wasn't kept<br><small>Too short. Gone after 24 h.</small></span><span class="k">Keep it</span></div>` : ''}
+    ${jrow({ title: 'Evening drive', meta: '18.6 km · 38 min · 17:44 · My car', source: 'auto' })}
+    ${toast ? jrow({ title: 'Short drive', meta: '0.3 km · 2 min · 17:20 · My car', source: 'auto' }) : ''}
+    ${filter ? '' : jrow({ title: 'Lunch drive', meta: '12.4 km · 24 min · 12:10 · Daily', source: 'hand' })}
+    ${jrow({ title: 'P. Hải Châu → P. Sơn Trà', meta: '12.4 km · 24 min · 07:42 · My car', source: filter ? 'auto' : 'shortcut' })}
+  </div>
+  ${toast ? `<div class="toast float" style="top:auto;bottom:108px"><span class="badge sm">${I.check}</span><span class="tt"><b>Kept</b>0.3 km at 17:20 is back in Journeys</span><span class="sa">Undo</span></div>` : ''}
+  ${bar(1)}`);
+
+const filterMenu = (theme) => phone(theme, `
+  <div class="nav"><span class="navbtn float acc">${I.stamp}</span>
+    <div class="segn"><span class="on">List</span><span>Activity</span></div><span style="width:40px"></span></div>
+  <div class="content">
+    <span class="fmenu">All ${I.down}</span>
+    <div class="sum"><div><b>43.4 km</b><small>GPS distance</small></div><div><b>3</b><small>Drives</small></div><div><b>1 h 26</b><small>Driving time</small></div></div>
+    <div class="dayh">Today · Tue 3 Nov · 3 drives · 43.4 km</div>
+    ${jrow({ title: 'Evening drive', meta: '18.6 km · 38 min · 17:44 · My car', source: 'auto' })}
+    ${jrow({ title: 'Lunch drive', meta: '12.4 km · 24 min · 12:10 · Daily', source: 'hand' })}
+  </div>
+  <div style="position:absolute;inset:0;background:rgba(0,0,0,.18);z-index:13"></div>
+  <div class="menu" style="right:16px;top:150px;width:250px">
+    <div><span class="ck">${I.check}</span>All</div>
+    <div><span class="ck"></span>My car<span class="mi">${I.car}</span></div>
+    <div><span class="ck"></span>Daily<span class="mi">${I.moto}</span></div>
+    <div class="sep"><span class="ck"></span>Auto Mode<span class="mi acc">${I.auto}</span></div>
+    <div><span class="ck"></span>By hand<span class="mi">${I.hand}</span></div>
+    <div><span class="ck"></span>Shortcut<span class="mi">${I.shortcut}</span></div>
+  </div>
+  ${bar(1)}`);
+
+const detail = ({ theme, line, icon }) => phone(theme, `
+  <div class="dmap">${mapSvg()}<svg viewBox="0 0 390 844" preserveAspectRatio="xMidYMid slice" style="position:absolute;inset:0;width:100%;height:100%"><g transform="translate(35,149) scale(.82)">${speedRoute()}</g></svg></div>
+  <span class="mapbtn float" style="left:16px">${I.back}</span>
+  <span class="mapbtn float" style="right:64px">${I.share}</span><span class="mapbtn float" style="right:16px">${I.dots}</span>
+  <span class="float" style="position:absolute;left:16px;top:384px;border-radius:18px;padding:8px 14px;font-weight:600;font-size:14px;z-index:4">${I.play} Replay</span>
+  <div class="dsheet">
+    <h2>Evening drive</h2>
+    <div class="when">Tue 3 Nov · 17:44 – 18:22</div>
+    <div class="srcline" style="margin:-4px 0 14px">${icon} ${line}</div>
+    <div class="narr"><span class="acc">${I.auto}</span> An 18.6 km evening drive, mostly at 30–60 km/h.</div>
+    <div class="tiles"><div><b>18.6 km</b><small>GPS distance</small></div><div><b>38 min</b><small>Drive time</small></div><div><b>29 km/h</b><small>Average</small></div></div>
+    <div class="vsec">${vcard({ name: 'My car', sub: 'Car', small: true, trailing: `<span class="t2">${I.chev}</span>` })}</div>
+  </div>`);
+
+mount(`<div class="sheet">
+<h1>Recording polish: how a drive starts, records, ends and is dropped</h1>
+<p class="lede">Mockups for <b>plans/recording-polish.md</b>, decisions of 2026-11-03: every drive stores how it started (by hand · Auto Mode · Shortcut) and how it ended; the panels show the stop countdown once a stop is confirmed; the Map draws the live line; an automatic end is confirmed in the app; a dropped short drive stays 24 h with Keep it. The spec wins over this picture.</p>
+
+<section>
+<h2>1 · The Map while recording</h2>
+<p class="sub">Follow north-up. The live line is copper on an ivory casing, thicker than past drives, which fade to a quiet grey underneath. The period chip becomes "Recording · source" (the figures stay in the panel only, decided 2026-11-03; by hand it reads just "Recording"). The Auto Mode button turns solid copper with a red dot when Auto Mode started this drive. Nothing new to tap: the countdown is information, not a button.</p>
+<div class="row">
+  <div>${mapRec({ theme: 'light', state: 'moving' })}<div class="cap"><b>Light · moving, started by Auto Mode.</b> The small glyph after "Recording" says who started it; the Auto Mode button carries the red dot.</div></div>
+  <div>${mapRec({ theme: 'light', state: 'stopped' })}<div class="cap"><b>Stopped, after the 30 s confirmation.</b> The countdown row slides in above the figures: 5:00 when it appears, here at 3:20. It goes the moment the car moves again.</div></div>
+  <div>${mapRec({ theme: 'dark', state: 'audio' })}<div class="cap"><b>Dark · car audio disconnected.</b> The short 90 s grace, shown as such. A disconnect never ends the drive by itself (P4): moving again cancels it.</div></div>
+  <div class="notes">
+    <h3>Rules</h3>
+    <ul>
+      <li>The countdown shows only when StopDetector has confirmed a stop (30 s), never while moving.</li>
+      <li>It counts to the auto-finish (5 min, or 90 s after the car audio went); the drive ends at the moment it stopped, as today.</li>
+      <li>Reduce Motion: the number changes, nothing ticks or slides.</li>
+      <li>VoiceOver reads it once when it appears ("Ends by itself in 5 minutes unless you move"), not every second.</li>
+      <li>The Auto Mode button's dot reads "Auto Mode, on, recording this drive".</li>
+    </ul>
+    <h3>Copy (en · vi)</h3>
+    <ul>
+      <li>Recording · Auto Mode · <i>Đang ghi · Auto Mode</i> (by hand: Recording · <i>Đang ghi</i>)</li>
+      <li>Ends by itself in 3:20 unless you move · <i>Tự kết thúc sau 3:20 nếu bạn không đi tiếp</i></li>
+      <li>Car audio off: ends in 1:10 · <i>Đã ngắt âm thanh xe: kết thúc sau 1:10</i></li>
+    </ul>
+  </div>
+</div>
+</section>
+
+<section>
+<h2>2 · The panels: the source, the countdown, paused</h2>
+<p class="sub">The compact panel carries the source as a glyph only (its name is in VoiceOver and in the expanded panel). The expanded panel writes it out under the title, with the start time, and repeats the countdown above the controls.</p>
+<div class="row">
+  <div>${compactOnly({ theme: 'light', source: 'shortcut', vehicle: 'Daily', kind: 'moto' })}<div class="cap"><b>Light · started by a Shortcut</b> (a CarPlay automation or <code>carodo://trip/start</code>), on the motorbike.</div></div>
+  <div>${expanded({ theme: 'dark', source: 'auto', cd: cdStop('3:20') })}<div class="cap"><b>Dark · expanded, stopped.</b> "Started by Auto Mode · 07:42", the countdown, then Heading, GPS, the vehicle, Pause and Hold to finish. Finishing is still the person's quickest way out.</div></div>
+  <div>${compactOnly({ theme: 'light', source: 'hand', paused: true })}<div class="cap"><b>Paused, started by hand.</b> No countdown while paused: a pause is the person's choice, auto-finish waits for Resume.</div></div>
+  <div class="notes">
+    <h3>Sources (decision 2)</h3>
+    <ul>
+      <li>By hand · <i>Bằng tay</i> — <code>hand.tap</code></li>
+      <li>Auto Mode · <i>Auto Mode</i> — <code>autostartstop</code></li>
+      <li>Shortcut · <i>Shortcut</i> — <code>square.2.layers.3d</code> (CarPlay automations and links are Shortcuts to the person)</li>
+    </ul>
+    <h3>Copy</h3>
+    <ul>
+      <li>Started by hand · 07:42 · <i>Bắt đầu bằng tay · 07:42</i></li>
+      <li>Started by Auto Mode · <i>Auto Mode bắt đầu</i></li>
+      <li>Started by a Shortcut · <i>Shortcut bắt đầu</i></li>
+      <li>Paused · <i>Tạm dừng</i></li>
+    </ul>
+    <h3>Decided</h3>
+    <ul><li>A paused drive never ends by itself, however long (2026-11-03).</li></ul>
+  </div>
+</div>
+</section>
+
+<section>
+<h2>3 · After an automatic end, and a dropped short drive</h2>
+<p class="sub">Nothing ends silently. A drive that ended by itself is confirmed by a toast the next time the app is opened or returned to, once. A short drive Auto Mode or a Shortcut started and did not keep stays as a dashed line in Journeys for 24 h; Keep it turns it into a normal drive.</p>
+<div class="row">
+  <div>${mapToast('light')}<div class="cap"><b>Light · the next time the app opens.</b> "Drive saved", the distance and how it ended; Open goes to the detail. It leaves after ~6 s or a swipe; never on top of a recording.</div></div>
+  <div>${journeysList({ theme: 'light', dropped: true })}<div class="cap"><b>Journeys · a dropped short drive.</b> The dashed line sits at the top of its day, with the source glyph. Not counted in the summary or the day heading.</div></div>
+  <div>${journeysList({ theme: 'dark', dropped: false, toast: true })}<div class="cap"><b>Dark · after Keep it.</b> The drive becomes a normal row at its time, counted in the summary, with Undo for a few seconds.</div></div>
+  <div class="notes">
+    <h3>Rules</h3>
+    <ul>
+      <li>One toast per automatic end, shown once; several waiting ones collapse into "2 drives saved · Open Journeys".</li>
+      <li>A dropped drive is <code>trips.status = 'dropped'</code>; every journal read and summary leaves it out; it is deleted 24 h after it ended (at launch or in the background).</li>
+      <li>Started by hand: unchanged, "Discard / Keep" after the hold.</li>
+      <li>No notification permission: in-app only (decision 4).</li>
+    </ul>
+    <h3>Copy</h3>
+    <ul>
+      <li>Drive saved · <i>Đã lưu chuyến</i> — 12.4 km · ended 07:58, 5 min after you stopped · <i>12,4 km · kết thúc 07:58, 5 phút sau khi bạn dừng</i> — Open · <i>Mở</i></li>
+      <li>A 0.3 km drive at 17:20 wasn't kept · <i>Chuyến 0,3 km lúc 17:20 không được giữ</i></li>
+      <li>Too short. Gone after 24 h. · <i>Quá ngắn. Sẽ mất sau 24 giờ.</i> — Keep it · <i>Giữ lại</i></li>
+      <li>Kept · <i>Đã giữ</i> — Undo · <i>Hoàn tác</i></li>
+    </ul>
+  </div>
+</div>
+</section>
+
+<section>
+<h2>4 · Journeys and the detail: where a drive came from</h2>
+<p class="sub">Rows show the source glyph only when it is not by hand (by hand is the default and stays quiet). The filter menu gains a source section next to the vehicles. The detail says it in one line under the time: how it started and how it ended.</p>
+<div class="row">
+  <div>${filterMenu('light')}<div class="cap"><b>Light · the filter menu.</b> All, the vehicles, then Auto Mode · By hand · Shortcut. One choice at a time, as today.</div></div>
+  <div>${journeysList({ theme: 'dark', dropped: false, filter: true })}<div class="cap"><b>Dark · filtered to Auto Mode.</b> The summary and day heading count only those drives.</div></div>
+  <div>${detail({ theme: 'light', icon: I.auto, line: 'Started by Auto Mode · ended by itself 5 min after stopping' })}<div class="cap"><b>Detail.</b> One quiet line under the time. A joined drive shows its first part's start and its last part's end.</div></div>
+  <div class="notes">
+    <h3>End reasons (decision 1)</h3>
+    <ul>
+      <li><code>person</code> · ended by you · <i>bạn kết thúc</i></li>
+      <li><code>stopped</code> · ended by itself 5 min after stopping · <i>tự kết thúc 5 phút sau khi dừng</i></li>
+      <li><code>disconnected</code> · ended after the car audio went off · <i>kết thúc sau khi ngắt âm thanh xe</i></li>
+      <li><code>no_signal</code> · ended with no GPS signal · <i>kết thúc vì mất tín hiệu GPS</i></li>
+      <li><code>recovered</code> · recovered after Carodo was closed · <i>khôi phục sau khi Carodo bị đóng</i></li>
+    </ul>
+    <h3>Elsewhere</h3>
+    <ul><li>Settings → Tracking status moves into Developer (decision 2026-11-03); not drawn.</li></ul>
+  </div>
+</div>
+</section>
+
+<section>
+<h2>5 · Largest Dynamic Type</h2>
+<p class="sub">The compact panel grows upward: the vehicle pill takes its own line, the countdown wraps, Speed drops so Elapsed and distance stay legible. The dropped-drive line stacks its Keep it under the sentence.</p>
+<div class="row">
+  <div>${phone('light axp', `
+    ${liveMap(true)}
+    <div class="chip float" style="font-size:20px;height:46px;border-radius:23px"><span class="recdot"></span>Recording · Auto Mode</div>
+    <div class="compact float">
+      <div class="hd1"><span class="recdot" style="width:12px;height:12px;border-radius:6px"></span>Recording <span class="srcglyph">${I.auto}</span><span style="flex:1"></span><span class="t2">${I.chev}</span></div>
+      <span class="vpill"><span class="acc">${I.car}</span>My car <span class="t2" style="font-size:16px">${I.updown}</span></span>
+      ${cdStop('3:20')}
+      <div class="metrics"><div><b>14:02</b><small>Elapsed</small></div><div><b>6.4 <span style="font-size:20px">km</span></b><small>GPS distance</small></div></div>
+    </div>
+    ${bar(0, 'stop')}`)}<div class="cap"><b>AX · stopped, started by Auto Mode.</b></div></div>
+  <div>${phone('dark axp', `
+    <div class="nav"><span class="navbtn float acc">${I.stamp}</span><span style="width:40px"></span></div>
+    <div class="content">
+      <div class="dayh" style="font-size:20px;margin-top:8px">Today · Tue 3 Nov</div>
+      <div class="dropped"><span style="line-height:1.3"><span class="acc">${I.auto}</span> A 0.3 km drive at 17:20 wasn't kept<br><small>Too short. Gone after 24 h.</small></span><span class="k">Keep it</span></div>
+      <div class="jrow" style="flex-direction:column;align-items:stretch"><div class="tt" style="font-size:24px">Evening drive</div><div class="mm" style="font-size:19px"><span class="acc">${I.auto}</span> 18.6 km · 38 min<br>17:44 · My car</div></div>
+    </div>
+    ${bar(1)}`)}<div class="cap"><b>AX · Dark · the dropped line in Journeys.</b> Rows drop the thumbnail at these sizes.</div></div>
+  <div class="notes">
+    <h3>Still to check on the device</h3>
+    <ul>
+      <li>The real countdown: a confirmed stop, then 5:00 → 0, and the drive ending at the stop time.</li>
+      <li>A drive Auto Mode drops as too short, then Keep it the same day.</li>
+      <li>The toast after reopening the app from the background and after a cold launch.</li>
+    </ul>
+  </div>
+</div>
+</section>
+</div>`);
+</script>
+</body>
+</html>

@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Passport stamp sketches</title>
+<!-- Sketches for the Driving Passport button (replaces the avatar at the top of Journeys and Feed).
+     The mark is svg/carodo-mark-small-mono.svg, copied as a symbol. Not generated: a chosen option
+     moves into source/ and build.sh. -->
+<style>
+  :root { --charcoal:#242321; --copper:#BD8053; --ivory:#F3EEE5; --stone:#77736D; }
+  * { box-sizing: border-box; }
+  body { margin:0; font: 15px/1.4 -apple-system, "SF Pro Text", system-ui, sans-serif; background:#fff; color:var(--charcoal); }
+  .sheet { width:1400px; padding:40px; }
+  h1 { font-size:26px; margin:0 0 4px; }
+  .lede { color:var(--stone); margin:0 0 28px; }
+  .grid { display:grid; grid-template-columns:repeat(4, 1fr); gap:20px; }
+  .opt { border:1px solid #e4ded3; border-radius:18px; overflow:hidden; }
+  .opt h2 { font-size:17px; margin:0; }
+  .opt p { margin:4px 0 0; color:var(--stone); font-size:13px; }
+  .head { padding:16px 18px 14px; }
+  .pane { display:flex; align-items:center; justify-content:space-around; padding:22px 10px; }
+  .light { background:var(--ivory); }
+  .dark { background:var(--charcoal); }
+  .big svg { width:150px; height:150px; }
+  .nav { display:flex; gap:14px; align-items:center; }
+  .btn { width:44px; height:44px; border-radius:22px; display:grid; place-items:center; }
+  .light .btn { background:rgba(255,255,255,.7); box-shadow:0 1px 4px rgba(0,0,0,.08); }
+  .dark .btn { background:rgba(255,255,255,.08); }
+  .btn svg { width:30px; height:30px; }
+  .tiny svg { width:20px; height:20px; }
+  .label { font-size:11px; color:var(--stone); text-align:center; margin-top:6px; }
+  .dark .label { color:#a9a49c; }
+  .ink { color:var(--copper); }
+  .wheelInk { color:var(--charcoal); }
+  .dark .wheelInk { color:var(--ivory); }
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <symbol id="mark" viewBox="0 0 100 100">
+      <path fill="currentColor" fill-rule="evenodd" d="M50 96C46.88 96 43.830 95.69 40.89 95.09L42 93.7C43.53 91.79 45.17 90 46.92 88.34C47.93 88.46 48.96 88.5 50 88.5C62.92 88.5 74.36 82.13 81.32 72.33C84.35 71.85 87.47 71.53 90.7 71.39C83.02 86.03 67.67 96 50 96ZM96 50C96 55.05 95.18 59.92 93.65 64.45C93.38 64.34 93.09 64.26 92.79 64.22C90.51 63.94 88.22 63.77 85.91 63.78C87.6 59.52 88.5 54.86 88.5 50C88.5 28.74 71.26 11.5 50 11.5C28.74 11.5 11.5 28.74 11.5 50C11.5 63.39 18.34 75.19 28.73 82.08C26.87 83.2 25.03 84.47 23.21 85.79C23.19 85.79 23.18 85.8 23.17 85.81C23.12 85.84 23.07 85.87 23.03 85.91L22.14 86.54C11.1 78.18 4 64.92 4 50C4 24.6 24.6 4 50 4C75.4 4 96 24.6 96 50ZM55.36 16L57.23 38L56.17 38C57.41 38.62 58.530 39.44 59.5 40.41L59.18 39.42L80.68 34.4C81.98 34.09 82.84 34.57 83.25 35.84L85.22 41.91C85.63 43.18 85.22 44.07 83.99 44.59L63.65 53.17L63.31 52.14C63.11 53.54 62.67 54.87 62.04 56.08L62.9 55.46L68.77 65.17C64.28 65.92 59.8 67.12 55.35 68.75L51.2 63.96L52.07 63.32C51.4 63.45 50.71 63.5 50 63.5C49.29 63.5 48.6 63.45 47.93 63.32L48.8 63.96L37.87 76.59C35.53 77.78 33.22 79.15 30.93 80.65L26.26 77.25C25.18 76.46 24.99 75.5 25.68 74.36L37.1 55.46L37.96 56.08C37.33 54.87 36.89 53.54 36.69 52.14L36.35 53.17L16.01 44.590C14.78 44.07 14.37 43.18 14.78 41.91L16.75 35.84C17.16 34.57 18.02 34.09 19.32 34.4L40.82 39.42L40.5 40.41C41.47 39.44 42.59 38.62 43.83 38L42.77 38L44.64 16C44.75 14.67 45.48 14 46.81 14L53.19 14C54.52 14 55.25 14.67 55.36 16ZM40 50C40 55.52 44.48 60 50 60C55.52 60 60 55.52 60 50C60 44.48 55.52 40 50 40C44.48 40 40 44.48 40 50Z"/>
+      <path fill="currentColor" d="M50 42C54.42 42 58 45.58 58 50C58 54.42 54.42 58 50 58C45.58 58 42 54.42 42 50C42 45.58 45.58 42 50 42Z"/>
+      <path fill="currentColor" d="M24.9 88.5C43.55 75.020 67.53 64.32 92.4 67.4L92.4 68.1C71.8 68.76 52.38 75.61 39.5 91.7L37.32 94.43C32.87 93.16 28.64 91.23 24.77 88.7Z"/>
+    </symbol>
+
+    <!-- A: round stamp. Double ring, the mark inside, lettering in the band (large sizes only). -->
+    <symbol id="a-big" viewBox="0 0 120 120">
+      <g fill="none" stroke="currentColor">
+        <circle cx="60" cy="60" r="56" stroke-width="3.5"/>
+        <circle cx="60" cy="60" r="41" stroke-width="1.5"/>
+      </g>
+      <path id="a-arc-top" d="M 13 60 A 47 47 0 0 1 107 60" fill="none"/>
+      <path id="a-arc-bot" d="M 9.5 60 A 50.5 50.5 0 0 0 110.5 60" fill="none"/>
+      <text font-family="-apple-system, system-ui" font-weight="800" font-size="9.5" letter-spacing="2.6" fill="currentColor">
+        <textPath href="#a-arc-top" startOffset="50%" text-anchor="middle">DRIVING PASSPORT</textPath>
+      </text>
+      <text font-family="-apple-system, system-ui" font-weight="800" font-size="9.5" letter-spacing="3" fill="currentColor">
+        <textPath href="#a-arc-bot" startOffset="50%" text-anchor="middle">CARODO</textPath>
+      </text>
+      <circle cx="16" cy="60" r="1.8" fill="currentColor"/><circle cx="104" cy="60" r="1.8" fill="currentColor"/>
+      <use href="#mark" x="28" y="28" width="64" height="64"/>
+    </symbol>
+    <symbol id="a-small" viewBox="0 0 120 120">
+      <g fill="none" stroke="currentColor">
+        <circle cx="60" cy="60" r="54" stroke-width="8"/>
+        <circle cx="60" cy="60" r="40" stroke-width="4"/>
+      </g>
+      <use href="#mark" x="30" y="30" width="60" height="60"/>
+    </symbol>
+
+    <!-- B: visa stamp. A tilted rounded rectangle with a dashed inner rule. -->
+    <symbol id="b-big" viewBox="0 0 120 120">
+      <g transform="rotate(-8 60 60)">
+        <rect x="6" y="22" width="108" height="76" rx="10" fill="none" stroke="currentColor" stroke-width="3.5"/>
+        <rect x="12" y="28" width="96" height="64" rx="6" fill="none" stroke="currentColor" stroke-width="1.2" stroke-dasharray="3 2.5"/>
+        <use href="#mark" x="17" y="40" width="40" height="40"/>
+        <text x="62" y="56" font-family="-apple-system, system-ui" font-weight="800" font-size="8.5" letter-spacing=".8" fill="currentColor">CARODO</text>
+        <text x="62" y="67" font-family="-apple-system, system-ui" font-weight="600" font-size="6.5" letter-spacing=".9" fill="currentColor">PASSPORT</text>
+        <text x="62" y="79" font-family="ui-monospace, Menlo" font-weight="600" font-size="6.5" fill="currentColor">NOV 2026</text>
+      </g>
+    </symbol>
+    <symbol id="b-small" viewBox="0 0 120 120">
+      <g transform="rotate(-8 60 60)">
+        <rect x="8" y="20" width="104" height="80" rx="14" fill="none" stroke="currentColor" stroke-width="8"/>
+        <use href="#mark" x="32" y="32" width="56" height="56"/>
+      </g>
+    </symbol>
+
+    <!-- C: passport booklet. The cover, a spine rule, the mark embossed. -->
+    <symbol id="c-big" viewBox="0 0 120 120">
+      <rect x="24" y="6" width="76" height="108" rx="9" fill="currentColor"/>
+      <rect x="31" y="6" width="2" height="108" fill="var(--paper)" opacity=".35"/>
+      <use href="#mark" x="40" y="26" width="48" height="48" style="color:var(--copper)"/>
+      <text x="64" y="90" text-anchor="middle" font-family="-apple-system, system-ui" font-weight="800" font-size="7.5" letter-spacing="2" fill="var(--paper)">PASSPORT</text>
+      <rect x="54" y="96" width="20" height="3" rx="1.5" fill="var(--paper)" opacity=".5"/>
+    </symbol>
+    <symbol id="c-small" viewBox="0 0 120 120">
+      <rect x="22" y="6" width="80" height="108" rx="14" fill="currentColor"/>
+      <rect x="32" y="6" width="5" height="108" fill="var(--paper)" opacity=".35"/>
+      <use href="#mark" x="40" y="32" width="54" height="54" style="color:var(--copper)"/>
+    </symbol>
+
+    <!-- D: month postmark. Scalloped edge, the mark, the month below. Inked when the month has a drive. -->
+    <symbol id="d-big" viewBox="0 0 120 120">
+      <circle cx="60" cy="60" r="54" fill="none" stroke="currentColor" stroke-width="5" stroke-dasharray="4.2 3.2"/>
+      <circle cx="60" cy="60" r="46" fill="none" stroke="currentColor" stroke-width="1.4"/>
+      <use href="#mark" x="34" y="24" width="52" height="52"/>
+      <text x="60" y="92" text-anchor="middle" font-family="-apple-system, system-ui" font-weight="800" font-size="12" letter-spacing="2" fill="currentColor">NOV</text>
+    </symbol>
+    <symbol id="d-small" viewBox="0 0 120 120">
+      <circle cx="60" cy="60" r="52" fill="none" stroke="currentColor" stroke-width="9" stroke-dasharray="11 7"/>
+      <use href="#mark" x="28" y="28" width="64" height="64"/>
+    </symbol>
+    <symbol id="d-small-empty" viewBox="0 0 120 120">
+      <circle cx="60" cy="60" r="52" fill="none" stroke="currentColor" stroke-width="5" stroke-dasharray="11 7" opacity=".55"/>
+      <use href="#mark" x="28" y="28" width="64" height="64" opacity=".55"/>
+    </symbol>
+  </defs>
+</svg>
+
+<div class="sheet">
+  <h1>Driving Passport button: four sketches</h1>
+  <p class="lede">The button sits where the avatar was (top of Journeys and Feed). The avatar stays the public identity; the stamp is the private journal. Each card: large (the Passport header), the 44 pt nav button, and 20 px.</p>
+  <div class="grid">
+    <!-- A -->
+    <div class="opt">
+      <div class="head"><h2>A · Round stamp</h2><p>Classic entry stamp: double ring, lettering in the band. The most "passport" at large size; at nav size it is a ringed mark.</p></div>
+      <div class="pane light big ink"><svg><use href="#a-big"/></svg></div>
+      <div class="pane light"><div class="nav ink"><div class="btn"><svg><use href="#a-small"/></svg></div><div class="tiny"><svg><use href="#a-small"/></svg></div></div></div>
+      <div class="pane dark"><div class="nav ink"><div class="btn"><svg><use href="#a-small"/></svg></div><div class="tiny"><svg><use href="#a-small"/></svg></div><svg style="width:80px;height:80px"><use href="#a-big"/></svg></div></div>
+    </div>
+    <!-- B -->
+    <div class="opt">
+      <div class="head"><h2>B · Visa stamp</h2><p>Tilted rectangle with a dashed rule, the month inked inside. Playful, but the tilt fights a round bar button.</p></div>
+      <div class="pane light big ink"><svg><use href="#b-big"/></svg></div>
+      <div class="pane light"><div class="nav ink"><div class="btn"><svg><use href="#b-small"/></svg></div><div class="tiny"><svg><use href="#b-small"/></svg></div></div></div>
+      <div class="pane dark"><div class="nav ink"><div class="btn"><svg><use href="#b-small"/></svg></div><div class="tiny"><svg><use href="#b-small"/></svg></div><svg style="width:80px;height:80px"><use href="#b-big"/></svg></div></div>
+    </div>
+    <!-- C -->
+    <div class="opt">
+      <div class="head"><h2>C · Booklet</h2><p>The passport itself: charcoal cover, copper mark. Reads as "my book" and is the clearest at 20 px. Ivory cover in Dark.</p></div>
+      <div class="pane light big wheelInk" style="--paper:var(--ivory)"><svg><use href="#c-big"/></svg></div>
+      <div class="pane light" style="--paper:var(--ivory)"><div class="nav wheelInk"><div class="btn"><svg><use href="#c-small"/></svg></div><div class="tiny"><svg><use href="#c-small"/></svg></div></div></div>
+      <div class="pane dark" style="--paper:var(--charcoal)"><div class="nav wheelInk"><div class="btn"><svg><use href="#c-small"/></svg></div><div class="tiny"><svg><use href="#c-small"/></svg></div><svg style="width:80px;height:80px"><use href="#c-big"/></svg></div></div>
+    </div>
+    <!-- D -->
+    <div class="opt">
+      <div class="head"><h2>D · Month postmark</h2><p>A postmark for the current month. Inked once the month has a drive, faded before: the button tells you the month is "stamped".</p></div>
+      <div class="pane light big ink"><svg><use href="#d-big"/></svg></div>
+      <div class="pane light"><div class="nav ink"><div><div class="btn"><svg><use href="#d-small"/></svg></div><div class="label">driven</div></div><div><div class="btn"><svg><use href="#d-small-empty"/></svg></div><div class="label">not yet</div></div><div class="tiny"><svg><use href="#d-small"/></svg></div></div></div>
+      <div class="pane dark"><div class="nav ink"><div><div class="btn"><svg><use href="#d-small"/></svg></div><div class="label">driven</div></div><div><div class="btn"><svg><use href="#d-small-empty"/></svg></div><div class="label">not yet</div></div><svg style="width:80px;height:80px"><use href="#d-big"/></svg></div></div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

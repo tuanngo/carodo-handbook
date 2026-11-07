@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Auto Mode sheet</title>
+<!-- Mockup for carodo-handbook drafts/auto-mode.md. Rendered to ../drive/auto-mode.png by render.sh.
+     Ideas, not specs: the spec wins. Device names are made up. -->
+<script src="first-run-kit.js"></script>
+<style>
+  .sh { position:absolute; top:84px; left:0; right:0; bottom:0; background:var(--bg); border-radius:34px 34px 0 0; box-shadow:0 -6px 30px rgba(0,0,0,.22); overflow:hidden; }
+  .sh .grab { width:38px; height:5px; border-radius:3px; background:var(--t2); opacity:.4; margin:8px auto 0; }
+  .sh .tt { text-align:center; font-weight:700; font-size:18px; margin-top:12px; }
+  .sh .st { text-align:center; color:var(--t2); font-size:14px; margin:4px 34px 14px; line-height:1.3; }
+  .sh .xb { position:absolute; right:16px; top:18px; width:32px; height:32px; border-radius:16px; background:var(--card); color:var(--t2); display:grid; place-items:center; font-size:12px; }
+  .grp { margin:0 16px; background:var(--el); border-radius:16px; padding:0 14px; border:.5px solid color-mix(in srgb,var(--stroke) 60%,transparent); }
+  .grp .r { display:flex; align-items:center; gap:12px; min-height:50px; padding:8px 0; }
+  .grp .r + .r { border-top:.5px solid color-mix(in srgb,var(--stroke) 70%,transparent); }
+  .grp .r .ic2 { width:24px; text-align:center; color:var(--acc); font-size:17px; flex:none; }
+  .grp .r .m { flex:1; min-width:0; } .grp .r .m b { font-size:15.5px; display:block; } .grp .r .m small { color:var(--t2); font-size:13px; display:block; margin-top:1px; line-height:1.25; }
+  .grp .r .v { font-size:14px; font-weight:600; flex:none; }
+  .ok { color:var(--acc); } .no { color:var(--t2); }
+  .hdr { margin:16px 30px 6px; font-size:12px; color:var(--t2); text-transform:uppercase; letter-spacing:.35px; font-weight:600; }
+  .note { margin:6px 30px 0; font-size:12.5px; color:var(--t2); line-height:1.3; }
+  .tog { width:51px; height:31px; border-radius:16px; background:color-mix(in srgb,var(--t2) 30%,transparent); position:relative; flex:none; }
+  .tog::after { content:''; position:absolute; top:2px; left:2px; width:27px; height:27px; border-radius:14px; background:#fff; box-shadow:0 2px 4px rgba(0,0,0,.2); }
+  .tog.on { background:var(--acc); } .tog.on::after { left:22px; }
+  .pill { display:inline-flex; align-items:center; gap:6px; font-size:13px; color:var(--t2); margin-top:3px; }
+  .pill i { width:7px; height:7px; border-radius:4px; background:var(--acc); display:inline-block; }
+  .pill.off i { background:var(--t2); opacity:.5; }
+  .bigbtn { margin:10px 16px 0; height:50px; border-radius:25px; background:var(--copper); color:var(--charcoal); font-weight:600; font-size:16px; display:flex; align-items:center; justify-content:center; gap:8px; }
+  .ghost { margin:10px 16px 0; height:46px; border-radius:23px; border:1.5px solid var(--acc); color:var(--acc); font-weight:600; font-size:15px; display:flex; align-items:center; justify-content:center; gap:8px; }
+  .linkcard { margin:0 16px 10px; border-radius:16px; padding:12px 14px; background:color-mix(in srgb,var(--acc) 12%,var(--el)); border:1px solid color-mix(in srgb,var(--acc) 45%,transparent); }
+  .linkcard .q { font-size:14.5px; } .chips2 { display:flex; gap:8px; margin-top:10px; flex-wrap:wrap; }
+  .chips2 span { display:flex; align-items:center; gap:6px; padding:6px 11px 6px 7px; border-radius:16px; background:var(--card); font-size:14px; font-weight:600; border:.5px solid var(--stroke); }
+  .chips2 span.on { border:1.5px solid var(--acc); }
+  .mini { width:34px; height:22px; display:grid; place-items:center; }
+  .steps { margin:0 16px; } .step { display:flex; gap:12px; align-items:flex-start; padding:10px 0; }
+  .step .n { width:26px; height:26px; border-radius:13px; background:var(--copper); color:var(--charcoal); font-weight:700; font-size:14px; display:grid; place-items:center; flex:none; }
+  .step .s { font-size:15px; line-height:1.35; padding-top:2px; } .step .s b { font-weight:600; }
+  .bar2 { display:flex; align-items:center; gap:10px; padding:10px 16px 0; }
+  .navback { color:var(--acc); font-size:16px; display:flex; align-items:center; gap:2px; }
+</style>
+</head>
+<body>
+<script>
+const art = (style, color, w = 34) => `<span class="mini">${vehicleArt({ body: style, color, w })}</span>`;
+const vrow = (style, color, name, link, state) => `
+  <div class="r"><div class="badge sm" style="width:52px;height:40px;border-radius:12px;background:var(--card)">${art(style, color, 46)}</div>
+    <div class="m"><b>${name}</b><small>${link}</small></div><span class="v ${state === 'ok' ? 'ok' : 'no'}">${state === 'ok' ? I.check : state === 'add' ? '' : ''}</span></div>`;
+
+const sheet = ({ theme, on, status, rows, linkPrompt = false, cars, shortcut, blocked = false }) => phone(theme, `
+  <div class="map" style="opacity:.55">${mapSvg()}</div>
+  <div class="sh"><div class="grab"></div><span class="xb">${I.x}</span>
+    <div class="tt">Auto Mode</div>
+    <div class="st">Records your drives on its own, even when Carodo is closed.</div>
+    <div class="grp"><div class="r"><div class="m"><b style="font-size:16.5px">Start drives automatically</b>
+      <span class="pill ${on ? '' : 'off'}"><i></i>${status}</span></div><span class="tog ${on ? 'on' : ''}"></span></div>
+      ${blocked ? `<div class="r"><span class="ic2">${I.warn}</span><div class="m"><small style="color:var(--t1);font-size:14px">iOS can only wake Carodo with location set to Always.</small></div><span class="v ok">Open Settings</span></div>` : ''}
+    </div>
+    <div class="hdr">How it starts</div>
+    <div class="grp">
+      <div class="r"><span class="ic2">${I.loc}</span><div class="m"><b>Leaving where you parked</b><small>Location: Always</small></div><span class="v ${rows[0] ? 'ok' : 'no'}">${rows[0] ? I.check : 'Needs Always'}</span></div>
+      <div class="r"><span class="ic2">${I.motion}</span><div class="m"><b>Noticing it's a car</b><small>Motion &amp; Fitness</small></div><span class="v ${rows[1] ? 'ok' : 'no'}">${rows[1] ? I.check : 'Off'}</span></div>
+      <div class="r"><span class="ic2">${I.car}</span><div class="m"><b>When your phone connects to the car</b><small>${shortcut}</small></div><span class="v ${rows[2] ? 'ok' : 'no'}">${rows[2] ? I.check : ''}</span></div>
+    </div>
+    <div class="hdr">Your cars</div>
+    ${linkPrompt ? `<div class="linkcard"><div class="q">Connected to <b>CarNet Auto</b>. Which vehicle is it?</div>
+      <div class="chips2"><span class="on">${art('suv', 'blue', 26)}Family</span><span>${art('hatch', 'white', 26)}Weekend</span></div>
+      <div style="display:flex;justify-content:flex-end;margin-top:8px"><span style="color:var(--acc);font-weight:700">Link</span></div></div>` : ''}
+    <div class="grp">${cars.join('')}</div>
+    <div class="note">CarPlay is linked when it connects. For a car without CarPlay, connect to its Bluetooth audio once with this sheet open.</div>
+    ${rows[2] ? '' : `<div class="hdr">Launch with your car</div><div class="note" style="margin-top:0">A one-time iOS automation makes this work even when Carodo is closed.</div><div class="bigbtn">${I.auto} Set Up Automation</div>`}
+  </div>`);
+
+const steps = (theme) => phone(theme, `
+  <div class="map" style="opacity:.55">${mapSvg()}</div>
+  <div class="sh"><div class="grab"></div>
+    <div class="bar2"><span class="navback">${I.back} Auto Mode</span></div>
+    <div class="tt" style="margin-top:6px">Launch with your car</div>
+    <div class="st">Add this once in the Shortcuts app. Carodo opens and starts recording when your phone connects to the car.</div>
+    <div class="grp steps" style="padding:4px 14px">
+      <div class="step"><span class="n">1</span><span class="s">Open <b>Shortcuts</b>, tap <b>Automation</b>, then <b>+</b>.</span></div>
+      <div class="step"><span class="n">2</span><span class="s">Choose <b>CarPlay</b> → <b>Connects</b>.<br><span class="t2" style="font-size:13.5px">No CarPlay? <b>Bluetooth</b> → your car → <b>Is Connected</b>.</span></span></div>
+      <div class="step"><span class="n">3</span><span class="s">Choose <b>Run Immediately</b>.</span></div>
+      <div class="step"><span class="n">4</span><span class="s">Add the action <b>Start Drive</b> from Carodo, then <b>Done</b>.</span></div>
+    </div>
+    <div class="bigbtn" style="margin-top:16px">Open Shortcuts</div>
+    <div class="note" style="margin-top:12px">The drive takes the vehicle linked to that car, else your last one. A second start while recording does nothing.</div>
+  </div>`);
+
+mount(`<div class="sheet">
+<h1>Auto Mode sheet</h1>
+<p class="lede">Mockup for <b>drafts/auto-mode.md</b>. Opened from the Map's Auto Mode button and from Settings. One page: the switch and its status, how a drive starts, each vehicle's car audio, and the one-time Shortcuts automation. The draft wins over this picture.</p>
+<section>
+<h2>1 · States of the sheet</h2>
+<p class="sub">The status line under the switch is never "Running" without Always. Each "How it starts" row says whether that layer works, so a missing piece is visible without reading a log.</p>
+<div class="row">
+  <div>${sheet({ theme: 'light', on: false, status: 'Off', rows: [false, true, false], shortcut: 'Not set up yet',
+      cars: [vrow('suv', 'blue', 'Family', 'No car audio linked', ''), vrow('scooter', 'red', 'Daily', 'No car audio linked', '')] })}
+    <div class="cap"><b>Light · first time, off.</b> Turning it on runs the Always step here (no second sheet).</div></div>
+  <div>${sheet({ theme: 'light', on: true, status: 'Running · waiting for your car', rows: [true, true, false], shortcut: 'Not set up yet', linkPrompt: true,
+      cars: [vrow('suv', 'blue', 'Family', 'No car audio linked', ''), vrow('hatch', 'white', 'Weekend', 'No car audio linked', '')] })}
+    <div class="cap"><b>Light · running, connected to an unlinked car audio.</b> The prompt only appears while connected; Link stores it on the chosen vehicle.</div></div>
+  <div>${sheet({ theme: 'dark', on: true, status: 'Running · waiting for your car', rows: [true, true, true], shortcut: 'Set up · last used Tue 07:42',
+      cars: [vrow('suv', 'blue', 'Family', 'CarPlay · Connected', 'ok'), vrow('hatch', 'white', 'Weekend', 'Mazda BT · Not connected', ''), vrow('scooter', 'red', 'Daily', 'No car audio linked', '')] })}
+    <div class="cap"><b>Dark · all set.</b> The automation ran once, so its row is ticked and the setup button gives way.</div></div>
+</div>
+</section>
+<section>
+<h2>2 · Set Up Automation, and when Always is missing</h2>
+<p class="sub">Carodo cannot create the automation or see it; it gives four steps in the system's own words and opens Shortcuts. Blocked by location, the switch row says why and offers Settings.</p>
+<div class="row">
+  <div>${steps('light')}<div class="cap"><b>Light · the steps, pushed inside the sheet.</b></div></div>
+  <div>${sheet({ theme: 'dark', on: true, status: 'Needs location set to Always', rows: [false, true, false], shortcut: 'Not set up yet', blocked: true,
+      cars: [vrow('sedan', 'silver', 'My car', 'No car audio linked', '')] })}
+    <div class="cap"><b>Dark · on but blocked.</b> Open Settings; manual drives still work.</div></div>
+  <div class="notes">
+    <h3>Proposed copy (en · vi)</h3>
+    <ul>
+      <li>Records your drives on its own, even when Carodo is closed. · <i>Tự ghi chuyến đi, kể cả khi Carodo đang đóng.</i></li>
+      <li>Start drives automatically · <i>Tự động bắt đầu chuyến đi</i></li>
+      <li>Running · waiting for your car · <i>Đang chạy · chờ bạn lên xe</i></li>
+      <li>How it starts · <i>Cách bắt đầu</i> — Leaving where you parked · <i>Rời chỗ đỗ</i> — Noticing it's a car · <i>Nhận ra đang ở trên xe</i> — When your phone connects to the car · <i>Khi điện thoại kết nối với xe</i></li>
+      <li>Your cars · <i>Xe của bạn</i> — Connected to %@. Which vehicle is it? · <i>Đã kết nối với %@. Đây là xe nào?</i> — Link · <i>Liên kết</i></li>
+      <li>Launch with your car · <i>Mở cùng xe của bạn</i> — Set Up Automation · <i>Thiết lập tự động hoá</i> — Open Shortcuts · <i>Mở Phím tắt</i></li>
+    </ul>
+    <h3>Open questions (in the draft)</h3>
+    <ul><li>This sheet replaces the Map button's Turn Off menu?</li><li>Link from the sheet only in v1?</li><li>A manual one-tap start while connected takes the linked vehicle?</li><li>The <code>vehicle_links</code> table (P6)?</li></ul>
+  </div>
+</div>
+</section>
+</div>`);
+</script>
+</body>
+</html>

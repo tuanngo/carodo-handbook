@@ -1,0 +1,332 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Journey trim</title>
+<!-- Mockup for the Trim slice of carodo-ios docs/specs/journeys.md (decided 2026-11-05: a sheet like a
+     video editor's timeline with two handles, not "cut the start / cut the end"). Rendered to
+     ../journeys/journey-trim.png by render.sh. Ideas, not specs: the spec wins. Map, route, times and figures
+     are synthetic (P5). -->
+<script src="first-run-kit.js"></script>
+<style>
+  .tsheet { position:absolute; inset:0; display:flex; flex-direction:column; }
+  .thead { height:104px; display:flex; align-items:flex-end; justify-content:space-between; padding:0 18px 12px; font-size:17px; }
+  .thead b { font-size:17px; } .thead .save { color:var(--acc); font-weight:700; } .thead .cancel { color:var(--acc); }
+  .thead .save.off { color:var(--t2); opacity:.55; }
+  .tmap { position:relative; margin:0 16px; height:300px; border-radius:22px; overflow:hidden; background:var(--map); border:.5px solid var(--stroke); }
+  .tmap svg { width:100%; height:100%; display:block; }
+  .read { margin:16px 18px 0; display:flex; align-items:baseline; justify-content:space-between; font-variant-numeric:tabular-nums; }
+  .read .tt { font-size:26px; font-weight:700; letter-spacing:-.3px; }
+  .read .tt .ar { color:var(--t2); font-weight:500; margin:0 4px; }
+  .read .rs { color:var(--acc); font-weight:600; font-size:15px; }
+  .kept { margin:4px 18px 0; color:var(--t2); font-size:14.5px; font-variant-numeric:tabular-nums; }
+  .kept b { color:var(--t1); font-weight:600; }
+  .tl { position:relative; margin:46px 16px 0; height:64px; }
+  .tl svg { position:absolute; inset:0; width:100%; height:100%; overflow:visible; }
+  .ticks { display:flex; justify-content:space-between; margin:6px 22px 0; color:var(--t2); font-size:11.5px; font-variant-numeric:tabular-nums; }
+  .bubble { position:absolute; top:-40px; transform:translateX(-50%); padding:5px 10px; border-radius:11px; font-size:14px; font-weight:700; font-variant-numeric:tabular-nums;
+    background:var(--t1); color:var(--bg); white-space:nowrap; z-index:3; }
+  .bubble::after { content:''; position:absolute; left:50%; bottom:-5px; margin-left:-5px; border:5px solid transparent; border-bottom:0; border-top-color:var(--t1); }
+  .chips { display:flex; gap:8px; margin:18px 16px 0; flex-wrap:wrap; }
+  .chipb { display:inline-flex; align-items:center; gap:6px; padding:8px 13px; border-radius:17px; font-size:14px; font-weight:600; background:var(--el); border:.5px solid var(--stroke); }
+  .chipb.on { background:color-mix(in srgb,var(--acc) 15%,var(--card)); color:var(--acc); border-color:color-mix(in srgb,var(--acc) 40%,transparent); }
+  .tfoot { margin:26px 18px 0; color:var(--t2); font-size:13px; line-height:1.35; text-align:center; }
+  .glass { position:absolute; left:12px; right:12px; bottom:34px; border-radius:26px; padding:14px 4px 14px; z-index:6; }
+  .glass .read { margin:0 14px; } .glass .kept { margin:2px 14px 0; } .glass .tl { margin:44px 12px 0; } .glass .ticks { margin:6px 18px 0; }
+  .fullhead { position:absolute; top:56px; left:12px; right:12px; height:46px; border-radius:23px; display:flex; align-items:center; justify-content:space-between; padding:0 16px; z-index:6; font-size:16px; }
+  .fullhead .save { color:var(--acc); font-weight:700; }
+  .ax .read { flex-direction:column; align-items:flex-start; gap:4px; } .ax .read .tt { font-size:34px; } .ax .read .rs { font-size:20px; }
+  .ax .kept { font-size:19px; } .ax .thead { font-size:21px; } .ax .thead b { font-size:21px; } .ax .ticks { font-size:15px; } .ax .tfoot { font-size:17px; }
+  .ax .tmap { height:220px; }
+  .pill2 { display:inline-flex; align-items:center; gap:6px; padding:6px 11px; border-radius:14px; background:var(--el); border:.5px solid var(--stroke); font-size:13.5px; font-weight:600; color:var(--t2); }
+  .ftiles { display:flex; gap:8px; margin:14px 16px 0; }
+  .ftiles div { flex:1; background:var(--el); border-radius:14px; padding:9px 11px; border:.5px solid color-mix(in srgb,var(--stroke) 60%,transparent); font-variant-numeric:tabular-nums; }
+  .ftiles small { display:block; font-size:11px; color:var(--t2); text-transform:uppercase; letter-spacing:.4px; font-weight:600; }
+  .ftiles b { display:block; font-size:21px; margin-top:1px; } .ftiles b span { font-size:13px; font-weight:600; color:var(--t2); }
+  .ftiles i { display:block; font-style:normal; font-size:13px; font-weight:700; color:var(--acc); margin-top:1px; }
+  .ftiles i.none { color:transparent; }
+  .ends { display:flex; align-items:center; gap:8px; margin:12px 16px 0; }
+  .ends div { flex:1; background:var(--el); border-radius:14px; padding:8px 12px; border:.5px solid color-mix(in srgb,var(--stroke) 60%,transparent); font-variant-numeric:tabular-nums; }
+  .ends small { display:block; font-size:11px; color:var(--t2); text-transform:uppercase; letter-spacing:.4px; font-weight:600; }
+  .ends b { font-size:19px; } .ends .was { color:var(--t2); font-size:13px; font-weight:500; margin-left:6px; text-decoration:line-through; }
+  .chips.scroll { flex-wrap:nowrap; overflow:hidden; margin-top:14px; }
+  .chips.scroll .chipb { white-space:nowrap; flex:none; }
+</style>
+</head>
+<body>
+<script>
+I.scissors = '<svg class="ic" viewBox="0 0 24 24"><circle cx="6" cy="7" r="2.6"/><circle cx="6" cy="17" r="2.6"/><path d="M8.2 8.4L20 17M8.2 15.6L20 7"/></svg>';
+I.walk = '<svg class="ic" viewBox="0 0 24 24"><circle cx="13" cy="4" r="2" fill="currentColor"/><path d="M9 21l2.5-6 3 2.5V21M11.5 15l1-5.5 3.5 3 2.5.5M12.5 9.5l-3.5 1.5-1.5 3"/></svg>';
+I.reset = '<svg class="ic" viewBox="0 0 24 24"><path d="M4 12a8 8 0 1 0 2.4-5.7"/><path d="M4 4v5h5"/></svg>';
+I.pin = '<svg class="ic fill" viewBox="0 0 24 24"><path d="M12 2.5a6.5 6.5 0 0 0-6.5 6.5c0 4.8 6.5 12.5 6.5 12.5s6.5-7.7 6.5-12.5A6.5 6.5 0 0 0 12 2.5z"/><circle cx="12" cy="9" r="2.4" fill="var(--el)"/></svg>';
+
+// A drive of 07:38 → 08:24 (46 min), synthetic: a walk to the car, the drive with two stops, a
+// walk at the end. Speeds 0..1, sampled across the timeline.
+const N = 120;
+const speed = Array.from({ length: N }, (_, i) => {
+  const t = i / (N - 1);
+  if (t < 0.07) return 0.05 + 0.03 * Math.sin(i);            // walking to the car
+  if (t > 0.94) return 0.05 + 0.03 * Math.sin(i * 1.7);      // walking from it
+  if (Math.abs(t - 0.38) < 0.03 || Math.abs(t - 0.71) < 0.025) return 0.02; // stops
+  return 0.35 + 0.35 * Math.sin(t * 9) ** 2 + 0.2 * Math.sin(t * 31) ** 2;
+});
+const stops = [0.38, 0.71];
+const clock = (t) => { const m = Math.round(38 + 46 * t); return `0${7 + Math.floor(m / 60)}:${String(m % 60).padStart(2, '0')}`; };
+
+// The timeline: a speed profile, the part outside the handles dimmed, a Copper frame with two grips.
+// lo/hi are 0..1. drag: 'lo' | 'hi' | ''. snap: show stop ticks.
+const timeline = ({ lo = 0, hi = 1, drag = '', marks = true, playhead = null, W = 358, H = 64 }) => {
+  const pad = 14, iw = W - 2 * pad, x = (t) => pad + iw * t;
+  const pts = speed.map((v, i) => `${x(i / (N - 1)).toFixed(1)},${(H - 8 - v * (H - 18)).toFixed(1)}`);
+  const area = `M${x(0)},${H - 8} L${pts.join(' L')} L${x(1)},${H - 8} Z`;
+  const grip = (t, side) => {
+    const gx = side === 'l' ? x(t) - pad : x(t);
+    const on = drag === (side === 'l' ? 'lo' : 'hi');
+    return `<rect x="${gx}" y="0" width="${pad}" height="${H}" rx="${side === 'l' ? '9' : '9'}" fill="var(--copper)"/>
+      <path d="${side === 'l' ? `M${gx + 8.5} ${H / 2 - 7} l-4 7 4 7` : `M${gx + 5.5} ${H / 2 - 7} l4 7 -4 7`}" stroke="var(--charcoal)" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+      ${on ? `<rect x="${gx - 3}" y="-3" width="${pad + 6}" height="${H + 6}" rx="11" fill="none" stroke="color-mix(in srgb,var(--copper) 45%,transparent)" stroke-width="3"/>` : ''}`;
+  };
+  return `<div class="tl"><svg viewBox="0 0 ${W} ${H}">
+    <rect x="${pad}" y="0" width="${iw}" height="${H}" rx="6" fill="var(--card)"/>
+    <path d="${area}" fill="color-mix(in srgb,var(--acc) 30%,transparent)" stroke="var(--acc)" stroke-width="1.3"/>
+    ${marks ? stops.map(s => `<path d="M${x(s)} 6 V${H - 6}" stroke="var(--t2)" stroke-width="1.2" stroke-dasharray="2 3"/>`).join('') : ''}
+    <rect x="${pad}" y="0" width="${Math.max(0, x(lo) - pad)}" height="${H}" fill="var(--bg)" opacity=".72"/>
+    <rect x="${x(hi)}" y="0" width="${Math.max(0, x(1) - x(hi))}" height="${H}" fill="var(--bg)" opacity=".72"/>
+    <rect x="${x(lo)}" y="1.5" width="${x(hi) - x(lo)}" height="${H - 3}" fill="none" stroke="var(--copper)" stroke-width="3"/>
+    ${playhead !== null ? `<rect x="${x(playhead) - 1.5}" y="-4" width="3" height="${H + 8}" rx="1.5" fill="var(--t1)"/>` : ''}
+    ${grip(lo, 'l')}${grip(hi, 'r')}
+  </svg>${drag ? `<div class="bubble" style="left:${(x(drag === 'lo' ? lo : hi) / W) * 100}%">${clock(drag === 'lo' ? lo : hi)}</div>` : ''}</div>`;
+};
+const ticks = () => `<div class="ticks"><span>07:38</span><span>07:50</span><span>08:01</span><span>08:13</span><span>08:24</span></div>`;
+
+// The route on the map: kept part speed-coloured (Copper here), trimmed ends faint and dashed,
+// start and end markers on the new ends. Markers are placed after mount (getPointAtLength).
+const trackD = 'M70 250 C 90 240 105 215 120 200 S 150 150 190 140 S 250 120 270 95 S 300 60 330 55';
+const trimMap = ({ lo = 0, hi = 1, car = null, h = 300 }) => `
+  <svg viewBox="0 0 358 ${h}" preserveAspectRatio="xMidYMid slice">
+    ${mapSvg().replace(/^\s*<svg[^>]*>|<\/svg>\s*$/g, '')}
+    <path d="${trackD}" pathLength="100" fill="none" stroke="var(--t2)" stroke-width="4" stroke-dasharray="1.2 1.6" stroke-linecap="round" opacity=".7"/>
+    <path class="keep" data-lo="${lo}" data-hi="${hi}" data-car="${car ?? ''}" d="${trackD}" pathLength="100" fill="none" stroke="var(--ivory)" stroke-width="9" stroke-linecap="round"
+      stroke-dasharray="0 ${lo * 100} ${(hi - lo) * 100} 100"/>
+    <path d="${trackD}" pathLength="100" fill="none" stroke="var(--acc)" stroke-width="5.5" stroke-linecap="round"
+      stroke-dasharray="0 ${lo * 100} ${(hi - lo) * 100} 100"/>
+  </svg>`;
+
+const sheetHead = (save = true) => `<div class="thead"><span class="cancel">Cancel</span><b>Trim Journey</b><span class="save ${save ? '' : 'off'}">Save</span></div>`;
+const readout = ({ lo, hi, reset = true }) => `
+  <div class="read"><span class="tt">${clock(lo)}<span class="ar">→</span>${clock(hi)}</span>${reset ? `<span class="rs">${I.reset} Reset</span>` : ''}</div>
+  <div class="kept">Keeps <b>${(Math.round(186 * (hi - lo)) / 10).toFixed(1)} of 18.6 km</b> · <b>${Math.round(46 * (hi - lo))} of 46 min</b></div>`;
+
+// A · Photos-style: map above, the timeline with a Copper frame below.
+const variantA = ({ theme, lo = 0, hi = 1, drag = '', ax = false }) => phone(theme + (ax ? ' ax' : ''), `
+  <div class="tsheet">
+    ${sheetHead(lo > 0 || hi < 1)}
+    <div class="tmap">${trimMap({ lo, hi, car: drag ? (drag === 'lo' ? lo : hi) : null, h: ax ? 220 : 300 })}</div>
+    ${readout({ lo, hi, reset: lo > 0 || hi < 1 })}
+    ${timeline({ lo, hi, drag })}
+    ${ticks()}
+    <div class="tfoot">Only the journey's ends change. The GPS track is kept, so you can undo the trim any time.</div>
+  </div>`);
+
+// B · Smart ends: chips that place the handles at the walk and the stops; handles snap there.
+const variantB = ({ theme, lo, hi, chip = '' }) => phone(theme, `
+  <div class="tsheet">
+    ${sheetHead(true)}
+    <div class="tmap">${trimMap({ lo, hi })}</div>
+    ${readout({ lo, hi })}
+    ${timeline({ lo, hi })}
+    ${ticks()}
+    <div class="chips">
+      <span class="chipb ${chip === 'walk' ? 'on' : ''}">${I.walk} Leave out the walks</span>
+      <span class="chipb">${I.pin} Start after the stop at 07:56</span>
+    </div>
+    <div class="tfoot">Handles snap to a stop or the moment the car moved, with a tap of haptics.</div>
+  </div>`);
+
+// C · Full-screen map with the timeline in a glass card; scrubbing moves a dot along the route.
+const variantC = ({ theme, lo, hi, play }) => phone(theme, `
+  <div class="map"><svg viewBox="0 0 390 844" preserveAspectRatio="xMidYMid slice">
+    ${mapSvg().replace(/^\s*<svg[^>]*>|<\/svg>\s*$/g, '')}
+    <g transform="translate(10 230) scale(1.05)">
+      <path d="${trackD}" pathLength="100" fill="none" stroke="var(--t2)" stroke-width="4" stroke-dasharray="1.2 1.6" opacity=".7" stroke-linecap="round"/>
+      <path class="keep" data-lo="${lo}" data-hi="${hi}" data-car="${play}" d="${trackD}" pathLength="100" fill="none" stroke="var(--ivory)" stroke-width="9" stroke-linecap="round" stroke-dasharray="0 ${lo * 100} ${(hi - lo) * 100} 100"/>
+      <path d="${trackD}" pathLength="100" fill="none" stroke="var(--acc)" stroke-width="5.5" stroke-linecap="round" stroke-dasharray="0 ${lo * 100} ${(hi - lo) * 100} 100"/>
+    </g></svg></div>
+  <div class="fullhead float"><span class="acc">Cancel</span><b>Trim Journey</b><span class="save">Save</span></div>
+  <div class="glass float">
+    ${readout({ lo, hi })}
+    ${timeline({ lo, hi, playhead: play, W: 342 })}
+    ${ticks()}
+  </div>`);
+
+// The detail page after a trim: the figures are the trimmed ones, one quiet line says so.
+const detailAfter = (theme) => phone(theme, `
+  <div class="dmap"><svg viewBox="0 0 390 470" preserveAspectRatio="xMidYMid slice">
+    ${mapSvg().replace(/^\s*<svg[^>]*>|<\/svg>\s*$/g, '')}
+    <g transform="translate(20 60) scale(1.0)"><path class="keep" data-lo=".07" data-hi=".94" d="${trackD}" pathLength="100" fill="none" stroke="var(--acc)" stroke-width="6" stroke-linecap="round" stroke-dasharray="0 7 87 100"/></g>
+  </svg></div>
+  <div class="nav" style="top:50px"><span class="navbtn float">${I.back}</span><span class="navbtn float">${I.dots}</span></div>
+  <div class="dsheet">
+    <h2>Home → Work</h2>
+    <div class="when">Tue 3 Nov · 07:41 – 08:21</div>
+    <div class="tiles"><div><b>16.2 km</b><small>GPS distance</small></div><div><b>40 min</b><small>Drive time</small></div><div><b>24 km/h</b><small>Avg speed</small></div></div>
+    <div style="display:flex;align-items:center;gap:8px;color:var(--t2);font-size:14px">${I.scissors}<span>Trimmed · 2.4 km and 6 min left out</span><span style="flex:1"></span><span class="acc" style="font-weight:600">Edit</span></div>
+  </div>`);
+
+const menuShot = (theme) => phone(theme, `
+  <div class="dmap"><svg viewBox="0 0 390 470" preserveAspectRatio="xMidYMid slice">${mapSvg().replace(/^\s*<svg[^>]*>|<\/svg>\s*$/g, '')}
+    <g transform="translate(20 60)"><path d="${trackD}" fill="none" stroke="var(--acc)" stroke-width="6" stroke-linecap="round"/></g></svg></div>
+  <div class="nav" style="top:50px"><span class="navbtn float">${I.back}</span><span class="navbtn float">${I.dots}</span></div>
+  <div class="menu" style="right:16px;top:104px">
+    <div>Edit<span class="mi">✎</span></div>
+    <div>Trim<span class="mi">${I.scissors}</span></div>
+    <div>Merge with Previous Drive<span class="mi">⤝</span></div>
+    <div class="sep" style="color:#D9534A">Delete<span class="mi" style="color:#D9534A">🗑</span></div>
+  </div>
+  <div class="dsheet"><h2>Home → Work</h2><div class="when">Tue 3 Nov · 07:38 – 08:24</div></div>`);
+
+
+I.house = '<svg class="ic fill" viewBox="0 0 24 24"><path d="M12 3.2l9 7.6h-2.6V20h-4.6v-5.6h-3.6V20H5.6v-9.2H3z"/></svg>';
+const band = (v) => v < 0.12 ? null : v < 0.38 ? '#5C9EDB' : v < 0.62 ? '#54BD85' : v < 0.82 ? '#F2B840' : '#E36B45';
+
+// Revision 2 timeline: one bar per ~25 s, speed-coloured inside the frame (the same bands as the
+// route), grey outside; a stop or a walk is a run of short grey-blue bars.
+const barTimeline = ({ lo = 0, hi = 1, drag = '', W = 358, H = 64 }) => {
+  const pad = 14, iw = W - 2 * pad, x = (t) => pad + iw * t, M = 60, bw = iw / M;
+  const bars = Array.from({ length: M }, (_, i) => {
+    const t = (i + .5) / M, v = speed[Math.round(t * (N - 1))], h = 4 + v * (H - 22), inside = t >= lo && t <= hi;
+    const c = inside ? (band(v) || '#5C9EDB') : 'color-mix(in srgb,var(--t2) 40%,transparent)';
+    return `<rect x="${(pad + i * bw + .8).toFixed(1)}" y="${(H - 9 - h).toFixed(1)}" width="${(bw - 1.6).toFixed(1)}" height="${h.toFixed(1)}" rx="1" fill="${c}"/>`;
+  }).join('');
+  const grip = (t, side) => {
+    const gx = side === 'l' ? x(t) - pad : x(t), on = drag === (side === 'l' ? 'lo' : 'hi');
+    return `<rect x="${gx}" y="0" width="${pad}" height="${H}" rx="9" fill="var(--copper)"/>
+      <path d="${side === 'l' ? `M${gx + 8.5} ${H / 2 - 7} l-4 7 4 7` : `M${gx + 5.5} ${H / 2 - 7} l4 7 -4 7`}" stroke="var(--charcoal)" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+      ${on ? `<rect x="${gx - 3}" y="-3" width="${pad + 6}" height="${H + 6}" rx="11" fill="none" stroke="color-mix(in srgb,var(--copper) 45%,transparent)" stroke-width="3"/>` : ''}`;
+  };
+  return `<div class="tl"><svg viewBox="0 0 ${W} ${H}">
+    <rect x="${pad}" y="0" width="${iw}" height="${H}" rx="6" fill="var(--card)"/>
+    ${bars}
+    <rect x="${x(lo)}" y="1.5" width="${x(hi) - x(lo)}" height="${H - 3}" fill="none" stroke="var(--copper)" stroke-width="3"/>
+    ${grip(lo, 'l')}${grip(hi, 'r')}
+  </svg>${drag ? `<div class="bubble" style="left:${(x(drag === 'lo' ? lo : hi) / W) * 100}%">${clock(drag === 'lo' ? lo : hi)}</div>` : ''}</div>`;
+};
+
+// Figures: the trimmed value, and under it what the trim takes away, in Copper (not red: leaving
+// something out is a choice, not an error). Nothing under a figure that did not change.
+const figTiles = ({ lo, hi }) => {
+  const changed = lo > 0 || hi < 1, k = hi - lo;
+  const km = (Math.round(186 * k) / 10).toFixed(1), dkm = (18.6 - km).toFixed(1);
+  const drive = Math.round(38 * Math.min(1, k + .03)), total = Math.round(46 * k);
+  return `<div class="ftiles">
+    <div><small>GPS distance</small><b>${km} <span>km</span></b><i class="${changed ? '' : 'none'}">−${dkm} km</i></div>
+    <div><small>Drive time</small><b>${drive} <span>min</span></b><i class="${changed && drive < 38 ? '' : 'none'}">−${38 - drive} min</i></div>
+    <div><small>Total</small><b>${total} <span>min</span></b><i class="${changed ? '' : 'none'}">−${46 - total} min</i></div>
+  </div>`;
+};
+const endsRow = ({ lo, hi }) => `<div class="ends">
+  <div><small>Starts</small><b>${clock(lo)}</b>${lo > 0 ? `<span class="was">07:38</span>` : ''}</div><span class="t2">→</span>
+  <div><small>Ends</small><b>${clock(hi)}</b>${hi < 1 ? `<span class="was">08:24</span>` : ''}</div></div>`;
+const chipRow = (on = '') => `<div class="chips scroll">
+  <span class="chipb ${on === 'home' ? 'on' : ''}">${I.house} After leaving Home</span>
+  <span class="chipb ${on === 'walk' ? 'on' : ''}">${I.walk} Leave out the walks</span>
+  <span class="chipb">${I.pin} After the stop at 07:56</span></div>`;
+
+// The chosen sheet: A's layout, B's chips, the figures with what the trim takes away.
+const chosen = ({ theme, lo = 0, hi = 1, drag = '', chip = '', ax = false }) => phone(theme + (ax ? ' ax' : ''), `
+  <div class="tsheet">
+    ${sheetHead(lo > 0 || hi < 1)}
+    <div class="tmap" style="height:${ax ? 170 : 250}px">${trimMap({ lo, hi, car: drag ? (drag === 'lo' ? lo : hi) : null, h: ax ? 170 : 250 })}</div>
+    ${figTiles({ lo, hi })}
+    ${barTimeline({ lo, hi, drag })}
+    ${ticks()}
+    ${endsRow({ lo, hi })}
+    ${chipRow(chip)}
+    <div class="tfoot" style="margin-top:16px">${lo > 0 || hi < 1 ? `<span class="acc" style="font-weight:600">${I.reset} Reset</span>` : 'The GPS track is kept: you can undo a trim any time.'}</div>
+  </div>`);
+
+mount(`<div class="sheet">
+<h1>Journey · Trim timeline</h1>
+<p class="lede">⋯ → Trim opens a sheet like a video editor: the drive as a timeline (its speed profile), two Copper handles for where it starts and ends, the map showing what stays. Non-destructive: <code>trim_start_at</code> and <code>trim_end_at</code>, the raw samples untouched. Three directions were drawn and A with B's chips was chosen; synthetic drive 07:38 → 08:24 with a walk at each end and two stops.</p>
+<section>
+<h2>Chosen (2026-11-05) · A with B's chips, figures before and after</h2>
+<p class="sub">A's layout. Each figure shows the trimmed value, and under it in Copper what the trim takes away (−2.4 km); nothing under a figure that did not change. The timeline is a bar per ~25 s in the route's speed colours inside the frame, grey outside. Starts and Ends show the new time with the old one struck through. Chips place the handles: <b>After leaving Home</b> (the first fix outside a saved place, private or not), <b>Leave out the walks</b> (departure and arrival), <b>After the stop at 07:56</b>; the handles snap to the same points.</p>
+<div class="row">
+  <div>${chosen({ theme: 'light' })}<div class="cap"><b>Light · opened.</b> Save off, no deltas.</div></div>
+  <div>${chosen({ theme: 'light', lo: .07, hi: .94, drag: 'lo' })}<div class="cap"><b>Light · dragging the start.</b> Figures and Starts follow the handle live.</div></div>
+  <div>${chosen({ theme: 'dark', lo: .07, hi: .94, chip: 'home' })}<div class="cap"><b>Dark · "After leaving Home".</b> The start moves to the edge of Home's circle; the end stays.</div></div>
+  <div>${chosen({ theme: 'light', lo: .07, hi: .94, ax: true })}<div class="cap"><b>AX.</b> The map shortens; the timeline keeps its height.</div></div>
+</div>
+</section>
+<h2 style="font-size:16px;color:var(--stone);margin:0 0 18px">Explored before the choice</h2>
+
+
+<section>
+<h2>A · Photos-style: map above, timeline below (recommended)</h2>
+<p class="sub">The familiar iOS trim: a Copper frame around what is kept, the rest dimmed. While a handle moves, a bubble shows its time and a dot rides the route on the map. Save is off until something changes; Reset puts the ends back.</p>
+<div class="row">
+  <div>${menuShot('light')}<div class="cap"><b>Entry.</b> ⋯ → Trim, between Edit and Merge.</div></div>
+  <div>${variantA({ theme: 'light' })}<div class="cap"><b>Light · opened.</b> Handles at the very ends, Save off.</div></div>
+  <div>${variantA({ theme: 'light', lo: .07, hi: .94, drag: 'lo' })}<div class="cap"><b>Light · dragging the start.</b> Bubble with the time; the map's start marker follows.</div></div>
+  <div>${variantA({ theme: 'dark', lo: .07, hi: .94 })}<div class="cap"><b>Dark · trimmed.</b> "Keeps 16.2 of 18.6 km · 40 of 46 min".</div></div>
+</div>
+</section>
+
+<section>
+<h2>B · Smart ends: A plus one-tap suggestions</h2>
+<p class="sub">Carodo already knows when the car really left and arrived (<code>departed_at</code>, <code>arrived_at</code>) and where it stopped. Chips place the handles there; a dragged handle snaps to them with a haptic tick.</p>
+<div class="row">
+  <div>${variantB({ theme: 'light', lo: .07, hi: .94, chip: 'walk' })}<div class="cap"><b>Light · "Leave out the walks" on.</b> Both handles jump to departure and arrival.</div></div>
+  <div>${variantB({ theme: 'dark', lo: .41, hi: .94 })}<div class="cap"><b>Dark · start after the first stop.</b> The handle snapped to the stop (dashed tick).</div></div>
+  <div class="notes">
+    <h3>Why consider it</h3>
+    <ul><li>The usual reason to trim is the walk to and from the car or a stop before the real drive; one tap does it.</li>
+    <li>Snapping makes the handles precise on a 46 min drive squeezed into 330 pt.</li></ul>
+    <h3>Cost</h3>
+    <ul><li>Two more lines of copy and a rule for which stops get a chip (at most two).</li></ul>
+  </div>
+</div>
+</section>
+
+<section>
+<h2>C · Full-screen map, timeline in a glass card</h2>
+<p class="sub">The map fills the sheet, the timeline floats at the bottom. Touching the timeline outside the handles scrubs a white playhead and a dot along the route, to find the exact point to cut. More room for the map, less for the figures.</p>
+<div class="row">
+  <div>${variantC({ theme: 'light', lo: .07, hi: .94, play: .5 })}<div class="cap"><b>Light · scrubbing.</b> The playhead at 08:01, the dot on the route.</div></div>
+  <div>${variantC({ theme: 'dark', lo: .2, hi: .8, play: .2 })}<div class="cap"><b>Dark · trimmed both ends.</b></div></div>
+</div>
+</section>
+
+<section>
+<h2>After saving · Largest Dynamic Type</h2>
+<p class="sub">The detail shows the trimmed journey: title, times and every figure from the kept part. One quiet line says it was trimmed and opens the sheet again. At accessibility sizes the readout stacks and the map shortens; the timeline keeps its height (it is a control, not text).</p>
+<div class="row">
+  <div>${detailAfter('light')}<div class="cap"><b>Detail after the trim.</b> 07:41 – 08:21, 16.2 km.</div></div>
+  <div>${variantA({ theme: 'dark', lo: .07, hi: .94, ax: true })}<div class="cap"><b>AX · Dark.</b></div></div>
+  <div class="notes">
+    <h3>To decide before code</h3>
+    <ul>
+      <li><b>Which figures change?</b> Proposed: everything the journal shows (distance, times, speeds, map, totals, Passport) is the kept part; the samples outside stay on the device and come back with Reset.</li>
+      <li><b>Shortest kept drive:</b> proposed the same as a kept drive (500 m or 2 min; bicycle 200 m or 1 min); the handles stop there.</li>
+      <li><b>Joined or merged journeys:</b> one timeline across the parts, the waits drawn as gaps; trim only the outer ends (cutting inside is Split here).</li>
+      <li><b>Share:</b> the privacy zone still trims shared routes on top of this.</li>
+    </ul>
+  </div>
+</div>
+</section>
+</div>`);
+
+// Start, end and the moving dot on each kept route.
+document.querySelectorAll('path.keep').forEach(p => {
+  const L = p.getTotalLength();
+  const at = (t) => p.getPointAtLength(L * t);
+  const g = p.parentNode, ns = 'http://www.w3.org/2000/svg';
+  const dot = (pt, fill, stroke, r = 6.5) => { const c = document.createElementNS(ns, 'circle'); c.setAttribute('cx', pt.x); c.setAttribute('cy', pt.y); c.setAttribute('r', r);
+    c.setAttribute('fill', fill); c.setAttribute('stroke', stroke); c.setAttribute('stroke-width', 3); g.appendChild(c); };
+  dot(at(+p.dataset.lo), 'var(--ivory)', 'var(--charcoal)');
+  dot(at(+p.dataset.hi), 'var(--charcoal)', 'var(--ivory)');
+  if (p.dataset.car !== '' && p.dataset.car !== undefined) dot(at(+p.dataset.car), 'var(--copper)', 'var(--ivory)', 8);
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,233 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>First run · Day 0</title>
+<!-- Mockup for carodo-ios docs/specs/onboarding.md (Steps 4–6), garage.md, navigation.md, passport.md (Settings).
+     Rendered to ../onboarding/first-run-day0.png by render.sh. Ideas, not specs: the spec wins.
+     Revision 2 (2026-11-03, owner review): step 4 is Name + Type only; units move to Settings; the Garage is a
+     carousel of large vehicle cards with a drawing by body style and colour; a standing Auto Mode button on the Map. -->
+<script src="first-run-kit.js"></script>
+<style>
+  .carousel { position:absolute; top:150px; left:0; right:0; display:flex; gap:12px; padding:0 24px; }
+  .gcard { width:330px; flex:none; border-radius:26px; background:var(--el); border:.5px solid color-mix(in srgb,var(--stroke) 60%,transparent); overflow:hidden; box-shadow:var(--shadow); }
+  .gcard .hero { height:170px; display:grid; place-items:center; position:relative; }
+  .gcard .hero .more { position:absolute; right:12px; top:12px; width:32px; height:32px; border-radius:16px; background:var(--card); display:grid; place-items:center; color:var(--t2); }
+  .gcard .body { padding:14px 16px 16px; }
+  .gcard h3 { margin:0; font-size:22px; } .gcard .meta { color:var(--t2); font-size:14px; margin-top:2px; }
+  .figs { display:flex; gap:8px; margin-top:12px; }
+  .figs div { flex:1; background:var(--card); border-radius:12px; padding:8px 10px; }
+  .figs b { display:block; font-size:17px; font-variant-numeric:tabular-nums; } .figs small { font-size:11px; color:var(--t2); text-transform:uppercase; letter-spacing:.3px; font-weight:600; }
+  .bars { display:flex; align-items:flex-end; gap:5px; height:46px; margin-top:12px; }
+  .bars i { flex:1; background:var(--acc); border-radius:2px; opacity:.85; } .bars i.z { height:2px !important; opacity:.3; }
+  .odo { display:flex; justify-content:space-between; font-size:13px; color:var(--t2); margin-top:10px; border-top:.5px solid color-mix(in srgb,var(--stroke) 70%,transparent); padding-top:10px; }
+  .odo b { color:var(--t1); font-variant-numeric:tabular-nums; }
+  .addcard { width:330px; flex:none; border-radius:26px; border:1.5px dashed color-mix(in srgb,var(--t2) 50%,transparent); display:flex; flex-direction:column; align-items:center; justify-content:center; color:var(--acc); font-weight:600; gap:8px; }
+  .pdots { position:absolute; left:0; right:0; display:flex; justify-content:center; gap:7px; }
+  .pdots i { width:7px; height:7px; border-radius:4px; background:var(--t2); opacity:.35; } .pdots i.on { opacity:1; background:var(--t1); }
+  .sheetf { position:absolute; top:58px; left:0; right:0; bottom:0; background:var(--bg); border-radius:14px 14px 0 0; box-shadow:0 -4px 30px rgba(0,0,0,.2); }
+  .sheetf .grab { width:38px; height:5px; border-radius:3px; background:var(--t2); opacity:.4; margin:7px auto 0; }
+  .sheetf .tb { display:flex; justify-content:space-between; align-items:center; padding:10px 18px 6px; font-size:17px; }
+  .gl { margin:0 16px; background:var(--el); border-radius:12px; padding:0 14px; }
+  .gl .r { display:flex; align-items:center; min-height:46px; gap:10px; font-size:16px; }
+  .gl .r + .r { border-top:.5px solid color-mix(in srgb,var(--stroke) 70%,transparent); }
+  .gl .r .k { flex:1; } .gl .r .v { color:var(--t2); }
+  .gh { margin:16px 30px 6px; font-size:12.5px; color:var(--t2); text-transform:uppercase; letter-spacing:.3px; }
+  .chips { display:flex; flex-wrap:wrap; gap:6px; padding:10px 0; }
+  .chips span { padding:6px 11px; border-radius:15px; background:var(--card); font-size:14px; border:.5px solid var(--stroke); }
+  .chips span.on { background:color-mix(in srgb,var(--acc) 18%,var(--card)); border-color:var(--acc); color:var(--acc); font-weight:600; }
+  .sw { display:flex; gap:8px; padding:11px 0; flex-wrap:wrap; }
+  .sw i { width:26px; height:26px; border-radius:13px; border:.5px solid rgba(0,0,0,.2); } .sw i.on { box-shadow:0 0 0 2px var(--bg),0 0 0 4px var(--acc); }
+  .dark .sw i { border-color:rgba(255,255,255,.28); }
+  .autobtn.on { color:var(--acc); } .autobtn.off { color:var(--t2); }
+</style>
+</head>
+<body>
+<script>
+const artBadge = (kind, color) => `<div class="badge" style="width:64px;height:52px;border-radius:16px;background:var(--card)">${vehicleArt({ body: kind === 'moto' ? 'scooter' : 'sedan', color, w: 58 })}</div>`;
+const swatches = (on) => `<div class="sw" style="padding:4px 0;gap:0;flex-wrap:nowrap;justify-content:space-between;flex:1">${Object.entries(paint).map(([k, c]) => `<i class="${k === on ? 'on' : ''}" style="background:${c};width:24px;height:24px"></i>`).join('')}</div>`;
+const tile = (kind, on, color, ax) => `<div style="flex:1;border-radius:16px;padding:${ax ? 12 : 10}px 8px 8px;text-align:center;background:${on ? 'color-mix(in srgb,var(--acc) 12%,var(--card))' : 'var(--card)'};border:${on ? '2px solid var(--acc)' : '.5px solid var(--stroke)'}">
+  <div style="height:${ax ? 64 : 54}px;display:grid;place-items:center">${vehicleArt({ body: kind === 'moto' ? 'scooter' : 'sedan', color: on ? color : 'silver', w: ax ? 120 : 110 })}</div>
+  <div style="font-size:${ax ? 22 : 14}px;font-weight:600;color:${on ? 'var(--acc)' : 'var(--t2)'};margin-top:2px">${kind === 'moto' ? 'Motorbike' : 'Car'}</div></div>`;
+const kb = (dark) => `<div style="position:absolute;left:0;right:0;bottom:0;height:300px;background:${dark ? '#2b2b2d' : '#d1d3d9'};padding:10px 4px 0;z-index:25">
+  ${['qwertyuiop', 'asdfghjkl', 'zxcvbnm'].map((r, n) => `<div style="display:flex;justify-content:center;gap:6px;margin:0 0 11px ${n === 1 ? 0 : 0}px">${[...r].map(c => `<span style="width:${n === 2 ? 30 : 33}px;height:42px;border-radius:6px;background:${dark ? '#6b6b6e' : '#fff'};color:${dark ? '#fff' : '#000'};display:grid;place-items:center;font-size:20px">${c}</span>`).join('')}</div>`).join('')}
+  <div style="display:flex;gap:6px;padding:0 4px"><span style="flex:1;height:42px;border-radius:6px;background:${dark ? '#6b6b6e' : '#fff'}"></span><span style="width:92px;height:42px;border-radius:6px;background:#0a84ff;color:#fff;display:grid;place-items:center;font-size:16px">done</span></div></div>`;
+const step4 = ({ theme, kind = 'car', name = '', ax = false, color = 'silver', keyboard = false }) => phone(theme + (ax ? ' ax' : ''), `
+<div class="ob">
+  <div class="top"><span class="acc" style="font-size:22px">${I.back}</span>
+    <div class="dots"><i></i><i></i><i></i><i class="on"></i><i></i><i></i></div><span style="width:22px"></span></div>
+  ${keyboard || ax ? '' : `<div class="wheelwrap" style="height:170px">${wheel(118)}<div class="shadow"></div></div>`}
+  <h1 style="${keyboard ? 'margin-top:4px' : ''}">Your first car</h1>
+  <div style="height:${keyboard ? 10 : 16}px"></div>
+  <div class="cardg" style="padding:2px 14px 12px">
+    <div class="rowi" style="padding:12px 2px"><span class="nm ${name ? '' : 'ph'}" style="font-size:${ax ? 25 : 18}px;font-weight:600;${name ? '' : 'color:color-mix(in srgb,var(--t2) 75%,transparent)'}">${keyboard || name ? '<span class="caret" style="height:22px"></span>' : ''}${name || (kind === 'moto' ? 'My motorbike' : 'My car')}</span></div>
+    <div style="display:flex;gap:10px;margin-top:8px">${tile('car', kind === 'car', color, ax)}${tile('moto', kind === 'moto', color, ax)}</div>
+    <div style="margin-top:10px">${ax ? `<div class="sw" style="gap:9px">${Object.entries(paint).map(([k, c]) => `<i class="${k === color ? 'on' : ''}" style="background:${c};width:34px;height:34px;border-radius:17px"></i>`).join('')}</div>` : swatches(color)}</div>
+  </div>
+  <div class="spacer"></div>
+  <div class="btnp" style="${keyboard ? 'position:absolute;left:0;right:0;bottom:314px;z-index:26' : ''}">Continue</div>
+  ${keyboard ? '' : '<div class="btns">Later</div>'}
+</div>${keyboard ? kb(theme === 'dark') : ''}`);
+
+const chrome = (chip, auto) => `
+  <div class="chip float">${chip}</div>
+  <div class="ctrls float">
+    <span class="autobtn ${auto ? 'on' : 'off'}" style="position:relative">${I.auto}${auto ? '' : '<svg style="position:absolute;inset:0" viewBox="0 0 46 46"><path d="M14 14L32 32" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>'}</span>
+    <span>${I.map}</span><span class="acc">${I.loc}</span><span style="font-size:13px;font-weight:700">3D</span></div>`;
+
+const mapFirst = ({ theme, line, auto }) => phone(theme, `
+  <div class="map">${mapSvg()}</div>
+  <div class="me" style="left:178px;top:430px"></div>
+  ${chrome(`<span class="t2">${I.map}</span>No drives yet`, auto)}
+  ${line}${bar(0)}`);
+
+const crop = (theme, line) => phone(theme, `
+  <div class="map">${mapSvg()}</div>
+  <div class="me" style="left:160px;top:60px"></div>
+  ${line}${bar(0)}`, 'crop');
+
+const card = (v) => `
+<div class="gcard">
+  <div class="hero" style="background:linear-gradient(160deg, color-mix(in srgb, ${paint[v.color]} 22%, var(--el)), var(--el) 75%)">
+    ${vehicleArt({ body: v.body, color: v.color, w: 250 })}<span class="more">${I.dots}</span></div>
+  <div class="body">
+    <h3>${v.name}</h3><div class="meta">${v.meta}</div>
+    ${v.empty ? `<div style="margin-top:14px;font-size:15px;color:var(--t2)">No drives yet. Your next drive with ${v.name} shows here.</div>` : `
+    <div class="figs"><div><small>GPS distance</small><b>${v.dist}</b></div><div><small>Drives</small><b>${v.drives}</b></div><div><small>Time</small><b>${v.time}</b></div></div>
+    <div class="bars">${v.bars.map(h => `<i class="${h ? '' : 'z'}" style="height:${h}%"></i>`).join('')}</div>`}
+    <div class="odo"><span>Odometer</span>${v.odo ? `<span><b>${v.odo}</b> · entered ${v.odoDate}</span>` : '<span class="acc" style="font-weight:600">Add a reading</span>'}</div>
+  </div>
+</div>`;
+
+const passportGarage = (theme, cars, page) => phone(theme, `
+  <div class="nav"><span class="navbtn float">${I.back}</span><b style="font-size:17px">Garage</b><span class="navbtn float acc">${I.plus}</span></div>
+  <div style="position:absolute;top:112px;left:24px;font-size:14px;font-weight:600;color:var(--t2)">${cars.title}</div>
+  <div class="carousel" style="transform:translateX(${-page * 342}px)">${cars.list.map(card).join('')}<div class="addcard" style="height:420px">${I.plus} Add vehicle</div></div>
+  <div class="pdots" style="top:${cars.list[0].empty ? 560 : 650}px">${[...cars.list, 0].map((_, i) => `<i class="${i === page ? 'on' : ''}"></i>`).join('')}</div>
+  <div style="position:absolute;left:24px;right:24px;top:${cars.list[0].empty ? 600 : 690}px;font-size:13.5px;color:var(--t2)">Tap a card for the vehicle page: its drives, the odometer history, edit.</div>`);
+
+const editor = (theme) => phone(theme, `
+  <div class="map" style="opacity:.25">${mapSvg()}</div>
+  <div class="sheetf"><div class="grab"></div>
+    <div class="tb"><span class="acc">Cancel</span><b>Edit vehicle</b><span class="acc" style="font-weight:600">Save</span></div>
+    <div style="display:grid;place-items:center;height:118px">${vehicleArt({ body: 'suv', color: 'blue', w: 220 })}</div>
+    <div class="gl"><div class="r"><div class="seg wide" style="flex:1;margin:8px 0"><span class="on">${I.car} Car</span><span>${I.moto} Motorbike</span></div></div>
+      <div class="r"><span class="k">Name</span><span class="v" style="color:var(--t1)">Family</span></div></div>
+    <div class="gh">Looks</div>
+    <div class="gl"><div class="r" style="display:block"><div class="chips"><span>Sedan</span><span>Hatchback</span><span class="on">SUV</span><span>MPV</span><span>Pickup</span><span>Coupé</span></div></div>
+      <div class="r" style="display:block"><div class="sw">${Object.entries(paint).map(([k, c]) => `<i class="${k === 'blue' ? 'on' : ''}" style="background:${c}"></i>`).join('')}</div></div></div>
+    <div class="gh">Details · optional</div>
+    <div class="gl"><div class="r"><span class="k">Make</span><span class="v">Kia</span></div><div class="r"><span class="k">Model</span><span class="v">Sportage</span></div>
+      <div class="r"><span class="k">Year</span><span class="v">2022</span></div><div class="r"><span class="k">Fuel</span><span class="v">Petrol ${I.updown}</span></div>
+      <div class="r"><span class="k">Odometer</span><span class="v">44,004 km</span></div></div>
+  </div>`);
+
+const settings = (theme) => phone(theme, `
+  <div class="nav"><span class="navbtn float">${I.back}</span><b style="font-size:17px">Settings</b><span style="width:40px"></span></div>
+  <div style="position:absolute;top:110px;left:0;right:0">
+    <div class="gh">Tracking</div>
+    <div class="gl"><div class="r"><span class="acc">${I.auto}</span><span class="k">Auto Mode</span><span class="v">Off ${I.chev}</span></div>
+      <div class="r"><span class="acc">${I.flag}</span><span class="k">Auto finish</span><span class="v">On ${I.chev}</span></div></div>
+    <div class="gh">Units</div>
+    <div class="gl"><div class="r"><span class="acc">${I.ruler}</span><span class="k">Distance &amp; speed</span><span class="v">Automatic · km ${I.updown}</span></div></div>
+    <div style="margin:6px 30px 0;font-size:13px;color:var(--t2)">Automatic follows your iPhone’s region. Fuel volume arrives with fuel stops.</div>
+    <div class="gh">Appearance</div>
+    <div class="gl"><div class="r"><span class="k">Appearance</span><span class="v">Light ${I.updown}</span></div></div>
+  </div>
+  <div class="menu" style="right:20px;top:280px;width:250px">
+    <div><span class="ck">${I.check}</span><span>Automatic<br><small class="t2">km, km/h (from Region)</small></span></div>
+    <div><span class="ck"></span>Kilometres · km/h</div>
+    <div><span class="ck"></span>Miles · mph</div></div>`);
+
+const garage1 = { title: '1 car', list: [{ name: 'My car', meta: 'Car', body: 'sedan', color: 'silver', empty: true }] };
+const garage3 = { title: '2 cars · 1 motorbike', list: [
+  { name: 'Family', meta: 'Kia Sportage · 2022 · Petrol', body: 'suv', color: 'blue', dist: '671 km', drives: 6, time: '9 h 18', bars: [0,0,0,0,0,0,0,0,0,12,38,100], odo: '44,004 km', odoDate: '30 Oct' },
+  { name: 'Daily', meta: 'Honda Vision · Scooter', body: 'scooter', color: 'red', dist: '212 km', drives: 31, time: '11 h', bars: [20,30,25,40,35,30,45,50,40,35,30,60], odo: '18,240 km', odoDate: '2 Oct' },
+  { name: 'Weekend', meta: 'Hatchback', body: 'hatch', color: 'white', empty: true }] };
+
+mount(`<div class="sheet">
+<h1>First run · Day 0: right after onboarding <span style="font-size:16px;color:var(--stone);font-weight:500">· revision 3</span></h1>
+<p class="lede">After the owner's review: <b>step 4 asks only Name and Type</b> (units move to Settings, the plate line goes); the Garage in the Passport becomes a <b>carousel of large vehicle cards</b> with a drawing made from the vehicle's kind, body style and colour; the Map gets a <b>standing Auto Mode button</b>. The compact vehicle card stays the shared object for the Start panel, recording and the journey detail. The spec wins over this picture.</p>
+
+<section>
+<h2>1 · Your first car: one title, a name, the vehicle, a colour <span style="font-size:14px;color:var(--stone);font-weight:500">· revision 3</span></h2>
+<p class="sub">The subtitle and the small rectangular badge go. The two drawings <b>are</b> the Car · Motorbike choice: large tiles under the round wheel, the chosen one painted in the chosen colour, so no "Car" line under the name is needed. While the keyboard is up, the wheel steps away (it slides up and fades, 0.25 s) and the card moves under the title; Continue rides above the keyboard; Done or a tap outside brings the wheel back.</p>
+<div class="row">
+  <div>${step4({ theme: 'light' })}<div class="cap"><b>Light · at rest.</b> Car chosen, Silver; blank name saves "My car".</div></div>
+  <div>${step4({ theme: 'light', keyboard: true, name: 'Fam' })}<div class="cap"><b>Light · typing.</b> No overlap with the 3D wheel: it is out of the way until the keyboard goes.</div></div>
+  <div>${step4({ theme: 'dark', kind: 'moto', name: 'Daily', color: 'red' })}<div class="cap"><b>Dark · Motorbike, red.</b> The Car tile stays silver until chosen.</div></div>
+  <div>${step4({ theme: 'light', ax: true, kind: 'car', color: 'blue' })}<div class="cap"><b>Largest Dynamic Type.</b> No wheel; tiles and colours grow and wrap, the page scrolls.</div></div>
+</div>
+<div class="row" style="margin-top:18px"><div class="notes" style="width:900px">
+  <h3>Changes from revision 2 (owner, 2026-11-03)</h3>
+  <ul><li>Subtitle removed: the title alone says it.</li><li>Rectangle badge and the kind line removed; the type tiles carry the drawings (labels stay small in the tiles for clarity and VoiceOver).</li><li>Keyboard: the wheel steps aside while editing (Reduce Motion: it fades only).</li></ul>
+</div></div>
+</section>
+
+<section>
+<h2>2 · The Garage in the Passport: a carousel</h2>
+<p class="sub">One large card per vehicle, swiped sideways, an "Add vehicle" card last. The top of each card is the vehicle drawn by kind, body style and colour (the same drawing the Map and the replay video will use); below, its own figures. The odometer is <b>only what the person entered, with its date</b>, never estimated from GPS (P2). The compact card stays everywhere a drive picks its vehicle.</p>
+<div class="row">
+  <div>${passportGarage('light', garage1, 0)}<div class="cap"><b>Light · right after onboarding.</b> "My car" with no looks set yet: a neutral silver sedan, no figures, "Add a reading".</div></div>
+  <div>${passportGarage('dark', garage3, 0)}<div class="cap"><b>Dark · three vehicles, first card.</b> All-time GPS distance, drives, time; 12 weeks of GPS distance; the odometer as entered.</div></div>
+  <div>${editor('light')}<div class="cap"><b>Add / edit (sheet, the forms exception).</b> Type and Name first; Looks (body style, colour) drive the drawing live; Details are optional.</div></div>
+  <div class="notes">
+    <h3>Proposed fields (schema: needs approval, P6)</h3>
+    <ul><li><code>body_style</code>: car: sedan · hatchback · SUV · MPV · pickup · coupé; motorbike: scooter · underbone · manual · sport. Default sedan / scooter.</li>
+      <li><code>color</code>: one of 10 named paints (white, black, silver, grey, red, blue, green, yellow, orange, brown), so the drawing always works. Default silver.</li>
+      <li><code>fuel_type</code>: petrol · diesel · hybrid · electric · none. Optional.</li>
+      <li>Make, model, year, odometer as today.</li>
+      <li>Private: on the device and the person's iCloud only. The Feed still shows kind, make and model (ADR 0007).</li></ul>
+    <h3>Not copied from the references</h3>
+    <ul><li>An odometer "estimated from a reading" (Carstack) breaks P2.</li><li>Top speed on the vehicle (Rovy) breaks ADR 0007.</li></ul>
+  </div>
+</div>
+</section>
+
+<section>
+<h2>3 · Settings → Units</h2>
+<p class="sub">A grouped list (the forms exception). Distance &amp; speed: Automatic (from Region) · Kilometres · Miles; Automatic shows what it resolved to. Fuel volume (Automatic · Litres · Gallons) is specified but appears only when fuel stops are real.</p>
+<div class="row">
+  <div>${settings('light')}<div class="cap"><b>Light · the Units menu open.</b></div></div>
+  <div class="notes">
+    <h3>Proposed copy (en · vi)</h3>
+    <ul><li>Units · <i>Đơn vị</i></li><li>Distance &amp; speed · <i>Quãng đường và tốc độ</i></li>
+      <li>Automatic · <i>Tự động</i> — km, km/h (from Region) · <i>km, km/h (theo Vùng)</i></li>
+      <li>Kilometres · km/h · <i>Kilômét · km/h</i> — Miles · mph · <i>Dặm · mph</i></li>
+      <li>Automatic follows your iPhone’s region. · <i>Tự động theo vùng của iPhone.</i></li></ul>
+  </div>
+</div>
+</section>
+
+<section>
+<h2>4 · First-run Map, with a standing Auto Mode button</h2>
+<p class="sub">The top of the map's control column always shows Auto Mode: copper when on, grey and struck through when off; a tap opens the Auto Mode explainer (on) or its controls (off). The quiet line above the bar shows the first-run hint and any permission problem, as in revision 1.</p>
+<div class="row">
+  <div>${mapFirst({ theme: 'light', auto: false, line: sline(I.hand, 'Auto Mode is off: tap Start when you drive.', 'Turn on', 't2') })}<div class="cap"><b>Light · Auto Mode off.</b> The line goes after the first drive; the button stays.</div></div>
+  <div>${mapFirst({ theme: 'dark', auto: true, line: sline(I.auto, 'Auto Mode is on: just drive.', '') })}<div class="cap"><b>Dark · Auto Mode on.</b></div></div>
+  <div class="notes">
+    <h3>Rules (unchanged)</h3>
+    <ul><li>One line, one action. Order: location denied → precise location off → Auto Mode needs Always → Motion off → the first-run hint.</li>
+      <li>The button reads to VoiceOver as "Auto Mode, on" / "Auto Mode, off".</li>
+      <li>Chip: No drives yet · <i>Chưa có chuyến nào</i>.</li></ul>
+    <h3>Copy (en · vi)</h3>
+    <ul><li>Auto Mode is off: tap Start when you drive. · <i>Auto Mode đang tắt: chạm Bắt đầu khi bạn lái.</i> — Turn on · <i>Bật</i></li>
+      <li>Auto Mode is on: just drive. · <i>Auto Mode đang bật: cứ thế mà lái.</i></li></ul>
+  </div>
+</div>
+</section>
+
+<section>
+<h2>5 · Permission states</h2>
+<p class="sub">Approved in revision 1: the same quiet line, its own icon, one action; nothing blocks the map.</p>
+<div class="row">
+  <div>${crop('light', sline(I.auto, 'Auto Mode is off: it needs location set to Always.', 'Turn on', 't2'))}<div class="cap"><b>When In Use only.</b></div></div>
+  <div>${crop('dark', sline(I.locoff, 'Location is off: Carodo can’t record drives.', 'Settings'))}<div class="cap"><b>Location denied.</b></div></div>
+  <div>${crop('light', sline(I.motion, 'Motion is off: Auto Mode may notice drives late.', 'Settings', 't2'))}<div class="cap"><b>Motion denied</b>, Auto Mode on.</div></div>
+  <div>${crop('dark', sline(I.target, 'Precise Location is off: routes will be rough.', 'Settings', 't2'))}<div class="cap"><b>Reduced accuracy.</b></div></div>
+</div>
+</section>
+</div>`);
+</script>
+</body>
+</html>

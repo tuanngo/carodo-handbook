@@ -1,0 +1,62 @@
+{
+  "status": "design proposal, not persisted values",
+  "default": "Slate",
+  "neutral": "Silver",
+  "backgrounds": {
+    "light": "#F3EEE5",
+    "dark": "#242321"
+  },
+  "selection": "#BD8053",
+  "colors": [
+    {
+      "name": "Silver",
+      "hex": "#B8BDC2",
+      "role": "Trung tính"
+    },
+    {
+      "name": "Slate",
+      "hex": "#8195A6",
+      "role": "Mặc định"
+    },
+    {
+      "name": "Pearl",
+      "hex": "#E5E2DC",
+      "role": "Trắng ngọc"
+    },
+    {
+      "name": "Graphite",
+      "hex": "#41474C",
+      "role": "Đen than"
+    },
+    {
+      "name": "Crimson",
+      "hex": "#AE5450",
+      "role": "Đỏ trầm"
+    },
+    {
+      "name": "Ocean",
+      "hex": "#567FA3",
+      "role": "Xanh biển"
+    },
+    {
+      "name": "Forest",
+      "hex": "#648272",
+      "role": "Xanh rêu"
+    },
+    {
+      "name": "Champagne",
+      "hex": "#C6AA68",
+      "role": "Vàng cát"
+    },
+    {
+      "name": "Terracotta",
+      "hex": "#BE805E",
+      "role": "Cam đất"
+    },
+    {
+      "name": "Cocoa",
+      "hex": "#8E7262",
+      "role": "Nâu"
+    }
+  ]
+}
