@@ -8,7 +8,10 @@ state and what is still open. Map technology is already decided: `MKMapView` (ca
 | Phase | Scope | State |
 |---|---|---|
 | **R.1** Cinematic Route Replay | Full-screen replay from Journey Detail: the recorded route, the Carodo wheel moving on recorded time, one Follow camera in 3D pitch, the speed-profile timeline, play / pause / seek / rate, live distance and speed | R.1a done (2fdd363); R.1b+c done 2026-11-08 (carodo-ios c5e263f); R.1d built 2026-11-08, owner's review; R.1e (device) next |
-| **R.2** Camera & Terrain | The Cinematic Director: Follow, Reveal and Highlight shots scheduled on the timeline before playback; opening, descent and closing beats; speed-led height; realistic elevation, satellite / hybrid; speed-coloured driven line | Draft in `replay.md` (R.2) |
+| **R.2A** Camera Foundation Polish | Opening (high over the start, down into Follow) and Cruise (dynamic distance on straights), on a pure `CameraDirector` with hysteresis, hold and cooldown in screen time | Done 2026-11-08 (carodo-ios 743ea84, Opening + Cruise) |
+| **R.2B** Contextual Camera | Rest, Hairpin Reveal, Terrain Reveal, Junction Reveal: one at a time, each only once its trigger is proven trustworthy on device drives | Draft (`replay.md`, R.2) |
+| **R.2C** Journey Highlights | Camera moments on verified facts (provinces crossed, Smart Stops, milestones); with R.3 and Journey Enrichment | Later |
+| **R.2 options** | Driven line Copper or by speed (menu); Standard or Satellite map (menu) | Decided 2026-11-08, after R.2A |
 | **R.3** Replay Highlights & Sharing | Highlights from facts the device already has, the reserved header slot, a 30–60 s Cinematic Recap (an edit, not a faster rate), 9:16 video export, the privacy trim on everything shared | Draft in `replay.md` (R.3); video rendering needs a spike |
 | **V2.3** Journey Enrichment | Smart Stops, POI, Fuel / Charging, Weather | After R.3. Once built, its stops and places become highlight sources; Replay never queries them while playing |
 
@@ -116,6 +119,27 @@ stand in front of the way ahead; tile loading at 120× on a highway needs the iP
 Owner review (2026-11-08): the route vanished while playing (strokeEnd pushed every frame; now at
 most 10 Hz, proven by 12 consecutive frames), open at 15×, look through bends (pure pursuit 0.8 s
 ahead), and an arrival beat (camera ahead to the finish, rising, then back to the whole route).
+
+## R.2 — how the Director joins what exists (2026-11-08)
+
+Extend, never rewrite. Per frame, unchanged: player → coordinator `show(frame)` → `FollowCamera.pose`
+→ the one `setCamera`. Added between them:
+
+```
+ReplayViewModel.prepare (off main): ReplayTimeline · ReplayRoute · CameraScript (new)
+  CameraScript: for each keyframe, how straight the road is over the next 250 m … 32 km (chord /
+  path, two pointers, O(n) per window); nil across a jump or past the end. Later: grade, bend density.
+coordinator.show(frame):
+  facts  = script.straightness(at: keyframe, seeing: follow.distanceM × 2.5)      O(log n)
+  intent = director.intent(facts, arrivalNear, dt)   CameraDirector (pure): phase, hysteresis,
+                                                     hold, cooldown, eased strength; a seek resets
+  pose   = follow.pose(…, intent)                    distance × intent.distanceScale; Opening lift
+  setCamera(pose)                                    still the only writer of MKMapView.camera
+```
+
+Checked against what exists, no conflict found: pure pursuit still picks the heading (the Director
+never touches it); Cruise multiplies the speed-led distance inside its bounds; the Arrival stays in
+`FollowCamera` and turns Cruise off in its last seconds; per-frame cost grows by two binary searches.
 
 ## Performance rules for R.1b–R.1d (from the Map, the live drive and Journey Detail)
 
