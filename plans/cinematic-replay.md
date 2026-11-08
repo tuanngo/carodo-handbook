@@ -7,7 +7,7 @@ state and what is still open. Map technology is already decided: `MKMapView` (ca
 
 | Phase | Scope | State |
 |---|---|---|
-| **R.1** Cinematic Route Replay | Full-screen replay from Journey Detail: the recorded route, the Carodo wheel moving on recorded time, one Follow camera in 3D pitch, the speed-profile timeline, play / pause / seek / rate, live distance and speed | R.1a timeline done 2026-11-08; R.1b next |
+| **R.1** Cinematic Route Replay | Full-screen replay from Journey Detail: the recorded route, the Carodo wheel moving on recorded time, one Follow camera in 3D pitch, the speed-profile timeline, play / pause / seek / rate, live distance and speed | R.1a done (2fdd363); R.1b+c done 2026-11-08 (carodo-ios c5e263f); R.1d next |
 | **R.2** Camera & Terrain | The Cinematic Director: Follow, Reveal and Highlight shots scheduled on the timeline before playback; opening, descent and closing beats; speed-led height; realistic elevation, satellite / hybrid; speed-coloured driven line | Draft in `replay.md` (R.2) |
 | **R.3** Replay Highlights & Sharing | Highlights from facts the device already has, the reserved header slot, a 30–60 s Cinematic Recap (an edit, not a faster rate), 9:16 video export, the privacy trim on everything shared | Draft in `replay.md` (R.3); video rendering needs a spike |
 | **V2.3** Journey Enrichment | Smart Stops, POI, Fuel / Charging, Weather | After R.3. Once built, its stops and places become highlight sources; Replay never queries them while playing |
@@ -93,6 +93,16 @@ summary held them). 16 tests in `ReplayTimelineTests` (both sides of the 1-minut
 gap, healed gap, lead-in, pause, unknown speed, rates, default rate, scrubber bars, display-route
 fallback, a 3-hour drive). Simulator, Debug: a 3-hour drive builds and plays every frame of a 120×
 playback (~6,000 reads) in 20 ms in total. Not measured on the iPhone yet (R.1e).
+
+## R.1b + R.1c result (2026-11-08, carodo-ios c5e263f)
+
+Built together so the screen could be judged playing: the play button on the detail map, the
+full-screen `ReplayView` (header, speed-profile scrubber, play / pause, rate pill, distance, compact
+`SpeedDial`), `ReplayPlayer` (display link, ~5 Hz to SwiftUI), `ReplayRoute` (runs cut at jumps,
+simplified at 8 m, each fix placed along its run for `strokeEnd`) and `ReplayMapView`. Moved to the
+design system to share them: `SpeedDial` (from the live sheet, with a compact size) and
+`DriveLocationMarker` / `MarkerHeading` (from the Map tab). The detail map is taken down while Replay
+covers it. 1341 tests pass; lint and warnings clean. Still whole-route only: Follow and 3D in R.1d.
 
 ## Performance rules for R.1b–R.1d (from the Map, the live drive and Journey Detail)
 
