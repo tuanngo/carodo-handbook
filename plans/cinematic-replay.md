@@ -7,7 +7,7 @@ state and what is still open. Map technology is already decided: `MKMapView` (ca
 
 | Phase | Scope | State |
 |---|---|---|
-| **R.1** Cinematic Route Replay | Full-screen replay from Journey Detail: the recorded route, the Carodo wheel moving on recorded time, one Follow camera in 3D pitch, the speed-profile timeline, play / pause / seek / rate, live distance and speed | R.1a done (2fdd363); R.1b+c done 2026-11-08 (carodo-ios c5e263f); R.1d next |
+| **R.1** Cinematic Route Replay | Full-screen replay from Journey Detail: the recorded route, the Carodo wheel moving on recorded time, one Follow camera in 3D pitch, the speed-profile timeline, play / pause / seek / rate, live distance and speed | R.1a done (2fdd363); R.1b+c done 2026-11-08 (carodo-ios c5e263f); R.1d built 2026-11-08, owner's review; R.1e (device) next |
 | **R.2** Camera & Terrain | The Cinematic Director: Follow, Reveal and Highlight shots scheduled on the timeline before playback; opening, descent and closing beats; speed-led height; realistic elevation, satellite / hybrid; speed-coloured driven line | Draft in `replay.md` (R.2) |
 | **R.3** Replay Highlights & Sharing | Highlights from facts the device already has, the reserved header slot, a 30–60 s Cinematic Recap (an edit, not a faster rate), 9:16 video export, the privacy trim on everything shared | Draft in `replay.md` (R.3); video rendering needs a spike |
 | **V2.3** Journey Enrichment | Smart Stops, POI, Fuel / Charging, Weather | After R.3. Once built, its stops and places become highlight sources; Replay never queries them while playing |
@@ -103,6 +103,19 @@ simplified at 8 m, each fix placed along its run for `strokeEnd`) and `ReplayMap
 design system to share them: `SpeedDial` (from the live sheet, with a compact size) and
 `DriveLocationMarker` / `MarkerHeading` (from the Map tab). The detail map is taken down while Replay
 covers it. 1341 tests pass; lint and warnings clean. Still whole-route only: Follow and 3D in R.1d.
+
+## R.1d result (2026-11-08)
+
+`FollowCamera` (pure, 11 tests): 60° pitch, look-ahead 10 % of the distance (0.22 put the wheel on
+the panel's edge), heading eased (0.8 s) with a 3° dead band and a 90°/s cap, distance from the
+speed on screen (4 s of travel, 600 m–15 km, eased 1.5 s), a 1 s per-frame blend into Follow, a
+snap on seek. Course falls back to the stretch's bearing (`ReplayTimeline.travelBearing`).
+Header: Overview and Follow; the first Play follows; a finger frees the camera. Realistic
+elevation on. Open: 3D buildings cannot be hidden on the standard configuration and sometimes
+stand in front of the way ahead; tile loading at 120× on a highway needs the iPhone.
+Owner review (2026-11-08): the route vanished while playing (strokeEnd pushed every frame; now at
+most 10 Hz, proven by 12 consecutive frames), open at 15×, look through bends (pure pursuit 0.8 s
+ahead), and an arrival beat (camera ahead to the finish, rising, then back to the whole route).
 
 ## Performance rules for R.1b–R.1d (from the Map, the live drive and Journey Detail)
 
