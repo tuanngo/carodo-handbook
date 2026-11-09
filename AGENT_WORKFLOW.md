@@ -20,18 +20,55 @@ iOS calls itself and explains each in a line, because the owner is new to Swift
    with no code yet, in `drafts/`. Open questions are asked and recorded there, not in chat.
 3. **Design**: a screen gets a mockup in `design/mockups/` before code ("To draw" lists what is
    missing, in the order a new person meets the screens). The spec wins over the mockup.
-4. **Plan**: the agent inspects the repo and proposes a short plan; no code yet for cross-cutting
-   work.
+4. **Plan**: audit first, then propose (below, Plan before code); no code until the owner
+   approves it.
 5. **Slice**: one vertical slice that can be run or reviewed (e.g. the vehicle card, then the
    Start panel, then the first saved drive).
 6. **Run**: build and test on the narrowest target; location, background and battery behaviour
    only on a physical iPhone (`carodo-ios/docs/operations/device-testing.md`, Daily check).
 7. **Review**: the diff, permissions, schema, privacy, battery and UX, against the checklist below.
 8. **Record**: the result lands in the repo's `docs/` (spec, ADR, contract) in the same change;
-   `plans/` status and `plans/backlog.md` here.
-9. **Commit**: only when the owner asks; one logical change per commit, lowercase conventional
-   messages, no AI attribution. Until the owner rebuilds the first commit, nothing is committed or
-   pushed.
+   `plans/` status and `plans/backlog.md` here; what is left open goes in
+   [`plans/technical-debt.md`](plans/technical-debt.md) (debt, limitation or pending validation).
+9. **Commit**: one finished outcome per commit, only your own paths, lowercase conventional
+   messages, no AI attribution. The agent commits by itself once the work is proven (checks pass,
+   screenshots for a change on screen); UI still being polished, a matter of taste or an unproven
+   device behaviour waits for the owner's review. Push only when asked. The full rules: the repo's
+   `AGENTS.md` (Git).
+
+## Plan before code
+
+1. **Audit what is there**: the source, the data flow, the schema, the tests and the docs the
+   change touches. Name every file and type you read; never assume the code matches a plan or a
+   doc (code and ADRs win, AGENTS.md "Docs disagree?").
+2. **Keep three things apart** in the plan: what the code does today (with its file), what you
+   propose, and what you assume but have not checked.
+3. **The plan states** scope, non-goals, dependencies, acceptance criteria, the files to change and
+   why, the tests, and the decisions the owner must make (each with a recommendation).
+4. **No code before approval.** Exception: a small change the owner asked for directly that needs
+   no architecture, schema, contract or product decision.
+5. **After approval, stay inside it.** A finding that needs more (a schema, a contract, a new
+   service, another feature's files) stops the work and goes to the owner as a question.
+
+## While building
+
+- **Before editing a file**: `git status` and `git log` on it. Changed and uncommitted by someone
+  else: add to it, never overwrite; being edited right now: ask (Working in parallel, below).
+- **Reuse by meaning** (the repo's AGENTS.md, "Reuse before adding"): extend the one algorithm that
+  answers the same question; keep apart two that answer different ones, and say which and why.
+  No protocol, service or framework for a single use.
+- **Tests on both sides** of every threshold, plus the edge cases (empty, one point, gaps, trim,
+  joined parts) and a regression test for what the change must not move.
+- **Real data where it can speak**: replay the pulled drives read-only (`task replay`, the
+  `DriveDataReplayTests` replays, `.carodo` backups), aggregate figures only, never a coordinate.
+  Synthetic tests prove the code; they never count as real-world validation. A result that differs
+  from a known baseline is explained, never tuned away.
+- **A bug found on the way**: fix it inside the approved scope, add the test that would have caught
+  it, and give its root cause in the report. Outside the scope: ask first.
+- **Checks after the last change**: run lint, the build (warnings) and the tests again after the
+  final edit, and report that run; never quote an earlier one. A temporary debug or seed step is
+  removed before the report and said so.
+- **Stop at the slice.** The next phase is proposed, never started.
 
 ## Working in parallel
 
@@ -49,6 +86,8 @@ iOS calls itself and explains each in a line, because the owner is new to Swift
 ```text
 Outcome:
 User story:
+Existing behaviour (files read):
+Owner decisions needed:
 Spec (Ready?) and mockups:
 Acceptance criteria:
 Non-goals:
@@ -66,7 +105,15 @@ A worked example: [`plans/first-run.md`](plans/first-run.md).
 The fields are the repository's "Report" rule (`carodo-ios/AGENTS.md`, Conventions): what changed
 and why, files, exact commands and their results, device checks still required, risks and
 assumptions, and every schema, API, permission or dependency change. Add the specs and docs
-updated, and the strings added (English and Vietnamese, for the owner to review).
+updated, and the strings added (English and Vietnamese, for the owner to review). Then, each in its
+own line:
+
+- **Behaviour changed**: what a person sees or the data does differently; "none" said outright.
+- **Test evidence**: the run after the last change (counts, failures, warnings, lint).
+- **Real-data verification**: what was replayed or tried on a device, with its figures; or "none".
+- **Bugs found on the way**: each with its root cause and the test now guarding it.
+- **Left open**: technical debt, known limitations and pending validations, each also entered in
+  [`plans/technical-debt.md`](plans/technical-debt.md) with its ID.
 
 ## CARODO review checklist
 

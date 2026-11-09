@@ -15,6 +15,9 @@ This folder may link into them; they never link here. Rules for changing code: e
 | [`product/vision.md`](product/vision.md) | What CARODO is: product loop, positioning, principles, brand |
 | [`product/roadmap.md`](product/roadmap.md) | Phases of the iOS and backend tracks, built in parallel |
 | [`plans/`](plans/) | Implementation plans and their status: [`ios.md`](plans/ios.md) (phases, slices A–D), [`gps-engine.md`](plans/gps-engine.md) + [`gps-perf-audit.md`](plans/gps-perf-audit.md) (tracking field test and Always/Map perf findings), [`ios-backend-integration.md`](plans/ios-backend-integration.md) (identity: App Attest, accounts, sessions), [`backend.md`](plans/backend.md) (backend slices, status, open decisions) |
+| [`plans/technical-debt.md`](plans/technical-debt.md) | What finished work left open: technical debt, known limitations and pending validations, each with its review trigger (not a to-do list) |
+| [`plans/backend-source-audit.md`](plans/backend-source-audit.md) | Six open backend audit findings (2026-11-07), priorities, reproduction scenarios and regression checks |
+| [`audits/`](audits/README.md) | Source audits and what they taught: each case, its fix commit, the test that guards it and the pattern to avoid ([2026-11-07 iOS](audits/2026-11-07-ios-source-audit.md): seven cases, all fixed) |
 | [`field-tests/`](field-tests/README.md) | Test drives: the script the owner reads on the phone before a drive, and the agent's review of its logs after |
 | [`drafts/`](drafts/README.md) | Specs and designs for features with no code yet |
 | [`design/mockups/`](design/mockups/README.md) | The owner's visual explorations: ideas, not specs |
@@ -22,7 +25,7 @@ This folder may link into them; they never link here. Rules for changing code: e
 | [`design/vehicle-art/`](design/vehicle-art/README.md) | Archived vector explorations (rounded and detailed v4); current iOS vehicle identity uses SF Symbols |
 | [`design/passport-stamp/`](design/passport-stamp/README.md) | Passport button and stamp shapes from the mark; an idea for badges, not a decision |
 | [`references/`](references/README.md) | What we learn from others: open-source repos (with licence rules and map options) and notes on apps we study |
-| [`AGENT_WORKFLOW.md`](AGENT_WORKFLOW.md) | How to brief an agent and what its completion report contains |
+| [`AGENT_WORKFLOW.md`](AGENT_WORKFLOW.md) | How an agent works here: audit and plan before code, the approval gate, building inside the scope, the brief and the completion report |
 
 ## Rules
 
