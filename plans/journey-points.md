@@ -31,7 +31,7 @@ End / Stop / Break), **GPS Position**, **Nearby POI**, **Footprints**, **Saved P
 |---|---|---|
 | 1 | Stop và Break mở trên Map tab: focus, GPS marker, vòng tròn vị trí (`StopPosition`), preview native, Find nearby places, tách khỏi Live Map | Done: `3aa3e25` (bản fullScreenCover), `e027155` (Map tab) |
 | 2 | Nearby POI tự động cho Stop và Break | Done: `f66dcfa`. Chờ PV-13 |
-| 3 | Start và End mở trên Map | Next, chưa duyệt code |
+| 3 | Start và End mở trên Map | Done: `193d6ca`. Chờ device (PV-12) |
 
 ### Slice 2 (đã làm)
 
@@ -49,7 +49,15 @@ Lý do giữ năm điều kiện: replay Apple thật trên 24 stop dev: nới �
 hóa, văn phòng ở đèn đỏ). Ngưỡng hiện tại: 0/24, đúng lý do (14 stop import thưa fix, 10 stop Carodo 1–3 phút ở phố đông
 với 2–4 nơi trong 6–20 m). **Chưa được xác nhận hiệu quả**: chưa có stop ≥ 5 phút do Carodo ghi (PV-13).
 
-### Slice 3 (Start/End, tiếp theo)
+### Slice 3 (Start/End, đã làm)
+
+Cách làm (2026-11-10): Start/End là `JourneyPoint` (`.start`, `.end`) trên timeline; Map đặt chúng lên fix đầu/cuối của
+track đã trim (`JourneyPointTrack`), địa chỉ đọc từ cell của fix đó (trùng `start_cell`/`end_cell`). Start ước tính khi
+có lead-in `TripGap.outsideStart` vào fix đầu còn giữ: vị trí là điểm đầu route, không vòng tròn, không toạ độ, không
+Nearby POI, dòng "Estimated". Marker: cờ route hoặc `PlaceMapMarker` của Saved Place. Địa chỉ Apple trả giữ trong
+`StopPlaceMemory` (RAM). Trong Saved Place riêng tư, preview không hiện toạ độ (cả Stop).
+
+Quyết định gốc:
 
 Quyết định của owner (2026-11-09):
 
