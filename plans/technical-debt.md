@@ -18,7 +18,6 @@ IDs never change or get reused: `TD-n`, `KL-n`, `PV-n`.
 | ID | What | Impact | Status | Review when | Links |
 |---|---|---|---|---|---|
 | TD-1 | **Replay Stop Alignment.** Replay compresses a stop by the recorder's held state (and silent stops, `29f39f7`); the journal's stops come from `JourneyAnalysis.stopIntervals`. Two definitions of a finished stop on the timeline | Replay's "Stopped 12 min" can differ from the route timeline's stop; drift grows with each change to either | Open | Replay shows stop labels or highlights next to the route timeline, or either stop rule changes. First audit which part is the same question (a finished stop on the timeline: share) and which is not (moving or held at the playing moment: keep) | [smart-stops-v1.md §11.6](smart-stops-v1.md), `carodo-ios/Carodo/Core/Replay/ReplayTimeline.swift`, `carodo-ios/Carodo/Core/Domain/JourneyDetails.swift` |
-| TD-2 | **Recovery does not settle a silent stop.** `TripReplay.stoppedSince` reads a recovered trip's fixes with the `StopDetector` but has no "now", so a drive whose fixes went quiet while slow (`StopDetector.settle`) ends at its last fix, not at the stop | A recovered drive can end a few to tens of seconds late, with the parked fixes in between | Open | With the relaunch-while-recording slice (significant change kept on while recording), or a recovered drive that ends late | `carodo-ios/Carodo/Core/Recording/TripReplay.swift` |
 
 ## Known limitations
 
