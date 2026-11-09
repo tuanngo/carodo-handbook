@@ -108,6 +108,10 @@ is done parked.
       `car_audio = carplay`.
 - [ ] **[passenger]** Start, CarPlay or a shortcut while parked: "Ready · Waiting to move", then Live once moving.
 - [ ] **[logs]** Car audio lost while stopped: ends after 90 s (`autoFinished disconnected`).
+- [ ] **[after parking]** + **[logs]** Parked minutes cut off (carodo-ios `fca3622`, `af84aa1`;
+      `field-tests/2026-11-08-parked-minutes.md`): an end by itself after the grace, Finish after
+      waiting parked, and a force-quit while parked opened 10+ min later each end at the stop, with
+      no fix after `ended_at`.
 - [ ] **[passenger]** + **[after parking]** A pending drive on a motorbike: no panel, the dashed chip; answer from the Journeys card
       (driver, passenger with each mode, Not me); a passenger route thin and grey on the Map.
 - [ ] **[logs]** A night indoors with Auto Mode on: no drive, battery flat.

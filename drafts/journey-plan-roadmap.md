@@ -11,10 +11,15 @@ Done (2026-11-07); device checks open.
 4. V2.2A.3 — Provinces Crossed: Current phase.
 5. V2.2A.4 — Contextual Summary
 Deterministic narrative.
-5. V2.2B — Intelligent Journey Story
-Apple Foundation Models.
+5. V2.2B — Intelligent Journey Story Apple Foundation Models.
 
-## V2.3 — Journey Enrichment
+## V2.3R — Cinematic Journey Replay (trước Enrichment, plan: plans/cinematic-replay.md)
+
+1. R.1	Cinematic Route Replay	Replay full-screen, Follow camera, timeline, distance/speed
+2. R.2	Camera & Terrain	Cinematic Director (Follow, Reveal, Highlight), địa hình
+3. R.3	Replay Highlights & Sharing	Highlights, Cinematic Recap 30–60 s, video
+
+## V2.3 — Journey Enrichment (sau V2.3R)
 
 1. V2.3A	POI Categories & Discovery	Nhận diện POI có ý nghĩa gần route, taxonomy, matching và ranking
 2. V2.3B	Smart Stops	Phát hiện điểm dừng và gợi ý xác nhận ghé thăm

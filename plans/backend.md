@@ -22,6 +22,15 @@ rebuilds the first commit once the skeleton deploys to staging.
 | Feed read | `GET /v1/feed` Discover and Following: items are one person's drives in one hour, keyset pages on (`drove_at`, `account_id`) with sealed cursors, deleted / opted-out / hidden drives and blocks (both ways) left out, ETag and 304, Discover cached by TTL-bucketed keys with stale-while-revalidate and one computation per key (ADR 0008); rows read measured at 500 accounts and 10,000 drives |
 | Live status | `PUT` / `DELETE /v1/live?tripId=`: a `live_status` row renewed for 15 minutes, a tombstone at the end so a late renewal is refused, no index on `expires_at` so a renewal writes one row, `liveOptIn` checked, listed above the Feed's first page (everyone, or the followed), pruned hourly, cleared on account deletion (ADR 0008; carodo-ios ADR 0010 changed) |
 
+## Open audit findings
+
+The [2026-11-07 source audit](backend-source-audit.md) records six unresolved findings: APP-01
+(P1, session revocation/login races) and APP-02–06 (P2, body limits, attestation logs, username
+holds, Live ordering and Feed pagination). The slices above are implemented locally; `Done` does
+not mean these correctness/security gaps are resolved or that the backend is release-ready.
+Fix APP-01 first, then the P2 findings before using real user data. Track fixes, regression tests
+and verification dates in that audit record; documentation alignment alone closes none of them.
+
 ## Next, in order
 
 1. **Profile** `GET`/`PUT /v1/me/profile`, `GET /v1/usernames/{username}`, `GET /v1/users/{id}`: a

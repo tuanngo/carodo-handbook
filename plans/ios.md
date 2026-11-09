@@ -57,6 +57,14 @@ Slice D progress (in code, device check pending):
      send. Found on the way: actor reentrancy let two drains send twice (now one drain at a time),
      and strict FIFO let one stuck message block all (messages are independent now). Wiring
      (enqueue on publish/delete, real transport, drain triggers) comes with `BackendService`.
+  5. **Database that cannot be opened (owner, 2026-11-07).** A: launch before the first unlock
+     waits for protected data (`AppLaunch`): **done in code**, device check pending (restart the
+     iPhone, drive or walk out of the parking geofence before unlocking, then unlock and open:
+     the journal is there, not empty). B, **before the first TestFlight build**: while the
+     database is broken (corrupt, failed migration), the live trip is appended to a spool file of
+     the same protection class and imported into the journal at the next launch that opens the
+     database. C (record before the first unlock into an unprotected file) was declined: raw GPS
+     readable on a locked iPhone.
 - **D3: done in code** (device drives pending). `StopDetector` (stop 3 km/h for 30 s, resume
   12 km/h, grace 5 min ending at the stop, 12 min no-signal), auto-finish for every drive (default
   on; Start panel setting still to build), `AutoModeCoordinator` (detection → session from the
