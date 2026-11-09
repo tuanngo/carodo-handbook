@@ -251,20 +251,6 @@ riêng. Không sửa trong V2.3.2 (Replay thuộc session khác).
 Chỉ khi dev, chỉ đọc, chỉ in số liệu tổng hợp, không tọa độ. Baseline chuyến 312 km: 8 stops / 89
 phút. Nếu khác baseline thì phân tích nguyên nhân, không sửa thuật toán cho khớp số.
 
-## 12. Phase sau: Stop Location Discovery (định hướng, không làm ở V2.3.2)
+## 12. Phase sau: Journey Points (V2.3.3)
 
-Kiểu Geofency: chạm vào một stop mở một location sheet.
-- Bản đồ với vị trí GPS có sẵn. **Reverse geocode khi sheet mở** (địa chỉ/khu vực). **Nearby Places
-  chỉ khi người dùng bấm xem**, không chạy cho mọi stop.
-- Nhiều kết quả thì hiện danh sách để chọn; không tự chọn kết quả gần nhất (khoảng cách không chứng
-  minh đã ghé). Được xem mà không chọn, chọn một, không chọn gì, hoặc đóng mà không lưu.
-- Địa chỉ không xác nhận hoạt động; POI là ứng viên. Chỉ khi người dùng xác nhận (và nghiệp vụ hỗ
-  trợ) mới thành context đã xác nhận. Không tự tạo Saved Place, fill-up, chi phí hay Journey Event.
-  Audit mô hình dữ liệu trước khi quyết định cách lưu liên kết địa điểm.
-- Privacy và hiệu năng: không gửi tọa độ chỉ vì mở Journey Detail; network chỉ từ hành động khám phá
-  của người dùng; có trạng thái loading, empty, offline, error; hủy request khi đóng sheet; không
-  lặp request, cache có giới hạn theo chính sách MapKit; không lưu hay sync POI chưa xác nhận như fact;
-  không ảnh hưởng recording.
-- Trước khi làm: audit `PlaceLookup`/`AppleGeocoderPlaceLookup`, `MapKitStationFinder`,
-  `geocoded_cells`, Saved Places, quy định attribution và lưu trữ của MapKit, các UI component sẵn có.
-  Không thêm service hay abstraction nếu đã có thành phần phù hợp.
+Đã làm theo hướng cuối của owner: [journey-points.md](journey-points.md).
