@@ -1,258 +1,261 @@
-# V2.3.1 — Driving Dynamics Shadow Mode: kế hoạch triển khai
+# V2.3.1 — Driving Dynamics Shadow Mode: implementation plan
 
-Trạng thái: **kế hoạch, chờ owner duyệt** (2026-11-08). Chưa có code.
-Nền tảng: V2.3.0 (`fda2612`: `JourneyAnalysis.stopIntervals`, `TrackQuality`, `Percentiles`, quy tắc
-"Derived insights and enrichment" trong `docs/architecture.md`). Quyết định của owner: mục G của
+Status: **built**, carodo-ios `7ffb515` (the analysis) and `539ca4d` (the log line after a save). Planned
+2026-11-08; what is still open is PV-3 in `technical-debt.md`.
+Foundation: V2.3.0 (`fda2612`: `JourneyAnalysis.stopIntervals`, `TrackQuality`, `Percentiles`, the
+"Derived insights and enrichment" rules in `docs/architecture.md`). The owner's decisions: section G of
 `journey-v2.3-enrichment-audit.md`.
 
-## 0. Phạm vi
+## 0. Scope
 
-**Làm:** một phân tích thuần, chạy **một lần sau khi lưu chuyến**, đo gia tốc/giảm tốc dọc theo
-hướng chạy từ tốc độ Doppler của GPS, ghi **một dòng** vào tracking log (Developer mode). Công cụ
-`task replay` tính lại cùng phân tích trên các database kéo từ iPhone để nghiên cứu phân bố.
+**In:** one pure analysis, run **once after a trip is saved**, that measures acceleration and
+deceleration along the direction of travel from the GPS Doppler speed and writes **one line** to the
+tracking log (Developer mode). The `task replay` tool computes the same analysis on databases pulled
+from the iPhone, to study the distributions.
 
-**Không làm:** UI, safety score, kết luận về hành vi lái, cornering, Core Motion, lưu kết quả vào
-database, schema, sync, đổi `RouteRecorder`/recording/distance, Between-Journey Smart Stops.
+**Out:** UI, a safety score, any conclusion about driving behaviour, cornering, Core Motion, storing
+results in the database, schema, sync, changes to `RouteRecorder`/recording/distance, Between-Journey
+Smart Stops.
 
-## 1. Thuật toán và cách xử lý độ bất định của GPS
+## 1. Algorithm and how GPS uncertainty is handled
 
-### 1.1 Đầu vào
+### 1.1 Input
 
-Các fix đã được chấp nhận của **chính chuyến vừa lưu** (`StoredTrip.samples`, raw track), không
-phải route đã replay: route giữ tốc độ = 0 khi xe đứng ở chỗ dừng, làm méo đạo hàm. Dynamics đọc
-dữ liệu thô, **không lọc lại vị trí** (không trùng logic với `RouteRecorder`, vì bộ lọc đó đã
-quyết định fix nào được giữ).
+The accepted fixes of **the trip just saved** (`StoredTrip.samples`, the raw track), not the replayed
+route: the route holds speed at 0 while the car stands at a stop, which distorts the derivative.
+Dynamics reads the raw data and **does not filter positions again** (no logic shared with
+`RouteRecorder`, whose filter has already decided which fixes are kept).
 
-### 1.2 Độ dốc tốc độ theo cửa sổ: hồi quy tuyến tính có trọng số
+### 1.2 Speed slope per window: weighted linear regression
 
-Audit cho thấy lấy hiệu tốc độ giữa hai fix liền nhau (1 s) là nhiễu: 18 "phanh gấp" giả, không
-cái nào kéo dài quá một bước. Thay vào đó, với mỗi fix `i` lấy cửa sổ **căn giữa, rộng W = 3 s**
-(giả thuyết, chỉnh được) và ước lượng độ dốc `a` của `v(t)` bằng **bình phương tối thiểu có trọng
-số** `wₖ = 1/σₖ²`, với `σₖ = speedAccuracy` của fix:
+The audit showed that the speed difference between two consecutive fixes (1 s) is noise: 18 false
+"hard brakes", none lasting more than one step. Instead, for each fix `i` take a **centred window,
+W = 3 s wide** (a hypothesis, tunable) and estimate the slope `a` of `v(t)` by **weighted least
+squares** with `wₖ = 1/σₖ²`, where `σₖ = speedAccuracy` of the fix:
 
-- `a = Σw(t−t̄)(v−v̄) / Σw(t−t̄)²`, sai số `σₐ = √(1 / Σw(t−t̄)²)`.
-- Tương đương đạo hàm Savitzky–Golay bậc 1 (thuật toán mà `docs/architecture.md` đã ghi là
-  "Reference"), có thêm trọng số theo độ chính xác: một fix tốc độ kém kéo kết quả ít hơn.
-- Tính bằng **hai con trỏ và tổng chạy** (Σw, Σwt, Σwv, Σwt², Σwtv): O(n) cho cả chuyến, không
-  lưu mảng trung gian.
+- `a = Σw(t−t̄)(v−v̄) / Σw(t−t̄)²`, error `σₐ = √(1 / Σw(t−t̄)²)`.
+- Equivalent to a first-order Savitzky–Golay derivative (the algorithm `docs/architecture.md` already
+  lists as "Reference"), with an accuracy weight added: a fix with poor speed pulls the result less.
+- Computed with **two pointers and running sums** (Σw, Σwt, Σwv, Σwt², Σwtv): O(n) for the whole trip,
+  no intermediate array.
 
-**Lưu ý trung thực:** `speedAccuracy` của Core Location không được Apple định nghĩa là 1σ, và sai
-số giữa các fix liên tiếp tương quan với nhau (bộ lọc Kalman bên trong). Vì vậy `σₐ` là **chỉ số
-tương đối** để xếp hạng và lọc, không phải khoảng tin cậy thống kê đúng nghĩa. Bài test thực tế
-(mục 7.3) sẽ hiệu chỉnh nó.
+**An honest caveat:** Apple does not define Core Location's `speedAccuracy` as 1σ, and errors of
+consecutive fixes are correlated (the internal Kalman filter). So `σₐ` is a **relative index** for
+ranking and filtering, not a true statistical confidence interval. The real-world test (section 7.3)
+will calibrate it.
 
-### 1.3 Một cửa sổ chỉ hợp lệ khi
+### 1.3 A window is valid only when
 
-- mọi fix trong cửa sổ cùng `segment` (không qua pause hay ranh giới phần ghép);
-- mọi khoảng giữa hai fix ≤ `TrackQuality.Configuration.regularIntervalS` (1,5 s): **dùng lại** định
-  nghĩa nhịp đều của V2.3.0, không đặt ngưỡng thứ hai. Có khoảng trống GPS thì không có cửa sổ;
-- ít nhất 3 fix, tất cả có tốc độ ≥ 0 và speed accuracy đã biết;
-- speed accuracy của từng fix ≤ `maxSpeedAccuracyMps` (giả thuyết 2,5 m/s, khoảng p75 của dữ liệu
-  audit);
-- tốc độ lớn nhất trong cửa sổ ≥ `minimumSpeedMps` (giả thuyết 3 m/s ≈ 11 km/h): bỏ nhiễu khi đứng
-  yên, nhưng vẫn giữ pha phanh tới lúc dừng hẳn (đầu cửa sổ còn đang chạy).
+- every fix in the window has the same `segment` (it never crosses a pause or the boundary of a joined
+  part);
+- every interval between two fixes is ≤ `TrackQuality.Configuration.regularIntervalS` (1.5 s):
+  **reuse** V2.3.0's definition of a regular cadence, no second threshold. A GPS gap means no window;
+- at least 3 fixes, all with speed ≥ 0 and a known speed accuracy;
+- the speed accuracy of each fix is ≤ `maxSpeedAccuracyMps` (hypothesis 2.5 m/s, about the p75 of the
+  audit data);
+- the highest speed in the window is ≥ `minimumSpeedMps` (hypothesis 3 m/s ≈ 11 km/h): drops the noise
+  while standing still, but keeps the braking phase down to a full stop (the start of the window is
+  still moving).
 
-### 1.4 Sự kiện (chỉ ô tô, ngưỡng nghiên cứu)
+### 1.4 Events (cars only, research thresholds)
 
-**Schmitt trigger** trên chuỗi độ dốc của các cửa sổ hợp lệ liên tiếp:
+A **Schmitt trigger** on the slopes of consecutive valid windows:
 
-| | Vào | Ra | Thời lượng tối thiểu | Gộp |
+| | Enter | Leave | Minimum duration | Merge |
 |---|---|---|---|---|
-| Giảm tốc | `a ≤ −2,94 m/s²` (−0,30 g) | `a > −1,47` (một nửa) | ≥ 2 tâm cửa sổ liên tiếp (~1 s) | hai sự kiện cách nhau < 2 s là một |
-| Tăng tốc | `a ≥ +2,75 m/s²` (+0,28 g) | `a < +1,37` | như trên | như trên |
+| Deceleration | `a ≤ −2.94 m/s²` (−0.30 g) | `a > −1.47` (half) | ≥ 2 consecutive window centres (~1 s) | two events less than 2 s apart are one |
+| Acceleration | `a ≥ +2.75 m/s²` (+0.28 g) | `a < +1.37` | as above | as above |
 
-Một sự kiện kết thúc ngay khi gặp cửa sổ không hợp lệ (khoảng trống GPS, segment mới): **không bao
-giờ nối qua chỗ mất GPS**.
+An event ends as soon as it meets an invalid window (a GPS gap, a new segment): **an event never
+bridges lost GPS**.
 
-Hai mức, đều chỉ để ghi log:
-- **candidate**: ước lượng điểm vượt ngưỡng;
-- **confident**: cận gần ngưỡng nhất vẫn vượt, `a + k·σₐ ≤ −2,94` (phanh) hoặc `a − k·σₐ ≥ +2,75`
-  (tăng tốc), với `k = 1` là giả thuyết.
+Two levels, both for the log only:
+- **candidate**: the point estimate crosses the threshold;
+- **confident**: the bound nearest the threshold still crosses it, `a + k·σₐ ≤ −2.94` (braking) or
+  `a − k·σₐ ≥ +2.75` (acceleration), with `k = 1` as a hypothesis.
 
-Với dữ liệu audit (3 s, giảm tốc lớn nhất 2,29 m/s²), dự kiến **0 candidate** trên các chuyến
-thường. Đó là kết quả mong đợi, không phải lỗi.
+With the audit data (3 s, largest deceleration 2.29 m/s²), **0 candidates** are expected on ordinary
+trips. That is the expected result, not a bug.
 
-## 2. Ô tô và xe máy
+## 2. Cars and motorbikes
 
-| | Ô tô (`car`) | Xe máy (`motorbike`) | Xe đạp, không gán xe |
+| | Car (`car`) | Motorbike (`motorbike`) | Bicycle, no vehicle assigned |
 |---|---|---|---|
-| Phân tích phân bố | Có | Có | Không (log `skipped`) |
-| Ngưỡng sự kiện | −0,30 g / +0,28 g, **ngưỡng nghiên cứu** | **Không có** (`nil`): chỉ ghi phân bố | — |
-| Cửa sổ, lọc cửa sổ | Mặc định 1.3 | Cùng giá trị lúc đầu, cấu hình riêng để chỉnh sau | — |
+| Distribution analysis | Yes | Yes | No (log `skipped`) |
+| Event thresholds | −0.30 g / +0.28 g, **research thresholds** | **None** (`nil`): distribution only | — |
+| Window, window filter | Defaults of 1.3 | Same values at first, its own configuration to tune later | — |
 
-- Loại xe lấy từ `Vehicle.vehicleClass` của xe gán cho chuyến (đã có sẵn). Không gán xe thì không
-  đoán: bỏ qua.
-- Đo bằng tốc độ GPS chứ không đọc cảm biến điện thoại, nên điện thoại để trong túi hay gắn trên
-  xe máy không ảnh hưởng.
-- Cấu hình theo loại xe là một giá trị `Configuration` có `byClass`, đặt trong `TrackingRules`
-  (nơi duy nhất chứa ngưỡng chỉnh được), không phải một protocol hay class riêng.
+- The vehicle class comes from `Vehicle.vehicleClass` of the trip's vehicle (already there). No vehicle
+  assigned means no guess: skip.
+- It measures GPS speed, not the phone's sensors, so a phone in a pocket or mounted on a motorbike makes
+  no difference.
+- The per-class configuration is a `Configuration` value with `byClass`, in `TrackingRules` (the one
+  place for tunable thresholds), not a separate protocol or class.
 
-## 3. Quality gating và confidence
+## 3. Quality gating and confidence
 
-Ba lớp tách biệt:
+Three separate layers:
 
-1. **Đủ điều kiện của journey** (cổng có/không, không phải điểm số): chuyến đã chắc chắn
-   (`!isPending`), `rider == .driver`, loại xe là `car` hoặc `motorbike`. Đây là đúng điều kiện
-   "sure + driven" mà `JourneyMerge` dùng; nếu điều kiện đó đã là một hàm đọc được thì dùng lại,
-   nếu đang nằm trong `JourneyMerge.refusal` thì tách ra một predicate trên `Journey` để cả hai
-   cùng đọc (không chép).
-2. **Độ tin cậy của phép đo** (journey): từ `TrackQuality` của chuyến. Cổng riêng của dynamics
-   (giả thuyết):
-   - `regularIntervalShare ≥ 0,9`;
-   - `trustedMovingSpeedShare ≥ 0,7`;
-   - `speedAccuracy.p50 ≤ 2,0 m/s`.
+1. **The journey qualifies** (a yes/no gate, not a score): the trip is sure (`!isPending`),
+   `rider == .driver`, the vehicle class is `car` or `motorbike`. This is exactly the "sure + driven"
+   condition `JourneyMerge` uses; if it is already a readable function, reuse it; if it lives inside
+   `JourneyMerge.refusal`, extract a predicate on `Journey` that both read (no copy).
+2. **Confidence of the measurement** (journey): from the trip's `TrackQuality`. Dynamics' own gate
+   (hypotheses):
+   - `regularIntervalShare ≥ 0.9`;
+   - `trustedMovingSpeedShare ≥ 0.7`;
+   - `speedAccuracy.p50 ≤ 2.0 m/s`.
 
-   Không đạt thì log `skipped reason=quality(cadence|trusted|speedAcc)`. Trên 18 chuyến audit,
-   khoảng 4 chuyến sẽ bị loại vì `trusted < 0,7`. Thêm một điểm `measure conf=0.00…1.00` tính bằng
-   **`DriveConfidence.ramp/score`** có sẵn (không tạo công thức mới).
-3. **Độ tin cậy của từng sự kiện**: `DriveConfidence.score` trên các đặc trưng: biên vượt ngưỡng
-   chia cho `σₐ`, số cửa sổ liên tiếp, độ phủ fix trong cửa sổ, speed accuracy trung bình. Log
-   bằng `conf=` như mọi quyết định khác của engine.
+   Failing it logs `skipped reason=quality(cadence|trusted|speedAcc)`. On the 18 audit trips, about 4
+   would be dropped for `trusted < 0.7`. Plus a `measure conf=0.00…1.00` score computed with the existing
+   **`DriveConfidence.ramp/score`** (no new formula).
+3. **Confidence of each event**: `DriveConfidence.score` over its features: the margin past the
+   threshold divided by `σₐ`, the number of consecutive windows, the fix coverage in the window, the mean
+   speed accuracy. Logged as `conf=` like every other engine decision.
 
-Không có điểm nào mô tả người lái; log chỉ nói về phép đo.
+No score describes the driver; the log speaks only about the measurement.
 
-## 4. Thu thập phân bố mà không tăng dữ liệu lưu
+## 4. Collecting distributions without storing more data
 
-- **Không lưu gì mới vào database.** Mỗi chuyến chỉ ghi **một dòng tracking log**. Log đã có giới
-  hạn dung lượng (`GRDBTrackingLog` xóa dòng cũ), không có tọa độ và không có thời điểm của sự kiện
+- **Nothing new is stored in the database.** Each trip writes **one tracking-log line**. The log is
+  already capped (`GRDBTrackingLog` deletes old lines) and carries no coordinates and no event times
   (P5, P9):
   ```
   dynamics v1 class=car windows=1180 measure conf=0.82 brake p50=0.2 p99=1.2 max=2.3 accel p99=1.3 max=2.7 candidates=0/0 confident=0/0
   dynamics v1 skipped reason=passenger|pending|bicycle|noVehicle|quality(trusted)
   ```
-- Percentile dùng `Percentiles` (nearest rank) của V2.3.0, không viết helper thứ hai.
-- Phân bố đầy đủ (histogram theo bin 0,25 m/s², gộp theo loại xe) **chỉ tạo trong `task replay`**,
-  tính lại từ raw track đã có. Không lưu ở đâu cả, chỉ in ra lúc chạy tool.
-- Kết quả đều tính lại được từ raw track. Đổi thuật toán thì chạy lại `task replay`, không cần
-  migration.
+- Percentiles use V2.3.0's `Percentiles` (nearest rank); no second helper.
+- The full distribution (a histogram in 0.25 m/s² bins, grouped by vehicle class) is **built only in
+  `task replay`**, recomputed from the raw tracks already there. It is stored nowhere, only printed while
+  the tool runs.
+- Every result can be recomputed from the raw track. Changing the algorithm means running `task replay`
+  again, never a migration.
 
-## 5. Chạy shadow mà không ảnh hưởng recording hoặc UI
+## 5. Running in shadow without touching recording or UI
 
-- **Khi nào:** trong `writer.onSettled` (`CarodoApp.swift`), ngay sau `logMotion(forTrip:)`. Đây
-  là chỗ các dòng log sau khi lưu đã nằm (`motion`, `ride`), sau khi chuyến đã ghi xong và đóng
-  transaction. Không chạm `LocationSource → RouteRecorder → TripWriter`.
-- **Cách chạy:** `DependencyContainer.logDrivingDynamics(forTrip:)` đọc chuyến (`storedTrip`), đọc
-  journey (rider, pending, xe) và xe (loại), rồi gọi phân tích thuần `@concurrent` (ngoài main
-  actor) và ghi log. Có `guard !isErasingLocalData` và đếm `activeDataWork` như `logMotion`. Lỗi
-  đọc thì không ghi gì (không log "0 sự kiện" thay cho "không biết").
-- **Chuyến còn pending lúc lưu** (Auto Mode chưa xác nhận): log `skipped reason=pending`. Phương
-  án tối giản: **không** thêm hook khi xác nhận sau; `task replay` sẽ tính các chuyến này với trạng
-  thái cuối cùng tại thời điểm kéo DB. Nếu muốn log cả lúc xác nhận thì cần một hook thứ hai: em
-  đề xuất để sau.
-- **Không UI**, không đổi màn hình nào. Developer view chỉ thêm một nhóm hiển thị cấu hình
-  `dynamics` cạnh `StopDetector` (đọc từ `TrackingRules`), giống các nhóm hiện có.
+- **When:** in `writer.onSettled` (`CarodoApp.swift`), right after `logMotion(forTrip:)`. That is where
+  the after-save log lines already sit (`motion`, `ride`), after the trip is written and its transaction
+  closed. It never touches `LocationSource → RouteRecorder → TripWriter`.
+- **How:** `DependencyContainer.logDrivingDynamics(forTrip:)` reads the trip (`storedTrip`), the journey
+  (rider, pending, vehicle) and the vehicle (class), then calls the pure analysis `@concurrent` (off the
+  main actor) and writes the log. It has `guard !isErasingLocalData` and counts `activeDataWork` like
+  `logMotion`. A failed read writes nothing (never "0 events" in place of "unknown").
+- **A trip still pending when saved** (Auto Mode, not confirmed yet): log `skipped reason=pending`. The
+  minimal option: **no** hook on a later confirmation; `task replay` computes these trips with their
+  final state when the database is pulled. Logging at confirmation too would need a second hook: I
+  propose leaving it for later.
+- **No UI**, no screen changes. The Developer view only adds a group showing the `dynamics` configuration
+  beside `StopDetector` (read from `TrackingRules`), like the existing groups.
 
-## 6. Versioning, hiệu năng, pin
+## 6. Versioning, performance, battery
 
-- `DrivingDynamics.version = 1`, in trong mỗi dòng log. Tăng version mỗi khi đổi bất kỳ quy tắc nào
-  (cửa sổ, cổng, ngưỡng). Lịch sử version ghi trong bảng ở `docs/tracking.md`. Không lưu kết quả nên
-  không cần tính lại chuyến cũ trên máy.
-- **Hiệu năng:** O(n), hai con trỏ; một giờ lái ≈ 3.600 fix, tính trong vài mili-giây, ngoài main
-  actor, một lần mỗi chuyến. Chi phí lớn nhất là một lần đọc và giải nén track (khoảng 25 KB với
-  một giờ lái).
-- **Pin:** không cảm biến mới, không mạng, không thêm khi đang ghi. Tác động không đo được so với
-  phần ghi chuyến.
+- `DrivingDynamics.version = 1`, printed in every log line. The version goes up whenever any rule changes
+  (window, gate, threshold). The version history is a table in `docs/tracking.md`. Nothing is stored, so
+  old trips never need recomputing on the device.
+- **Performance:** O(n), two pointers; an hour of driving ≈ 3,600 fixes, computed in a few milliseconds,
+  off the main actor, once per trip. The largest cost is one read and decompression of the track (about
+  25 KB for an hour of driving).
+- **Battery:** no new sensor, no network, nothing added while recording. The impact is not measurable
+  next to recording.
 
-## 7. Kiểm thử và validation
+## 7. Testing and validation
 
-### 7.1 Unit test với dữ liệu tổng hợp (`DrivingDynamicsTests`)
+### 7.1 Unit tests on synthetic data (`DrivingDynamicsTests`)
 
-Dữ liệu tổng hợp tất định, nhiễu từ một bộ sinh số giả ngẫu nhiên có seed cố định trong test.
-Không dùng track thật.
+Deterministic synthetic data, noise from a pseudo-random generator with a fixed seed in the test. No
+real tracks.
 
-- Chạy đều 15 m/s cộng nhiễu ±σ: 0 candidate; độ dốc p50 ≈ 0.
-- Ramp phanh −3,5 m/s² trong 3 s: 1 sự kiện phanh, đúng thời lượng; ở −2,5 m/s²: 0 (cả hai phía
-  ngưỡng vào).
-- Hysteresis: dao động quanh ngưỡng chỉ cho 1 sự kiện; hai ramp cách nhau 1,5 s gộp thành một,
-  cách nhau 3 s là hai.
-- Spike một fix (giống audit): 0 sự kiện.
-- Khoảng trống GPS hoặc ranh giới segment giữa ramp: không có cửa sổ qua chỗ đó, không sự kiện nối
-  qua.
-- Fix không có tốc độ hoặc speed accuracy > ngưỡng: cửa sổ bị loại.
-- Trọng số: một fix accuracy kém lệch tốc độ thì kéo độ dốc ít hơn một fix accuracy tốt.
-- Xe máy: ramp mạnh vẫn cho 0 sự kiện (không có ngưỡng) nhưng có trong phân bố.
-- Xe đạp, hành khách, pending, không xe: `skipped` với đúng lý do.
-- Cổng chất lượng: hai phía của 0,9 / 0,7 / 2,0.
-- Mô phỏng độ trễ của Core Location (ramp đi qua bộ lọc mũ): đo mức đỉnh bị làm phẳng, ghi lại
-  trong test như một **đặc tả đã biết** chứ không phải một ngưỡng.
-- `DriveConfidenceTests`: hai hàm confidence mới, hai phía mỗi mốc.
-- Tracking log: dòng `dynamics` không có tọa độ, không có thời điểm sự kiện.
-- O(n): 100.000 fix chạy dưới một giới hạn thời gian rộng (bảo vệ khỏi lỡ tay viết O(n²)).
+- Steady 15 m/s plus ±σ noise: 0 candidates; slope p50 ≈ 0.
+- A braking ramp of −3.5 m/s² for 3 s: 1 braking event of the right duration; at −2.5 m/s²: 0 (both
+  sides of the enter threshold).
+- Hysteresis: oscillating around the threshold gives 1 event; two ramps 1.5 s apart merge into one,
+  3 s apart are two.
+- A one-fix spike (as in the audit): 0 events.
+- A GPS gap or a segment boundary in the middle of a ramp: no window across it, no event bridging it.
+- A fix with no speed, or a speed accuracy above the threshold: the window is dropped.
+- Weighting: an off-speed fix with poor accuracy pulls the slope less than one with good accuracy.
+- Motorbike: a strong ramp still gives 0 events (no threshold) but appears in the distribution.
+- Bicycle, passenger, pending, no vehicle: `skipped` with the right reason.
+- Quality gate: both sides of 0.9 / 0.7 / 2.0.
+- Simulated Core Location lag (a ramp through an exponential filter): measure how much the peak is
+  flattened, recorded in the test as a **known property**, not a threshold.
+- `DriveConfidenceTests`: the two new confidence functions, both sides of each step.
+- Tracking log: the `dynamics` line has no coordinates and no event times.
+- O(n): 100,000 fixes run under a generous time limit (guards against an accidental O(n²)).
 
-### 7.2 Regression trên dữ liệu thật (`task replay`)
+### 7.2 Regression on real data (`task replay`)
 
-- Thêm cột: loại xe, đủ điều kiện hay lý do bỏ qua, số cửa sổ, p99/max phanh và tăng tốc,
-  candidate/confident. Cuối bảng in histogram gộp theo loại xe.
-- Kỳ vọng trên các chuyến đã kéo: 0 candidate cho ô tô, phân bố gần với audit. Mỗi candidate xuất
-  hiện đều được xem lại bằng trip report (không có tọa độ).
+- Added columns: vehicle class, qualifies or the skip reason, window count, braking and acceleration
+  p99/max, candidate/confident. A histogram grouped by vehicle class is printed after the table.
+- Expected on the pulled trips: 0 candidates for cars, distributions close to the audit. Every candidate
+  that appears is looked at with a trip report (no coordinates).
 
-### 7.3 Kiểm thử thực tế có kiểm soát (sau khi code xong)
+### 7.3 A controlled real-world test (after the code is done)
 
-- **Chỉ ở khu vực kín, có phép, không có xe khác; không bao giờ trên đường công cộng.** Người lái
-  có kinh nghiệm, tốc độ thấp.
-- **Tham chiếu:** đầu đọc OBD-II ghi tốc độ xe ≥ 5 Hz, hoặc một GNSS 10 Hz. Đồng bộ thời gian bằng
-  một mốc chung (bắt đầu chuyến Carodo và đánh dấu trên app tham chiếu cùng lúc).
-- **Ô tô:** từ 40 km/h, mỗi mức 5 lần: phanh nhẹ (~0,15 g), vừa (~0,3 g), mạnh (~0,5 g); tăng tốc
-  tương tự trong giới hạn xe.
-- **Xe máy:** chỉ phanh nhẹ và vừa, có đồ bảo hộ.
-- **Đo:** đỉnh độ dốc của Carodo so với đỉnh tham chiếu (hệ số bị làm phẳng, độ trễ); recall và
-  precision của candidate/confident theo từng mức; có hiệu chỉnh `k` và `σₐ` được không.
-- Kết quả ghi vào kế hoạch này. Chỉ sau đó mới bàn tới ngưỡng chính thức hoặc hiển thị.
+- **Only in a closed area, with permission, with no other vehicles; never on a public road.** An
+  experienced driver, low speeds.
+- **Reference:** an OBD-II reader logging vehicle speed at ≥ 5 Hz, or a 10 Hz GNSS. Time aligned with a
+  shared mark (start the Carodo trip and mark the reference app at the same moment).
+- **Car:** from 40 km/h, 5 times at each level: light braking (~0.15 g), medium (~0.3 g), hard
+  (~0.5 g); acceleration likewise, within the car's limits.
+- **Motorbike:** light and medium braking only, with protective gear.
+- **Measure:** Carodo's peak slope against the reference peak (flattening factor, lag); recall and
+  precision of candidate/confident per level; whether `k` and `σₐ` can be calibrated.
+- Results are recorded in this plan. Only then are official thresholds or any display discussed.
 
-### 7.4 Shadow trên chuyến thường
+### 7.4 Shadow on ordinary trips
 
-2–4 tuần lái hằng ngày trên 3 iPhone, cả ô tô lẫn xe máy; `task pull-db` rồi `task replay`. Dùng
-phân bố theo loại xe để đề xuất ngưỡng cho xe máy.
+2–4 weeks of daily driving on 3 iPhones, cars and motorbikes; `task pull-db` then `task replay`. Use the
+per-class distributions to propose motorbike thresholds.
 
-**V2.3.1 coi là xong khi:** code và test pass (`task lint`, `task warnings`, `task test`), replay
-chạy được, docs cập nhật. Dòng log trên iPhone thật sau một chuyến là **device check còn phải làm**.
-Không có tiêu chí precision ở V2.3.1: đó là điều kiện cho quyết định hiển thị sau này.
+**V2.3.1 counts as done when:** code and tests pass (`task lint`, `task warnings`, `task test`), the
+replay runs, the docs are updated. The log line on a real iPhone after a trip is a **device check still
+required**. V2.3.1 has no precision criterion: that is a condition for a later decision to display.
 
-## 8. File thay đổi
+## 8. Files changed
 
-| File | Thay đổi | Lý do |
+| File | Change | Reason |
 |---|---|---|
-| `Carodo/Core/Domain/DrivingDynamics.swift` (mới) | Phân tích thuần: cửa sổ, độ dốc có trọng số, phân bố, sự kiện, lý do bỏ qua, `version` | Một trách nhiệm, tất định, test được |
-| `Carodo/Core/Tracking/TrackingRules.swift` | Thêm cấu hình `dynamics` (theo loại xe) | Ngưỡng chỉnh được nằm một chỗ |
-| `Carodo/Core/Tracking/DriveConfidence.swift` | Hai hàm: measurement confidence, event confidence | Dùng lại `ramp/score`, không tạo công thức mới |
-| `Carodo/Core/Domain/Journey.swift` (có thể) và `Carodo/Core/Domain/JourneyMerge.swift` | Tách predicate "sure + driven" nếu đang nằm riêng trong `JourneyMerge` | Không chép quy tắc Merge |
-| `Carodo/Core/Diagnostics/TrackingLog.swift` | Kind `.dynamics` và hàm tạo dòng log | Log không tọa độ |
-| `Carodo/App/DependencyContainer.swift` | `logDrivingDynamics(forTrip:)` | Cùng chỗ với `logMotion`/`logRide` |
-| `Carodo/App/CarodoApp.swift` | Một dòng gọi trong `onSettled` sau `logMotion` | Chạy một lần sau khi lưu |
-| `Carodo/Features/Developer/Views/DeveloperView.swift` | Nhóm hiển thị cấu hình `dynamics` | Xem ngưỡng đang dùng |
-| `CarodoTests/DrivingDynamicsTests.swift` (mới), `DriveConfidenceTests`, `DiagnosticsLogTests`, `TrackingRulesTests` | Test mục 7.1 | |
-| `CarodoTests/DriveDataReplayTests.swift` | Cột dynamics và histogram theo loại xe | Công cụ nghiên cứu, mục 7.2 |
-| `docs/tracking.md` | Mục "Driving dynamics (shadow)": bảng ngưỡng, cổng, version | Ngưỡng là giả thuyết, có bảng như các mục khác |
-| `docs/architecture.md` | Chuyển dòng "Harsh braking…" từ Reference sang bảng đã xây (shadow, hồi quy có trọng số); cornering vẫn ở Reference, ghi rõ bị chặn với GPS | Một thuật toán cho một bài toán |
-| `docs/operations/device-testing.md` | Quy trình test có kiểm soát (7.3) | Đang có thay đổi chưa commit của session khác: chỉ stage hunk của mình |
+| `Carodo/Core/Domain/DrivingDynamics.swift` (new) | Pure analysis: windows, weighted slope, distribution, events, skip reasons, `version` | One responsibility, deterministic, testable |
+| `Carodo/Core/Tracking/TrackingRules.swift` | Add the `dynamics` configuration (per vehicle class) | Tunable thresholds in one place |
+| `Carodo/Core/Tracking/DriveConfidence.swift` | Two functions: measurement confidence, event confidence | Reuses `ramp/score`, no new formula |
+| `Carodo/Core/Domain/Journey.swift` (maybe) and `Carodo/Core/Domain/JourneyMerge.swift` | Extract the "sure + driven" predicate if it sits inside `JourneyMerge` | No copy of Merge's rule |
+| `Carodo/Core/Diagnostics/TrackingLog.swift` | Kind `.dynamics` and the function building its line | A log without coordinates |
+| `Carodo/App/DependencyContainer.swift` | `logDrivingDynamics(forTrip:)` | Next to `logMotion`/`logRide` |
+| `Carodo/App/CarodoApp.swift` | One call in `onSettled` after `logMotion` | Runs once after the save |
+| `Carodo/Features/Developer/Views/DeveloperView.swift` | A group showing the `dynamics` configuration | See the thresholds in use |
+| `CarodoTests/DrivingDynamicsTests.swift` (new), `DriveConfidenceTests`, `DiagnosticsLogTests`, `TrackingRulesTests` | Tests of 7.1 | |
+| `CarodoTests/DriveDataReplayTests.swift` | Dynamics columns and the per-class histogram | Research tool, 7.2 |
+| `docs/tracking.md` | A "Driving dynamics (shadow)" section: thresholds, gates, version | Thresholds are hypotheses, with a table like the other sections |
+| `docs/architecture.md` | Move the "Harsh braking…" row from Reference to the built table (shadow, weighted regression); cornering stays in Reference, noted as blocked with GPS | One algorithm per problem |
+| `docs/operations/device-testing.md` | The controlled test procedure (7.3) | Another session has uncommitted changes there: stage only this work's hunks |
 
-**Không đổi:** schema, sync, `RouteRecorder`, `StopDetector`, `TripReplay`, `RideProfile`, UI người
-dùng, quyền truy cập, dependency.
+**Unchanged:** schema, sync, `RouteRecorder`, `StopDetector`, `TripReplay`, `RideProfile`, the user's
+UI, permissions, dependencies.
 
-## 9. Trùng lặp: dùng lại hay cố ý giữ riêng
+## 9. Duplication: reused or deliberately kept apart
 
-- **Dùng lại:** `TrackQuality` (cổng chất lượng và định nghĩa nhịp đều); `Percentiles`;
-  `DriveConfidence.ramp/score`; `LocationSample.trustedSpeed` (khi cần); điều kiện "sure + driven"
-  của Merge; `Vehicle.vehicleClass`; hàm đọc `storedTrip`.
-- **Cố ý giữ riêng:** `RideProfile.accelRms` (RMS của chênh lệch tốc độ 1 s, dùng để **đoán loại xe**
-  trong log `ride`). Nó trả lời câu hỏi khác và đang được log; đổi nó sẽ làm đổi số liệu đang dùng.
-  Ghi chú trong docs rằng hai số này không so sánh trực tiếp được. `SlowMoving` (làm mượt trung bình
-  30 s để tìm đoạn kẹt xe) cũng là bài toán khác.
-- **Nguy cơ lệch thuật toán:** nếu sau này Replay hoặc Journey Detail muốn hiện "phanh mạnh" thì
-  phải đọc kết quả của `DrivingDynamics`, không tự tính lại.
+- **Reused:** `TrackQuality` (the quality gate and the definition of a regular cadence); `Percentiles`;
+  `DriveConfidence.ramp/score`; `LocationSample.trustedSpeed` (where needed); Merge's "sure + driven"
+  condition; `Vehicle.vehicleClass`; the `storedTrip` read.
+- **Deliberately kept apart:** `RideProfile.accelRms` (the RMS of 1 s speed differences, used to
+  **guess the vehicle class** in the `ride` log). It answers a different question and is being logged;
+  changing it would change figures in use. The docs note that the two numbers cannot be compared
+  directly. `SlowMoving` (a 30 s moving average to find traffic jams) is a different problem too.
+- **Risk of the algorithms drifting:** if Replay or Journey Detail later wants to show "hard braking",
+  it must read `DrivingDynamics`' result, never compute it again.
 
-## 10. Rủi ro
+## 10. Risks
 
-- `speedAccuracy` không phải 1σ và sai số tương quan → `σₐ` chỉ là chỉ số tương đối, cần hiệu chỉnh
-  ở 7.3.
-- Bộ lọc của Core Location có thể làm phẳng đỉnh phanh → GPS-only có thể không bao giờ đủ để thấy
-  phanh gấp. Shadow Mode trả lời câu này mà không có rủi ro cho người dùng.
-- `rider = driver` là mặc định, không phải xác nhận → một số chuyến hành khách không đánh dấu sẽ lọt
-  vào. Chấp nhận được khi chỉ ghi log.
-- Chuyến pending lúc lưu không có dòng log trên máy (chỉ có trong replay).
+- `speedAccuracy` is not 1σ and errors are correlated → `σₐ` is only a relative index, to be calibrated
+  in 7.3.
+- Core Location's filter may flatten braking peaks → GPS alone may never be enough to see hard braking.
+  Shadow Mode answers this with no risk to the user.
+- `rider = driver` is a default, not a confirmation → some unmarked passenger trips will get in.
+  Acceptable while it only logs.
+- A trip pending when saved has no log line on the device (only in the replay).
 
-## 11. Cần owner xác nhận khi duyệt
+## 11. For the owner to confirm at approval
 
-1. Chấp nhận phương án tối giản cho chuyến pending (chỉ có trong replay), chưa thêm hook lúc xác
-   nhận?
-2. Cửa sổ 3 s là cửa sổ chính; `task replay` so sánh thêm 2 s và 5 s để chọn. Đồng ý?
+1. Accept the minimal option for pending trips (replay only), with no hook at confirmation yet?
+2. 3 s is the main window; `task replay` also compares 2 s and 5 s to choose. Agreed?

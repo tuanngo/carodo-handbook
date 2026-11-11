@@ -13,6 +13,12 @@ agent explores, proposes, implements bounded changes, tests and reports; it make
 iOS calls itself and explains each in a line, because the owner is new to Swift
 (`carodo-ios/AGENTS.md`, "Working with the owner").
 
+**Language.** Every written document is in English: plans, drafts, audits, reports, ADRs and each
+repo's `docs/` alike, since a plan's result lands in `docs/`. The conversation with the owner may be
+in Vietnamese; a document is never. Vietnamese appears in a document only as app copy beside its
+English (`"Stopped 4 min" / "Dừng 4 phút"`), as a quoted model output, or as a phrase the owner types
+(`field-tests/README.md`).
+
 ## Recommended loop
 
 1. **Frame**: one outcome, acceptance criteria, non-goals and constraints (the brief below).

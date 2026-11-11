@@ -1,47 +1,47 @@
-# V2.3.2 — Smart Stops V1: kế hoạch triển khai
+# V2.3.2 — Smart Stops V1: implementation plan
 
-Trạng thái: **đã triển khai**, carodo-ios `365ceaa` (2026-11-09), sau một lượt review (sửa Merge sheet chọn sai chuyến liền kề, marker đọc bởi VoiceOver, giờ của khoảng nghỉ). Việc còn mở: `technical-debt.md` (TD-1, KL-1, PV-1, PV-2). Các quyết định cuối ở **mục 11**; chỗ nào khác mục 11 thì mục 11 thắng.
-Nền tảng: V2.3.0 `fda2612` (`JourneyAnalysis.stopIntervals`, `RouteStop`, `TrackQuality`), bản sửa
-"silent stop" `2760b84` (session khác, cùng hàm), quyết định ở mục G của
+Status: **built**, carodo-ios `365ceaa` (2026-11-09), after one review pass (fixed: the Merge sheet picking the wrong neighbouring trip, the marker as VoiceOver reads it, the times of a break). Still open: `technical-debt.md` (TD-1, KL-1, PV-1, PV-2). The final decisions are in **section 11**; where anything differs from section 11, section 11 wins.
+Foundation: V2.3.0 `fda2612` (`JourneyAnalysis.stopIntervals`, `RouteStop`, `TrackQuality`), the
+"silent stop" fix `2760b84` (another session, same function), and the decisions in section G of
 `journey-v2.3-enrichment-audit.md`.
 
-## 0. Nguyên tắc: dữ liệu dẫn dắt, không gắn nhãn hoạt động
+## 0. Principle: data leads, no activity labels
 
-Mỗi dòng về một điểm dừng thuộc đúng **một trong ba mức**, và câu chữ phải cho thấy mức đó:
+Every line about a stop belongs to exactly **one of three levels**, and its wording shows which:
 
-| Mức | Nguồn | Ví dụ (EN / VI) |
+| Level | Source | Example (EN / VI) |
 |---|---|---|
-| **Đo được** (measured) | GPS: thời gian, thời lượng, vị trí nằm trong vòng tròn của một Saved Place, chờ giữa hai phần ghép | "Stopped 4 min" / "Dừng 4 phút"; "At Home" / "Tại Nhà"; "Waited 12 min" / "Chờ 12 phút" |
-| **Ngữ cảnh chưa xác nhận** (context) | Nguồn ngoài (POI). **Không có trong V1** (không gọi MapKit) | (sau này) "Near a fuel station" / "Gần trạm xăng" |
-| **Người dùng xác nhận** (confirmed) | Fill-up hoặc chi phí người dùng tự ghi | "Fill-up logged" / "Đã ghi đổ xăng" |
+| **Measured** | GPS: time, duration, a position inside a Saved Place's circle, the wait between two joined parts | "Stopped 4 min" / "Dừng 4 phút"; "At Home" / "Tại Nhà"; "Waited 12 min" / "Chờ 12 phút" |
+| **Unconfirmed context** | An outside source (POI). **Not in V1** (no MapKit call) | (later) "Near a fuel station" / "Gần trạm xăng" |
+| **Confirmed by the person** | A fill-up or an expense the person logged | "Fill-up logged" / "Đã ghi đổ xăng" |
 
-**Không bao giờ** có các nhãn Coffee/Fuel/Rest/Charging Stop suy ra từ thời lượng. Một lần dừng
-4 phút chỉ là "Dừng 4 phút". Đây cũng là đầu vào sạch cho Journey Narrator sau này: nó chỉ được
-nói những gì ở mức đo được hoặc đã xác nhận (ADR 0012 giữ nguyên; V1 không đổi Narrator).
+**Never** a Coffee/Fuel/Rest/Charging Stop label inferred from a duration. A 4-minute stop is only
+"Stopped 4 min". This is also a clean input for the Journey Narrator later: it may say only what is
+measured or confirmed (ADR 0012 unchanged; V1 does not touch the Narrator).
 
-## 1. Source hiện có sẽ tái sử dụng
+## 1. Existing source to reuse
 
-| Cần | Đã có | File |
+| Need | Already there | File |
 |---|---|---|
-| Phân đoạn dừng (khoảng thời gian, vị trí bắt đầu, số fix, khoảng trống GPS dài nhất, kết thúc có ước tính không, dừng im lặng) | `JourneyAnalysis.stopIntervals`, `RouteStop`, `minimumStopS` (60 s), `maximumObservedGapS` (30 s) | `Core/Domain/JourneyDetails.swift` |
-| Route đã replay mà mọi phân tích cùng đọc | `TripReplay.metrics`, `JourneyDetailAnalysisBuilder` (`@concurrent`) | `Core/Recording/TripReplay.swift`, `Core/Domain/JourneyDetailAnalysis.swift` |
-| Điểm nằm trong Saved Place | `PlaceMatch.place(atLatitude:longitude:in:)`, `Place.contains`, `SavedPlaceMark` | `Core/Domain/Place.swift`, `JourneyDetails.swift` |
-| Fill-up và chi phí đã gắn với chuyến | `DriveLogs.linked: [DriveLogItem]` (thời điểm `at`; fill-up có tọa độ trạm khi ghi tại chỗ) | `Core/Domain/DriveLog.swift`, đã tải trong `JourneyDetailViewModel` |
-| Chờ đã ghép / đã Merge | `JoinedPart` (`stoppedAt`, `waitS`), `joinedParts(of:)`, đã tải cho menu Split | `Core/Repositories/Repositories.swift` |
-| Hai journey liền kề | `mergeNeighbours(of:)`, `JourneyMerge.Pair`, `JourneyMerge.refusal`, `maxGapS` 6 h | `Core/Domain/JourneyMerge.swift`, đã tải cho Merge sheet |
-| "Bắt đầu tại chỗ chuyến trước kết thúc" | `WaitJoin.Configuration.joinMaxDistanceM` (150 m), `joinMaxDistanceAutoStartM` (1.000 m) | `Core/Tracking/WaitJoin.swift` |
-| Chất lượng GPS | `TrackQuality` | `Core/Domain/TrackQuality.swift` |
+| Stop segmentation (interval, start position, fix count, longest GPS gap, whether the end is estimated, silent stop) | `JourneyAnalysis.stopIntervals`, `RouteStop`, `minimumStopS` (60 s), `maximumObservedGapS` (30 s) | `Core/Domain/JourneyDetails.swift` |
+| The replayed route every analysis reads | `TripReplay.metrics`, `JourneyDetailAnalysisBuilder` (`@concurrent`) | `Core/Recording/TripReplay.swift`, `Core/Domain/JourneyDetailAnalysis.swift` |
+| A point inside a Saved Place | `PlaceMatch.place(atLatitude:longitude:in:)`, `Place.contains`, `SavedPlaceMark` | `Core/Domain/Place.swift`, `JourneyDetails.swift` |
+| Fill-ups and expenses linked to the trip | `DriveLogs.linked: [DriveLogItem]` (time `at`; a fill-up has the station's coordinates when logged on the spot) | `Core/Domain/DriveLog.swift`, already loaded in `JourneyDetailViewModel` |
+| Joined / merged waits | `JoinedPart` (`stoppedAt`, `waitS`), `joinedParts(of:)`, already loaded for the Split menu | `Core/Repositories/Repositories.swift` |
+| Two neighbouring journeys | `mergeNeighbours(of:)`, `JourneyMerge.Pair`, `JourneyMerge.refusal`, `maxGapS` 6 h | `Core/Domain/JourneyMerge.swift`, already loaded for the Merge sheet |
+| "Started where the previous trip ended" | `WaitJoin.Configuration.joinMaxDistanceM` (150 m), `joinMaxDistanceAutoStartM` (1,000 m) | `Core/Tracking/WaitJoin.swift` |
+| GPS quality | `TrackQuality` | `Core/Domain/TrackQuality.swift` |
 
-**Cách các màn hình đang dùng stop intervals (audit):**
-- **Journey Detail / Route timeline**: chỉ có một dòng tóm tắt `StopSummary` ("2 điểm dừng · 4 phút") dưới mục kết thúc. Không có từng điểm dừng.
-- **Trim**: `TrimTrack.stops` = `stopIntervals(≥ 60 s)`, dùng cho chip "Sau điểm dừng" và các mốc hít.
+**How the screens use stop intervals today (audit):**
+- **Journey Detail / Route timeline**: only one summary line, `StopSummary` ("2 stops · 4 min"), under the end. No single stops.
+- **Trim**: `TrimTrack.stops` = `stopIntervals(≥ 60 s)`, for the "After a stop" chip and the snap marks.
 - **Stop bands** (tracking log): `stopIntervals(≥ 15 s)`.
-- **Replay**: **không** dùng `stopIntervals`. `ReplayTimeline` rút gọn theo trạng thái "đang được giữ" của recorder (> 60 s). Đây là chỗ hai logic đang tách nhau (đã ghi từ V2.3.0). V1 **không** sửa Replay; mục 10 hỏi có hợp nhất ở bản sau không.
-- **Recording và auto-finish** (`RouteRecorder`, `StopDetector`): không đụng.
+- **Replay**: does **not** use `stopIntervals`. `ReplayTimeline` compresses by the recorder's "held" state (> 60 s). This is where the two logics part (noted since V2.3.0). V1 does **not** change Replay; section 10 asks whether a later version unifies them.
+- **Recording and auto-finish** (`RouteRecorder`, `StopDetector`): untouched.
 
-## 2. Mô hình phân loại điểm dừng
+## 2. The stop classification model
 
-Phân loại **theo bằng chứng**, không theo hoạt động. Một value thuần, không lưu:
+Classified **by evidence**, not by activity. One pure value, not stored:
 
 ```swift
 /// One stop on a journey with what is known about it (docs/specs/journey-detail.md, Stops).
@@ -55,202 +55,209 @@ nonisolated struct JourneyStop: Identifiable, Equatable, Sendable {
 }
 ```
 
-- `Length`: dùng lại giới hạn của `StopBands` (`mediumS` 60 s, `longS` 300 s); không thêm ngưỡng thứ hai.
-- `Wait`: khi khoảng thời gian của stop chứa ranh giới giữa hai phần (`JoinedPart.stoppedAt`).
-- `Timing.approximate` khi `endIsEstimated`, hoặc khi stop chứa một khoảng trống GPS mà **không phải** dừng im lặng (xe có thể đã đi). Dừng im lặng (vị trí không đổi) vẫn là `observed`.
-- **Không có** trường `activity`, `category` hay `guess`.
+- `Length`: reuses `StopBands`' limits (`mediumS` 60 s, `longS` 300 s); no second threshold.
+- `Wait`: when the stop's interval holds the boundary between two parts (`JoinedPart.stoppedAt`).
+- `Timing.approximate` when `endIsEstimated`, or when the stop holds a GPS gap that is **not** a silent stop (the car may have moved). A silent stop (the position unchanged) stays `observed`.
+- **No** `activity`, `category` or `guess` field.
 
-`JourneyStops.make(stops:places:logs:parts:)` là một hàm thuần, chỉ ghép dữ liệu (`Core/Domain/JourneyStops.swift`). Không phải detector mới: nó chỉ đọc `[RouteStop]`.
+`JourneyStops.make(stops:places:logs:parts:)` is a pure function that only joins data (`Core/Domain/JourneyStops.swift`). It is not a new detector: it only reads `[RouteStop]`.
 
-## 3. Quy tắc bằng chứng và độ tin cậy
+## 3. Evidence and confidence rules
 
-| Bằng chứng | Quy tắc (giả thuyết, chỉnh được) | Mức |
+| Evidence | Rule (hypothesis, tunable) | Level |
 |---|---|---|
-| Thời lượng | `RouteStop.durationS`; có `≈` khi `timing == .approximate` | Đo được |
-| Vị trí đại diện | Fix đầu của run (luôn là fix đã được chấp nhận, ≤ 50 m). Chỉ dùng để so với Saved Place; **không reverse geocode** trong V1 (mục 10) | Đo được |
-| Saved Place | `PlaceMatch.place` tại vị trí đó. Chỉ là hình học (nằm trong vòng tròn), không nói làm gì ở đó | Đo được |
-| Chờ ghép/Merge | Ranh giới phần nằm trong stop | Đo được |
-| Fill-up/chi phí đã ghi | Item trong `driveLogs.linked` có `at` trong `[start − 5 phút, end + 5 phút]`, **hoặc** fill-up có tọa độ trạm trong 150 m quanh vị trí stop. Một item gắn **tối đa một** stop (gần nhất về thời gian); item không khớp stop nào vẫn hiện như hôm nay | Xác nhận |
-| Chất lượng GPS | Không thành điểm số: chỉ quyết định `observed`/`approximate` | — |
+| Duration | `RouteStop.durationS`; with `≈` when `timing == .approximate` | Measured |
+| Representative position | The run's first fix (always an accepted fix, ≤ 50 m). Used only against Saved Places; **no reverse geocoding** in V1 (section 10) | Measured |
+| Saved Place | `PlaceMatch.place` at that position. Geometry only (inside the circle); it says nothing about what was done there | Measured |
+| Joined/merged wait | A part boundary inside the stop | Measured |
+| Logged fill-up/expense | An item in `driveLogs.linked` whose `at` falls in `[start − 5 min, end + 5 min]`, **or** a fill-up whose station coordinates are within 150 m of the stop's position. An item attaches to **at most one** stop (the nearest in time); an item that matches no stop still shows as today | Confirmed |
+| GPS quality | Not a score: it only decides `observed`/`approximate` | — |
 
-Không có điểm "confidence" cho hoạt động, vì không suy ra hoạt động. Độ tin cậy ở đây là **độ tin
-cậy của phép đo thời gian** (`timing`), tách riêng.
+There is no "confidence" score for an activity, because no activity is inferred. Confidence here is
+**the confidence of the time measurement** (`timing`), kept separate.
 
-## 4. GPS gaps, trim, merge và split
+## 4. GPS gaps, trim, merge and split
 
-- **GPS gaps:** đã xử lý trong `stopIntervals` (kết thúc ước tính sau khoảng trống > 30 s, dừng
-  im lặng). `JourneyStops` chỉ đọc lại thành `timing`.
-- **Trim:** phân tích chạy trên track đã cắt (như hôm nay). Một điểm dừng bị trim cắt đôi trở thành
-  "chờ lúc đi" hoặc "đỗ xe" và không còn là stop (test V2.3.0 đã khóa hành vi này). Item đã ghi
-  nằm ngoài phần giữ lại thì không gắn với stop nào.
-- **Merge / Stop and wait:** track gồm mọi phần, mỗi phần một segment. Khoảng chờ giữa hai phần
-  thành một stop có `wait`. Vị trí là chỗ chờ, không phải fix đầu của phần sau (V2.3.0 đã có test).
-- **Split:** chỉ là đọc lại sau khi tách; không có trạng thái nào để dọn, vì không lưu gì.
-- **Replay:** không đổi.
+- **GPS gaps:** already handled in `stopIntervals` (an estimated end after a gap > 30 s, silent stops).
+  `JourneyStops` only reads it back as `timing`.
+- **Trim:** the analysis runs on the trimmed track (as today). A stop cut in two by a trim becomes
+  "waiting before leaving" or "parked" and is no longer a stop (a V2.3.0 test pins this). A logged item
+  outside the kept part attaches to no stop.
+- **Merge / Stop and wait:** the track holds every part, one segment each. The wait between two parts
+  becomes a stop with a `wait`. Its position is where the car waited, not the first fix of the later part
+  (V2.3.0 has the test).
+- **Split:** only a new read after the split; there is no state to clean, since nothing is stored.
+- **Replay:** unchanged.
 
-## 5. Between-Journey Stops: điều kiện
+## 5. Between-Journey Stops: conditions
 
-Hàm thuần `JourneyBreak.between(pair:earlierEnd:laterStart:)` trong `Core/Domain/JourneyBreak.swift`.
-Nó **gọi** `JourneyMerge.refusal`, không chép quy tắc của Merge:
+A pure function `JourneyBreak.between(pair:earlierEnd:laterStart:)` in `Core/Domain/JourneyBreak.swift`.
+It **calls** `JourneyMerge.refusal` and does not copy Merge's rules:
 
-1. `JourneyMerge.refusal(pair) == nil`: liền kề, cả hai đã chắc chắn, cùng vai (lái/khách), xe
-   tương thích, khoảng cách thời gian từ 0 tới 6 h. **Không đổi 6 h của Merge.**
-2. Cả hai `rider == .driver`.
-3. **Cùng xe**: cả hai đều có xe và là cùng một xe (chặt hơn Merge, vốn chấp nhận một bên không có
-   xe; mục 10).
-4. `pair.gapS ≤ 2 h` (`JourneyBreak.maximumBreakS`, quyết định của owner).
-5. **Liên tục vị trí**: điểm cuối của chuyến trước và điểm đầu của chuyến sau cách nhau
-   ≤ `WaitJoin.joinMaxDistanceM` (150 m), hoặc ≤ `joinMaxDistanceAutoStartM` (1.000 m) khi Auto Mode
-   bắt đầu chuyến sau. **Dùng lại** đúng hai giá trị của Stop and wait (cùng nghĩa "bắt đầu lại ở
-   chỗ chuyến trước dừng"). Điểm đầu và cuối lấy từ display route (luôn giữ hai đầu), không đọc
-   raw track.
-6. **Chất lượng dữ liệu**: chuyến nào chưa có điểm đầu/cuối (route rỗng) thì không gợi ý.
+1. `JourneyMerge.refusal(pair) == nil`: neighbours, both sure, the same role (driver/passenger),
+   compatible vehicles, a time gap from 0 to 6 h. **Merge's 6 h is unchanged.**
+2. Both `rider == .driver`.
+3. **The same vehicle**: both have a vehicle and it is the same one (stricter than Merge, which accepts
+   one side without a vehicle; section 10).
+4. `pair.gapS ≤ 2 h` (`JourneyBreak.maximumBreakS`, the owner's decision).
+5. **Continuity of position**: the earlier trip's end and the later trip's start are within
+   `WaitJoin.joinMaxDistanceM` (150 m), or within `joinMaxDistanceAutoStartM` (1,000 m) when Auto Mode
+   started the later trip. **Reuses** exactly Stop and wait's two values (the same meaning: "started again
+   where the previous trip stopped"). The start and end come from the display route (which always keeps
+   both ends), not the raw track.
+6. **Data quality**: a trip with no start or end point (an empty route) gets no suggestion.
 
-Kết quả là một fact đo được: "Nghỉ 25 phút trước chuyến này". Hành động **duy nhất**: mở Merge
-sheet hiện có. Không tự Merge, không tạo mô hình Multi-leg.
+The result is a measured fact: "25 min break before this drive". The **only** action: open the existing
+Merge sheet. No automatic Merge, no Multi-leg model.
 
-## 6. Hiệu năng và caching
+## 6. Performance and caching
 
-- `stopIntervals` đã chạy trong `JourneyDetailAnalysisBuilder` (ngoài main actor). V1 cho analysis
-  giữ `[RouteStop]` (≥ 60 s) thay vì chỉ `StopSummary`, và `StopSummary` tính từ chính danh sách đó
-  (không phân đoạn hai lần).
-- `JourneyStops.make`: O(stops × (logs + places + parts)). Places tối đa 20, logs và parts mỗi chuyến
-  chỉ vài cái, nên không đáng kể.
-- `JourneyBreak`: dùng lại neighbours mà Merge sheet đã tải, **không thêm truy vấn**.
-- **Không cache, không schema, không lưu.** Mọi thứ được tính lại khi mở trang, như các phân tích
-  khác. Nếu `JourneyDetailCache` đang giữ analysis thì `[RouteStop]` đi theo cache đó.
+- `stopIntervals` already runs in `JourneyDetailAnalysisBuilder` (off the main actor). V1 has the
+  analysis keep `[RouteStop]` (≥ 60 s) instead of only `StopSummary`, and `StopSummary` is computed from
+  that same list (no second segmentation).
+- `JourneyStops.make`: O(stops × (logs + places + parts)). At most 20 places, and only a few logs and
+  parts per trip, so it is negligible.
+- `JourneyBreak`: reuses the neighbours the Merge sheet already loaded, **no extra query**.
+- **No cache, no schema, nothing stored.** Everything is recomputed when the page opens, like the other
+  analyses. If `JourneyDetailCache` holds the analysis, `[RouteStop]` goes with it.
 
-## 7. Kiểm thử
+## 7. Testing
 
-**Unit test** (`JourneyStopsTests`, `JourneyBreakTests`; dữ liệu tổng hợp):
-- Độ dài: hai phía của 60 s và 300 s.
-- Saved Place: trong và ngoài vòng tròn; Saved Place riêng tư vẫn khớp (dữ liệu của chính người dùng).
-- Item đã ghi: hai phía của ±5 phút; tọa độ trạm hai phía của 150 m; một item gần hai stop chỉ gắn
-  một; item không khớp vẫn ở timeline.
-- `timing`: dừng im lặng là `observed`; khoảng trống kiểu đường hầm là `approximate`; `endIsEstimated`.
-- Joined wait và merged wait; trim cắt giữa stop; chuyến không có stop.
-- Between: từng điều kiện của `JourneyMerge.refusal` vẫn chặn (pending, khác vai, khác xe, > 6 h);
-  2 h hai phía; cùng xe; 150 m và 1.000 m hai phía; route rỗng; khách.
-- Không câu chữ nào chứa tên hoạt động (test chuỗi trong catalog).
+**Unit tests** (`JourneyStopsTests`, `JourneyBreakTests`; synthetic data):
+- Length: both sides of 60 s and 300 s.
+- Saved Place: inside and outside the circle; a private Saved Place still matches (the person's own data).
+- Logged items: both sides of ±5 min; station coordinates on both sides of 150 m; an item near two stops
+  attaches to one; an unmatched item stays on the timeline.
+- `timing`: a silent stop is `observed`; a tunnel-like gap is `approximate`; `endIsEstimated`.
+- Joined and merged waits; a trim cutting through a stop; a trip with no stops.
+- Between: each condition of `JourneyMerge.refusal` still blocks (pending, a different role, a different
+  vehicle, > 6 h); both sides of 2 h; the same vehicle; both sides of 150 m and 1,000 m; an empty route;
+  a passenger.
+- No wording names an activity (a string test over the catalog).
 
 **Regression:**
-- Tất cả test stop của V2.3.0 và của `2760b84` giữ nguyên kết quả.
-- Đọc chuyến 312 km trong `drive-data/carodo/*.carodo` (file backup, không mã hóa) qua `BackupFile` trong
-  tool replay, chỉ in số liệu: kỳ vọng 8 điểm dừng, 89 phút (như commit `2760b84`); in `JourneyStop`
-  của từng điểm (thời lượng, có Saved Place không, có item không, `timing`) và các cặp Between nếu có.
-- Dữ liệu thật **không** vào repo (P5).
+- Every stop test of V2.3.0 and of `2760b84` keeps its result.
+- Read the 312 km trip in `drive-data/carodo/*.carodo` (a backup file, unencrypted) through `BackupFile`
+  in the replay tool, printing figures only: 8 stops, 89 min expected (as in commit `2760b84`); print
+  each stop's `JourneyStop` (duration, whether it has a Saved Place, whether it has an item, `timing`)
+  and the Between pairs if any.
+- Real data **never** enters the repo (P5).
 
-**Screenshots** (khi có UI): Light/Dark, Dynamic Type lớn, tiếng Việt; chuyến không dừng, chuyến
-8 điểm dừng, chuyến có Saved Place, có fill-up, có chờ ghép, có khoảng nghỉ giữa hai chuyến.
+**Screenshots** (once there is UI): Light/Dark, large Dynamic Type, Vietnamese; a trip with no stops, a
+trip with 8 stops, one with a Saved Place, one with a fill-up, one with a joined wait, one with a break
+between two trips.
 
-## 8. File dự kiến thay đổi
+## 8. Files expected to change
 
-| File | Thay đổi |
+| File | Change |
 |---|---|
-| `Core/Domain/JourneyStops.swift` (mới) | `JourneyStop`, `JourneyStops.make` (thuần) |
-| `Core/Domain/JourneyBreak.swift` (mới) | Điều kiện Between, gọi `JourneyMerge.refusal` |
-| `Core/Domain/JourneyDetailAnalysis.swift` | Giữ `[RouteStop]`; `StopSummary` tính từ đó |
-| `Features/Journeys/ViewModels/JourneyDetailViewModel.swift` | Ghép stops với places, logs, parts; break từ neighbours đã tải. **Session khác hay sửa file này**: chỉ stage hunk của mình |
-| `Features/Journeys/Views/JourneyDetailSummarySections.swift` | Route timeline: một dòng mỗi stop (thời gian, thời lượng, ngữ cảnh đo được hoặc xác nhận); dòng nghỉ giữa hai chuyến kèm "Merge" |
-| `Resources/Localization/Journeys.xcstrings` | Câu chữ EN/VI theo mục 0 |
-| `CarodoTests/JourneyStopsTests.swift`, `JourneyBreakTests.swift` (mới), `DriveDataReplayTests.swift` (đọc `.carodo`) | Test |
-| `docs/specs/journey-detail.md` | Mục Route timeline: stops, ba mức bằng chứng, khoảng nghỉ |
-| `docs/architecture.md` | Bảng thuật toán: "Stops on the way" thêm phần ghép bằng chứng; Between-Journey |
+| `Core/Domain/JourneyStops.swift` (new) | `JourneyStop`, `JourneyStops.make` (pure) |
+| `Core/Domain/JourneyBreak.swift` (new) | The Between conditions, calling `JourneyMerge.refusal` |
+| `Core/Domain/JourneyDetailAnalysis.swift` | Keeps `[RouteStop]`; `StopSummary` computed from it |
+| `Features/Journeys/ViewModels/JourneyDetailViewModel.swift` | Joins stops with places, logs, parts; the break from the loaded neighbours. **Other sessions often edit this file**: stage only this work's hunks |
+| `Features/Journeys/Views/JourneyDetailSummarySections.swift` | Route timeline: one line per stop (time, duration, measured or confirmed context); a break line between two trips with "Merge" |
+| `Resources/Localization/Journeys.xcstrings` | EN/VI wording per section 0 |
+| `CarodoTests/JourneyStopsTests.swift`, `JourneyBreakTests.swift` (new), `DriveDataReplayTests.swift` (reads `.carodo`) | Tests |
+| `docs/specs/journey-detail.md` | Route timeline section: stops, the three evidence levels, breaks |
+| `docs/architecture.md` | Algorithm table: "Stops on the way" gains the evidence join; Between-Journey |
 
-**Không đổi:** schema, sync, `RouteRecorder`, `StopDetector`, `JourneyMerge`, `WaitJoin`, Replay,
-Narrator, Trim (vẫn đọc `stopIntervals`), MapKit/WeatherKit.
+**Unchanged:** schema, sync, `RouteRecorder`, `StopDetector`, `JourneyMerge`, `WaitJoin`, Replay,
+Narrator, Trim (still reads `stopIntervals`), MapKit/WeatherKit.
 
 ## 9. Acceptance criteria
 
-1. Mỗi stop ≥ 60 s trên Route timeline có thời gian và thời lượng; con số khớp `StopSummary`, Trim
-   và stop bands (cùng một phân đoạn).
-2. Không câu nào gọi tên một hoạt động nếu người dùng chưa ghi lại.
-3. Stop tại Saved Place hiện tên nơi đó; fill-up đã ghi trong khoảng thời gian của stop hiện "Đã ghi
-   đổ xăng" ở chính stop đó, không bị liệt kê lần thứ hai.
-4. Thời lượng không chắc chắn (do mất GPS) có `≈`.
-5. Hai chuyến thỏa mục 5 hiện "Nghỉ N phút" ở cả hai trang chi tiết, kèm hành động Merge (sheet hiện
-   có). Không thỏa thì không hiện gì.
-6. Chuyến 312 km: 8 điểm dừng, 89 phút, đọc được từng điểm.
-7. `task lint`, `task warnings`, `task test` pass; screenshots như mục 7. Không đổi schema, sync,
-   recording, Replay, Narrator.
+1. Every stop ≥ 60 s on the Route timeline has a time and a duration; the figures match `StopSummary`,
+   Trim and the stop bands (one segmentation).
+2. No line names an activity the person has not logged.
+3. A stop at a Saved Place shows the place's name; a fill-up logged within a stop's interval shows
+   "Fill-up logged" on that stop, never listed a second time.
+4. An uncertain duration (lost GPS) carries `≈`.
+5. Two trips meeting section 5 show "N min break" on both detail pages, with the Merge action (the
+   existing sheet). Otherwise nothing shows.
+6. The 312 km trip: 8 stops, 89 min, each readable.
+7. `task lint`, `task warnings`, `task test` pass; screenshots as in section 7. No change to schema,
+   sync, recording, Replay, Narrator.
 
-## 10. Cần owner duyệt
+## 10. For the owner to approve
 
-1. **Dòng nào hiện trên Route timeline:** mọi stop ≥ 1 phút (chuyến phố có thể 8–10 dòng), hay
-   stop ≥ 5 phút thành dòng riêng còn stop ngắn gộp thành "và 6 lần dừng ngắn · 9 phút"?
-   Đề xuất: **gộp** (giữ bố cục editorial gọn).
-2. **Ghép item với stop:** ±5 phút và 150 m có hợp lý không?
-3. **Tên khu vực cho stop không phải Saved Place** ("Dừng 12 phút · P. Tân Mỹ") cần reverse geocode
-   từng stop (gửi tọa độ cho Apple, mở rộng bảng trong `docs/privacy.md`). Đề xuất: **chưa làm ở V1**.
-4. **Between-Journey cùng xe:** bắt buộc cả hai có xe và giống nhau (đề xuất), hay theo Merge (chấp
-   nhận một bên không có xe)?
-5. **Liên tục vị trí:** dùng lại 150 m / 1.000 m của Stop and wait (đề xuất), hay nới cho road trip
-   (ví dụ đỗ xe ở bãi khác phía bên kia trạm dừng)?
-6. **Khoảng nghỉ hiện ở đâu:** chỉ trong trang chi tiết của hai chuyến (đề xuất), hay cả danh sách
-   Journeys (để sau)?
-7. **Replay:** giữ logic rút gọn riêng (V1), hay lên kế hoạch cho Replay đọc `stopIntervals` ở bản
-   sau để không còn hai định nghĩa?
-8. **Tool replay đọc `.carodo`:** đồng ý thêm (chỉ dev, chỉ in số liệu)?
+1. **Which lines appear on the Route timeline:** every stop ≥ 1 min (a city trip could have 8–10
+   lines), or stops ≥ 5 min as their own lines and short stops grouped as "and 6 short stops · 9 min"?
+   Proposal: **group** (keeps the editorial layout tight).
+2. **Matching items to stops:** are ±5 min and 150 m reasonable?
+3. **An area name for a stop that is not a Saved Place** ("Stopped 12 min · P. Tân Mỹ") needs a reverse
+   geocode per stop (sends coordinates to Apple, extends the table in `docs/privacy.md`). Proposal:
+   **not in V1**.
+4. **Between-Journey, same vehicle:** require both to have a vehicle and the same one (proposal), or
+   follow Merge (accept one side without a vehicle)?
+5. **Continuity of position:** reuse Stop and wait's 150 m / 1,000 m (proposal), or loosen it for road
+   trips (for example parking at another lot across a rest stop)?
+6. **Where breaks show:** only on the two trips' detail pages (proposal), or in the Journeys list too
+   (later)?
+7. **Replay:** keep its own compression logic (V1), or plan for Replay to read `stopIntervals` in a later
+   version so there are no longer two definitions?
+8. **The replay tool reading `.carodo`:** agree to add it (dev only, figures only)?
 
-## 11. Quyết định đã chốt (owner, 2026-11-09)
+## 11. Decisions made (owner, 2026-11-09)
 
-### 11.1 Ba mức bằng chứng (giữ nguyên mục 0)
+### 11.1 Three evidence levels (section 0 unchanged)
 
-Đo được / Gợi ý chưa xác nhận (chỉ có khi làm POI Discovery) / Người dùng xác nhận. Một khoản đã
-ghi là **fact đã xác nhận**; việc **ghép** khoản đó vào một stop cụ thể là suy luận của Carodo, chỉ
-làm khi bằng chứng đủ (11.3). Không bao giờ có nhãn Coffee/Fuel/Charging/Rest Stop.
+Measured / Unconfirmed suggestion (only once POI Discovery exists) / Confirmed by the person. A logged
+item is a **confirmed fact**; **attaching** it to a particular stop is Carodo's inference, made only when
+the evidence is enough (11.3). Never a Coffee/Fuel/Charging/Rest Stop label.
 
-### 11.2 Trình bày trên Route timeline
+### 11.2 Presentation on the Route timeline
 
-- Một dòng riêng cho stop **≥ 5 phút** (`StopBands.longS`), cho stop có khoản đã ghi được ghép vào,
-  và cho chờ giữa hai phần ghép. Mỗi stop đúng **một dòng**: khoản đã ghép nằm trong dòng của stop,
-  không lặp lại thành dòng riêng.
-- Stop 1 tới dưới 5 phút: gộp thành một câu "N lần dừng ngắn · X" **chỉ khi có từ 2 lần trở lên**.
-  Câu gộp không có vị trí và không phải một stop.
-- 5 phút chỉ là quy tắc **trình bày**: `stopIntervals`, `StopBands`, Trim giữ nguyên.
-- Câu chữ: "Dừng 12 phút", "Tại Nhà · 8 phút", "Chờ giữa hai chặng · 25 phút", thời lượng ước tính
-  thì "khoảng". Không hiện accuracy, confidence hay version. Không có placeholder rỗng.
+- Its own line for a stop **≥ 5 min** (`StopBands.longS`), for a stop with an attached logged item, and
+  for the wait between two joined parts. Each stop is exactly **one line**: an attached item sits in the
+  stop's line, never repeated as a line of its own.
+- Stops from 1 to under 5 min: grouped into one sentence "N short stops · X" **only when there are 2 or
+  more**. The grouped sentence has no position and is not a stop.
+- 5 min is only a **presentation** rule: `stopIntervals`, `StopBands`, Trim stay as they are.
+- Wording: "Stopped 12 min", "At Home · 8 min", "Waited between two legs · 25 min", and "about" for an
+  estimated duration. No accuracy, confidence or version shown. No empty placeholder.
 
-### 11.3 Ghép khoản đã ghi với stop (thay dòng "Fill-up/chi phí" ở mục 3)
+### 11.3 Attaching logged items to stops (replaces the "Fill-up/expense" row of section 3)
 
-Chỉ xét các khoản **đã liên kết với journey** (`driveLogs.linked`, liên kết do người dùng tạo). Với
-mỗi khoản:
-1. **Thời gian** của khoản phải nằm trong stop, nới 60 s (giờ người dùng nhập tròn tới phút).
-2. Fill-up có **tọa độ trạm** (ghi tại chỗ): còn phải cách vị trí stop ≤ 150 m. Có cả hai yếu tố thì
-   cả hai đều phải đạt.
-3. Chỉ có thời gian (chi phí, fill-up không có tọa độ): ghép khi đó là một khoản phát sinh lúc đứng
-   yên (fill-up, chi phí) **và chỉ có đúng một stop ứng viên**.
-4. Từ hai ứng viên trở lên, hoặc không có ứng viên nào: **không ghép**. Khoản vẫn hiện như hôm nay.
-Không tạo fill-up, chi phí hay Saved Place mới.
+Only items **already linked to the journey** count (`driveLogs.linked`, links the person made). For
+each item:
+1. The item's **time** must fall within the stop, widened by 60 s (the person types times rounded to
+   the minute).
+2. A fill-up with **station coordinates** (logged on the spot) must also be ≤ 150 m from the stop's
+   position. When both are there, both must hold.
+3. Time only (an expense, a fill-up without coordinates): attach when it is something that happens while
+   standing still (a fill-up, an expense) **and there is exactly one candidate stop**.
+4. Two candidates or more, or none: **no attachment**. The item still shows as today.
+No new fill-up, expense or Saved Place is created.
 
-### 11.4 Không có network mới
+### 11.4 No new network
 
-Không reverse geocode, không MapKit Nearby, không request mới. Chỉ dữ liệu offline và những gì
-Journey Detail đã tải.
+No reverse geocoding, no MapKit Nearby, no new request. Only offline data and what Journey Detail has
+already loaded.
 
 ### 11.5 Between-Journey
 
-- `JourneyMerge.refusal == nil` (gọi hàm, không chép), cả hai là người lái, **cùng một xe đã xác
-  định** (không gợi ý khi một bên thiếu xe), khoảng nghỉ ≤ 2 h. Giữ 6 h của Merge thủ công.
-- Liên tục vị trí: **150 m khi người dùng bắt đầu chuyến sau, 1.000 m khi Auto Mode bắt đầu**. Đúng
-  ngữ nghĩa của Stop and wait, dùng chung một hàm với Stop and wait (tách khỏi `WaitJoin.verdict`,
-  không chép). Không nới cho road trip.
-- Điểm đầu và cuối là fix đã ghi thật: bỏ phần lead-in (trước `startedAt`) của display route. Thiếu
-  điểm thì không gợi ý.
-- Chỉ hiện trong Journey Detail. Hành động duy nhất là mở Merge sheet hiện có.
+- `JourneyMerge.refusal == nil` (called, not copied), both are the driver, **the same known vehicle**
+  (no suggestion when one side has no vehicle), a break ≤ 2 h. Manual Merge keeps its 6 h.
+- Continuity of position: **150 m when the person started the later trip, 1,000 m when Auto Mode
+  started it**. Exactly Stop and wait's meaning, sharing one function with Stop and wait (extracted from
+  `WaitJoin.verdict`, not copied). Not loosened for road trips.
+- The start and end are fixes actually recorded: the display route's lead-in (before `startedAt`) is
+  left out. A missing point means no suggestion.
+- Shown only in Journey Detail. The only action opens the existing Merge sheet.
 
 ### 11.6 Technical debt: Replay Stop Alignment
 
-Replay rút gọn stop theo trạng thái "đang được giữ" của recorder (thêm "dừng im lặng" ở
-`29f39f7`), không đọc `stopIntervals`. Cần audit: phần nào cùng nghiệp vụ (một stop đã hoàn tất trên
-dòng thời gian) thì dùng chung; phần nào khác (trạng thái chuyển động tức thời khi phát) thì giữ
-riêng. Không sửa trong V2.3.2 (Replay thuộc session khác).
+Replay compresses stops by the recorder's "held" state (plus "silent stop" since `29f39f7`) and does not
+read `stopIntervals`. Needs an audit: what is the same concern (a finished stop on the timeline) is
+shared; what differs (the instant motion state during playback) stays apart. Not fixed in V2.3.2 (Replay
+belongs to another session).
 
-### 11.7 Developer replay đọc `.carodo`
+### 11.7 Developer replay reads `.carodo`
 
-Chỉ khi dev, chỉ đọc, chỉ in số liệu tổng hợp, không tọa độ. Baseline chuyến 312 km: 8 stops / 89
-phút. Nếu khác baseline thì phân tích nguyên nhân, không sửa thuật toán cho khớp số.
+Dev only, read only, aggregate figures only, no coordinates. Baseline for the 312 km trip: 8 stops /
+89 min. A result that differs from the baseline is explained, never fixed by tuning the algorithm to
+the number.
 
-## 12. Phase sau: Journey Points (V2.3.3)
+## 12. Next phase: Journey Points (V2.3.3)
 
-Đã làm theo hướng cuối của owner: [journey-points.md](journey-points.md).
+Built along the owner's final direction: [journey-points.md](journey-points.md).
