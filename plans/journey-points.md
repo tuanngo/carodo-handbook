@@ -86,7 +86,7 @@ keep in memory per journey revision, only for the journeys crossing the visible 
 if a measurement on an iPhone shows it is slow. Journey Points have no lasting identity yet (TD-5). Not measured yet: the
 Map's CPU with many annotations.
 
-## 4b. Places from journey points (approved 2026-11-11; P1, P2, P3 built; place editor redesigned `4692dc9`)
+## 4b. Places from journey points (approved 2026-11-11; P1–P4 built, P2 fixed on device `5686d1f`; place editor redesigned `4692dc9`; UI polish next)
 
 Goal (owner, 2026-11-11): like Geofency, Carodo builds the person's places by itself from where they drove, names each
 one once, and can later say how many times a place was visited and list those visits. For the owner personally, this
@@ -137,7 +137,7 @@ are not imported. Approved (owner, 2026-11-11): as test data only, from a Develo
 | P1 | `PlaceSource.detected`, `poi_id`, `poi_checked_at` in `v1_initial`; Settings lists only kept places; sync and `.carodo` carry the columns; tests. **Done** (2026-11-11) | yes (approved above) |
 | P2 | On journey save (after `PlaceNaming`, off the tracking path, never awaited by it): link each point to a place or create a `detected` one; ask Apple once (gates), retry later when offline. **Done** (2026-11-11): queue on `trips.points_matched_at` (approved), so past journeys go through it too (P5 folded in: 20 journeys and 12 requests a run) | yes (`points_matched_at`) |
 | P3 | Journey Detail map: Stop and Break markers beside Start/End; a tap shows a popup (name or street, category symbol, address, time). **Done** (2026-11-11, carodo-ios `84ac50e`): MapKit's own callout; "Visited N times" moves to P4. Open: P2 has not matched any journey on the owner's iPhone yet (0/26, pulled 23:07), to investigate | no |
-| P4 | A place's visits: count, first and last, the list of journeys; open from the popup and from Settings → Places | no |
+| P4 | A place's visits: count, first and last, the list of journeys; open from the popup (owner chose the popup only, 2026-11-11). **Done** (2026-11-12, carodo-ios `aa3808e`): a visit = a drive that ended in the place; stops ≥ 5 min not counted yet (needs every track; measure on device first). **Next session: UI polish** of the point card and the visits page (owner, 2026-11-12) | no |
 | P5 | History: create places for past journeys with a per-run budget under Apple's rate limit (a limit that names its risk) | no |
 | P6 | Footprints: places as markers (category symbol, else neutral), clustered far out, visible area only | no |
 | P7 | Developer: import a Geofency export (GeoJSON) as `detected` places, for test data only; skips a place already there | no |
