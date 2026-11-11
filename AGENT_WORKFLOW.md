@@ -60,8 +60,10 @@ iOS calls itself and explains each in a line, because the owner is new to Swift
 - **Tests on both sides** of every threshold, plus the edge cases (empty, one point, gaps, trim,
   joined parts) and a regression test for what the change must not move.
 - **Real data where it can speak**: replay the pulled drives read-only (`task replay`, the
-  `DriveDataReplayTests` replays, `.carodo` backups), aggregate figures only, never a coordinate.
-  Synthetic tests prove the code; they never count as real-world validation. A result that differs
+  `DriveDataReplayTests` replays, `.carodo` backups). They are development test data: read them in
+  full, plot them, look at single stops and fixes; never commit them or send them out (the rules:
+  `carodo-ios/AGENTS.md`, Development data). Synthetic tests prove the code; they never count as
+  real-world validation. A result that differs
   from a known baseline is explained, never tuned away.
 - **A bug found on the way**: fix it inside the approved scope, add the test that would have caught
   it, and give its root cause in the report. Outside the scope: ask first.
