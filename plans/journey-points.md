@@ -86,7 +86,7 @@ keep in memory per journey revision, only for the journeys crossing the visible 
 if a measurement on an iPhone shows it is slow. Journey Points have no lasting identity yet (TD-5). Not measured yet: the
 Map's CPU with many annotations.
 
-## 4b. Places from journey points (approved 2026-11-11; P1 built)
+## 4b. Places from journey points (approved 2026-11-11; P1, P2 built)
 
 Goal (owner, 2026-11-11): like Geofency, Carodo builds the person's places by itself from where they drove, names each
 one once, and can later say how many times a place was visited and list those visits. For the owner personally, this
@@ -135,7 +135,7 @@ are not imported. Approved (owner, 2026-11-11): as test data only, from a Develo
 | # | Slice | Schema |
 |---|---|---|
 | P1 | `PlaceSource.detected`, `poi_id`, `poi_checked_at` in `v1_initial`; Settings lists only kept places; sync and `.carodo` carry the columns; tests. **Done** (2026-11-11) | yes (approved above) |
-| P2 | On journey save (after `PlaceNaming`, off the tracking path, never awaited by it): link each point to a place or create a `detected` one; ask Apple once (gates), retry later when offline | no |
+| P2 | On journey save (after `PlaceNaming`, off the tracking path, never awaited by it): link each point to a place or create a `detected` one; ask Apple once (gates), retry later when offline. **Done** (2026-11-11): queue on `trips.points_matched_at` (approved), so past journeys go through it too (P5 folded in: 20 journeys and 12 requests a run) | yes (`points_matched_at`) |
 | P3 | Journey Detail map: Stop and Break markers beside Start/End; a tap shows a popup (name or street, category symbol, address, time, duration, "Visited N times") | no |
 | P4 | A place's visits: count, first and last, the list of journeys; open from the popup and from Settings → Places | no |
 | P5 | History: create places for past journeys with a per-run budget under Apple's rate limit (a limit that names its risk) | no |
