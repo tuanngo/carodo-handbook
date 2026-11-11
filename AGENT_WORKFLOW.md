@@ -53,7 +53,13 @@ English (`"Stopped 4 min" / "Dừng 4 phút"`), as a quoted model output, or as 
    why, the tests, and the decisions the owner must make (each with a recommendation).
 4. **No code before approval.** Exception: a small change the owner asked for directly that needs
    no architecture, schema, contract or product decision.
-5. **After approval, stay inside it.** A finding that needs more (a schema, a contract, a new
+5. **A target the steps can reach.** A size, speed or count in the acceptance criteria is checked
+   against what the steps actually move before the plan is handed over (the 2026-11-11 audit asked
+   for `MainTabView` under 900 lines with steps that moved 200).
+6. **A performance claim names its measurement**: device, build type, power, runs
+   (`carodo-ios/docs/operations/device-testing.md`, Measuring performance). Without one, the item
+   is a candidate to measure, never a fix.
+7. **After approval, stay inside it.** A finding that needs more (a schema, a contract, a new
    service, another feature's files) stops the work and goes to the owner as a question.
 
 ## While building
@@ -120,8 +126,9 @@ own line:
 - **Test evidence**: the run after the last change (counts, failures, warnings, lint).
 - **Real-data verification**: what was replayed or tried on a device, with its figures; or "none".
 - **Bugs found on the way**: each with its root cause and the test now guarding it.
-- **Left open**: technical debt, known limitations and pending validations, each also entered in
-  [`plans/technical-debt.md`](plans/technical-debt.md) with its ID.
+- **Left open**: technical debt, known limitations and pending validations, each **entered by the
+  agent itself** in [`plans/technical-debt.md`](plans/technical-debt.md) with its ID before the
+  report (offering to do it leaves it unrecorded), and the plan's status line updated.
 
 ## CARODO review checklist
 
