@@ -86,6 +86,64 @@ keep in memory per journey revision, only for the journeys crossing the visible 
 if a measurement on an iPhone shows it is slow. Journey Points have no lasting identity yet (TD-5). Not measured yet: the
 Map's CPU with many annotations.
 
+## 4b. Places from journey points (approved 2026-11-11; P1 built)
+
+Goal (owner, 2026-11-11): like Geofency, Carodo builds the person's places by itself from where they drove, names each
+one once, and can later say how many times a place was visited and list those visits. For the owner personally, this
+replaces Geofency over time.
+
+### Decisions approved (owner, 2026-11-11)
+
+- **One `places` table, one `Place` type.** Settings places and detected places are the same thing; they differ by
+  `source` (`added`, `suggested`, new `detected`) and `role`. Settings → Places lists only what the person keeps
+  (`added`, accepted `suggested`); `detected` places show on the maps only. Keeping or giving a role to a detected place
+  turns the same row into a Saved Place. A journey point belongs to the smallest live place containing it (the rule
+  `SavedPlaceMark` already uses).
+- **Automatic, with one Apple request per new place.** A new place is created from a qualifying journey point that no
+  place contains yet, and Apple Maps is asked **once**, at creation (not per visit, not per tap). The result is kept on
+  the place. This reverses two 2026-11-09 decisions (ADR 0015: "no Nearby POI becomes a saved place" and "past journey
+  points never from Apple Maps"): the ADR is amended in the same change as the code.
+- **Names:** the person's name → the POI name (only when `StopPlaceResolver`'s five gates pass, unchanged) → the street →
+  the ward. A place without a POI keeps `name` NULL; its address is read from `geocoded_cells` at display time (the cell
+  of its centre, as `start_cell` does), so it follows the app's language. `geocoded_cells` stays the address cache only:
+  its ~110 m cell is too coarse for a POI (Geofency's median place radius is 12 m).
+- **New columns (P6, approved):** `places.poi_id` (the POI's identifier, `MKMapItem.identifier` inside the adapter only;
+  paired with the existing `poi_category`), and `source = detected`. No provider column (one source of POIs).
+
+### Also approved (owner, 2026-11-11)
+
+- **`places.poi_checked_at`** (REAL, NULL = not asked yet): needed to tell "not asked" from "asked, no POI" so an offline
+  creation is retried and a failed answer is never read as "no POI" (Unknown is not zero). One more column (P6).
+- **Which points create a place:** a recorded Start, an End, a Stop; not an estimated Start (no position to name); a Break
+  only links to an existing place, never creates one (too short to be a place). The radius: the point's position circle,
+  at least 25 m, at most 100 m.
+- **Visits are derived, not stored:** a visit = a journey point inside the place; the count and list are read from the
+  journal (no visits table, no foreign key; moving a place recounts). A stored index only if an iPhone measurement with
+  2,000 drives shows it is slow (Footprints rule, §4).
+- **Inside a private Saved Place:** no detected place and no request (fail closed); the point belongs to the private place.
+
+### What it does not do (so it is not a full Geofency yet)
+
+Carodo only knows the points of its drives. A place reached on foot, by taxi, or a drive Carodo did not record is not a
+visit. Seeing those needs iOS visit monitoring (`CLMonitor`/visits) outside drives: a new background behaviour (P6) and a
+battery question, a separate decision later. Optional, personal: import the owner's Geofency export (1,360 places, 1,047
+with an Apple place id) as `detected` places in a DEBUG/Developer action; its 37,653 visits are not journey points and
+are not imported. Approved (owner, 2026-11-11): as test data only, from a Developer action (P7).
+
+### Slices (each one commit, each proven before the next)
+
+| # | Slice | Schema |
+|---|---|---|
+| P1 | `PlaceSource.detected`, `poi_id`, `poi_checked_at` in `v1_initial`; Settings lists only kept places; sync and `.carodo` carry the columns; tests. **Done** (2026-11-11) | yes (approved above) |
+| P2 | On journey save (after `PlaceNaming`, off the tracking path, never awaited by it): link each point to a place or create a `detected` one; ask Apple once (gates), retry later when offline | no |
+| P3 | Journey Detail map: Stop and Break markers beside Start/End; a tap shows a popup (name or street, category symbol, address, time, duration, "Visited N times") | no |
+| P4 | A place's visits: count, first and last, the list of journeys; open from the popup and from Settings → Places | no |
+| P5 | History: create places for past journeys with a per-run budget under Apple's rate limit (a limit that names its risk) | no |
+| P6 | Footprints: places as markers (category symbol, else neutral), clustered far out, visible area only | no |
+| P7 | Developer: import a Geofency export (GeoJSON) as `detected` places, for test data only; skips a place already there | no |
+
+Before TestFlight: TD-2 (Apple Maps data kept on the device) must cover stored POI names and ids.
+
 ## 5. Audit (2026-11-09)
 
 **`geocoded_cells`:** schema and meaning unchanged.
