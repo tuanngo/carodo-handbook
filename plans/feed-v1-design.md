@@ -210,7 +210,7 @@ it; the backend stores and returns it.
 ### Report and block (deferred, before the App Store)
 
 Not built in V1 (the published data is thin). The contract defines them now so nothing changes
-later: report and block **through the post** (`POST /v1/feed/posts/{id}/report`,
+later: report and block **through the post** (`POST /v1/feed/items/{itemId}/report`,
 `/block-author`); no author id ever appears in a response (an anonymous author stays unlinkable).
 Tracked as TD-8 and a release blocker.
 
@@ -224,18 +224,19 @@ and everything only they use: code, catalog strings, spec sections, contract end
 ## Contract 0.27.0-draft (outline)
 
 Errors stay RFC 9457 problem+json, with v2's codes in `code`. A clean replacement, not side by
-side: `POST /v1/feed/posts` replaces `PUT /v1/drives/{tripId}`, `/v1/me/sharing` replaces
+side: `PUT /v1/feed/drives/{tripId}` replaces `PUT /v1/drives/{tripId}`, `/v1/me/sharing` replaces
 `feedOptIn` and `region` on `/v1/me/profile`; accounts and auth endpoints stay (my call).
 - `GET/PUT /v1/me/sharing` — `sharing` on/off, `displayAs` (`anonymous` / `username`),
   `showVehicle`; turning off removes the posts.
-- `POST /v1/feed/posts` — upsert by `tripId` (fields above); `DELETE /v1/feed/posts/{tripId}` — hide.
+- `PUT /v1/feed/drives/{tripId}` — publish, idempotent by trip id with the existing revision +
+  tombstone rules (fields above); `DELETE /v1/feed/drives/{tripId}?revision=` — hide.
   Server validates per v2 FEED-VAL-03/04 (rejects anything geographic).
 - `GET /v1/feed?cursor&limit` — day groups (author local day), 72 h, opaque cursor, `isAuthor`,
   `displayName` resolved at read, reactions with counts and the viewer's own.
 - `GET /v1/feed/stats?window=72h` — `visible`, and when visible drivers / km / hours / busiest hour;
   when not, every number `null` and a coarse `warmup` fraction (0–1, step 0.1) for the progress line.
-- `PUT/DELETE /v1/feed/posts/{id}/reaction` — one of the five.
-- `POST /v1/feed/posts/{id}/report`, `POST /v1/feed/posts/{id}/block-author` — defined, built later.
+- `PUT/DELETE /v1/feed/items/{itemId}/reaction` — one of the five, on a row.
+- `POST /v1/feed/items/{itemId}/report`, `POST /v1/feed/items/{itemId}/block-author` — defined, built later.
 - Username claim and check (existing, with the validation above).
 - Retention: posts leave the Feed after 72 h; shapes and vehicle names are deleted within 30 days
   (v2 FEED-RET-02).
