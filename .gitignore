@@ -5,6 +5,7 @@
 .idea/
 .vscode/
 .remember/
+.superpowers/
 
 # Location traces: real drives are never committed (AGENTS.md invariant P5)
 *.gpx
