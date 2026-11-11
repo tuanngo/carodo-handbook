@@ -179,15 +179,33 @@ its post (my call).
 - No shape if what remains is under 2 km (v2 said 1 km).
 - Simplify (Douglas–Peucker on the normalized polyline, reusing the repo's simplifier) to **48–64
   points**: enough to fill the large background, still too coarse to lay on a street map.
-- Normalize into the unit box keeping aspect ratio, then rotate by **any angle** and maybe mirror,
-  seeded by `tripId` (the same drive always gives the same shape). Not v2's k·90°, which lines a
-  route up with a street grid.
+- Turn the shape onto its own long axis (principal axis of the trimmed points) so it lies
+  horizontally, then tilt it by a seeded angle within ±15° and maybe mirror it, seeded by `tripId`
+  (the same drive always gives the same shape); then normalize into the unit box keeping aspect
+  ratio. Aligning to the shape's own axis drops the compass heading entirely (better than v2's
+  k·90°, which lines a route up with a street grid), and a long straight drive fills the wide row
+  as a gentle near-horizontal line instead of a short vertical stub (owner question 2026-11-11).
 - Drawn with `Path`/`Canvas` only, never MapKit (v2 FEED-SHAPE-07). Tests: v2 FEED-SHAPE-08.
+
+**How it is drawn (owner, 2026-11-11; may change later):**
+- A smooth curve through the points (Catmull-Rom → `addCurve`), never straight segments; it adds no
+  information beyond the points sent.
+- Tapers thin → thicker toward the end (the direction reads), and fades to nothing at both ends
+  (the hidden start and end read as hidden). No start or end marker.
+- Two layers, blended by zone: a wide faint ribbon under a thin core with a background-coloured
+  halo. The ribbon shows only on the right part of the row, where there is no text, and fades out
+  under the text and icons through a horizontal gradient `mask`; there only the haloed core remains.
+- Colour: others' shapes in a neutral warm Stone (an appearance-aware semantic colour in the design
+  system, light and dark), your own in Copper. No green: Copper stays the only accent.
 
 ### Weather (P6: WeatherKit capability)
 
 One WeatherKit request per car drive, at its start rounded to ~0.1° (~11 km), never the route;
 keep only rain / clear / unknown. No capability or no answer → `unknown`.
+**Display comes only from the backend (owner, 2026-11-11):** the Feed shows a weather tag only when
+the feed response carries one; absent or `unknown` → nothing shown, never a guess on the client.
+The device decides the tag (the server never gets a position to look weather up, P5/P7) and sends
+it; the backend stores and returns it.
 
 ### Report and block (deferred, before the App Store)
 
