@@ -174,3 +174,72 @@ way; `docs/architecture.md`, Complexity budget):
 - Memory and the display link released on dismiss (Instruments, Allocations).
 - What 3D looks like in Vietnam: realistic elevation and 3D buildings are city-dependent; the
   pitched flat map must still read well.
+
+## Wow track (owner, 2026-11-12)
+
+The owner moved Replay ahead of the TestFlight gates for motivation and to have a short intro video
+to show ([master-plan.md](master-plan.md), steps 1–4). Each step is a slice: plan, owner approval,
+build, device check, one commit. The behaviours and the Director's rules stay those of
+`carodo-ios/docs/specs/replay.md` (R.2, R.3); this section keeps the order and the open questions.
+
+| Step | Outcome | Done when |
+|---|---|---|
+| **W1** TD-1 stop alignment | Replay's compressed stops and the journal's `JourneyAnalysis.stopIntervals` answer "a finished stop on the timeline" with one rule | A replay test on the owner's drives shows the same stops as the detail page's route timeline |
+| **W2** R.2B one behaviour per slice | Rest first (the most frequent, the cheapest trigger), then Hairpin Reveal, then Terrain Reveal where MapKit has 3D terrain; Junction Reveal last or never | Each: thresholds on both sides tested, `docs/tracking.md`-style table in `replay.md`, a screen recording of a real drive at 15× and 60× approved by the owner |
+| **W3** Video spike | A one-day answer, written here, to: how frames of the replay reach a video file | A 10 s 9:16 clip of a synthetic drive plays in Photos, with its frame rate and render time measured on the iPhone |
+| **W4** Recap + export | The 30–60 s Cinematic Recap (an edit: highlights near real rate, the rest compressed) and a 9:16 export from it, through the share sheet | Exported on the iPhone from a real drive, privacy trim on, attribution visible, under a minute to render |
+
+### W1 result (2026-11-12, carodo-ios 969ba51)
+
+Audit, measured on the 29 journeys in `drive-data/` (34 stops of a minute or more): both sides found
+the same 34 stops, but Replay's began about 10 s later (the recorder's stop confirmation) and ended
+one fix earlier (median difference 11 s), so 6 of 34 labels differed: four by rounding, one joined
+wait (the journal's 1,298 s stop played as two stops of 174 s around a "No GPS"), one stop left
+without GPS (71 s in the journal, 177 s in Replay). The thresholds differed too (`>= 60 s` and
+`> 60 s`).
+
+Built: `ReplayTimeline` finds no stop of its own; it compresses the stops
+`JourneyAnalysis.stopIntervals` returns (raw track and display route alike). A stop left without GPS
+ends at the journal's estimate, on a keyframe added there; a jump inside a stop is part of the stop
+(owner, 2026-11-12: a joined wait is one "Stopped 22 min"); the threshold is the journal's. Kept
+apart, as the playing moment's state: a held fix reads speed 0, stops under a minute play as they
+were, gaps outside a stop. `ReplayStopAlignmentReplayTests` asserts, on the drives in `drive-data/`,
+the same count, start, end and label: 34 of 34.
+
+Open: nothing on a device beyond the R.1 checks. For W2, Rest should trigger on these stop spans,
+not on the held state. `drive-data/carodo-20261111-sim-after-p2.sqlite` does not open read-only
+(SQLite error 14) and stops every drive-data replay test at the loader; the run above used a copy
+of the folder without it.
+
+### W3 — what the spike must decide
+
+- **Capture route.** (a) `ReplayKit` in-app capture (`RPScreenRecorder.startCapture`) of the recap
+  playing full screen into `AVAssetWriter`: real time, what the map really draws (3D buildings,
+  terrain), but a system prompt each session and the export takes as long as the recap. (b)
+  `MKMapSnapshotter` with an `MKMapCamera` per frame, the route and wheel drawn on each image:
+  offline and frame-exact, but slow per frame and its 3D fidelity unproven. (c) Drawing the map
+  view's layer per frame: likely blank or slow with MapKit's Metal rendering; try only to rule out.
+  Expected answer: (a), unless the prompt or the real-time wait is unacceptable to the owner.
+- **Contracts (P6, owner approval before code):** `ReplayKit`/`AVFoundation` are Apple frameworks
+  but new to the app; saving to Photos needs `NSPhotoLibraryAddUsageDescription` (the share sheet's
+  "Save Video" likely needs it too: verify).
+- **Terms:** map imagery inside a shared video must keep Apple's attribution and legal label in
+  frame; read MapKit's terms on exported imagery with TD-2 before a video leaves the device.
+- **Privacy (P5, P9):** the video uses the privacy-trimmed route with `t` re-based; no start or end
+  place, no clock finer than the share card's part of day unless it is only for the owner's eyes.
+
+### Brief for the next session
+
+```text
+Outcome: W1 then W2 (Rest) of the wow track; W3 spike only after W2's first commit.
+Existing behaviour (files read): carodo-ios Core/Replay/{ReplayTimeline,CameraDirector,CameraScript,
+  FollowCamera,ReplayRoute}.swift, Features/Journeys/Views/ReplayMapView.swift, docs/specs/replay.md.
+Owner decisions needed: W2 order confirmed; W3 capture route and the Photos permission (P6).
+Acceptance: per step table above.
+Non-goals: a 3D car model, web replay, highlights from Journey Enrichment (R.2C), new map styles.
+Constraints: one MKMapView, Director pure and prepared off the main actor, per-frame cost O(log n),
+  the performance rules above; nothing queried while playing; no schema or API change.
+Validation: task lint, task warnings, task test; device: a real drive replayed at 15× and 60×,
+  Time Profiler + FPS over USB.
+Do not: rewrite FollowCamera or the player; touch MainTabView beyond wiring.
+```
