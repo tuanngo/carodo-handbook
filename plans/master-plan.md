@@ -1,4 +1,4 @@
-# Master plan — what comes next (2026-11-12)
+# Master plan — what comes next (2026-11-12, updated 2026-11-13)
 
 One ordered list of the work between today and the first TestFlight build, so each new session
 starts from the same picture. Each line points to the plan that holds its detail; this file keeps
@@ -27,10 +27,25 @@ parallel.
 
 ## Study follow-ups (drive-recorders-study §5)
 
-L2 (hot-phone GPS) built, waiting for its device drive; L3 (MetricKit diagnostics) before step 9;
-L4 (versioned place sweeps) with TD-6 in step 6; L5 (`docs/solutions/`) once
-[`lessons-inbox.md`](lessons-inbox.md) holds about ten lessons or before the first TestFlight
-build. W3 tries the offline, fixed-step capture first (study §6).
+From [`../references/repos/drive-recorders-study.md`](../references/repos/drive-recorders-study.md).
+L2–L4 detail, approved decisions (D2.1 no, D2.2 no, D3.1 Developer only, D4.1 yes) and acceptance:
+[`study-followups-thermal-diagnostics-derived.md`](study-followups-thermal-diagnostics-derived.md).
+W3 tries the offline, fixed-step capture first (study §6).
+
+| Item | What is left | State (2026-11-13) |
+|---|---|---|
+| **L2** hot-phone GPS | Desk check on the iPhone ([field test](../field-tests/2026-11-13-hot-phone-gps.md), steps 3–5, Xcode Device Conditions), then commit **only** its 12 carodo-ios files: `Carodo/App/DependencyContainer.swift`, `Core/Diagnostics/{BatteryMonitor,DiagnosticsLogFormat,TrackingLog}.swift`, `Core/Recording/{DriveSessionManager,RecordingGPS}.swift`, `CarodoTests/{DeveloperModeTests,RecordingGPSTests,TrackingLogFieldsTests}.swift`, `docs/tracking.md`, `docs/specs/developer-mode.md`, `docs/operations/device-testing.md`. Suggested message: `feat(tracking): a hot phone gives up navigation accuracy` | Built, uncommitted; lint, warnings, 1,990 tests pass; **PV-17** |
+| **L3** MetricKit exits and diagnostics | Build per the plan: exit reasons from `applicationExitMetrics`, `MXDiagnosticPayload` kept (20 files, 2 MB), Developer → Crashes and hangs, `MetricKitStore` observed; screenshots (Light, Dark, large type, Vietnamese); a PV row when built | Next; must ship before step 9 |
+| **L4** versioned place sweeps | Build with TD-6 (step 6): `places_version`, `points_version` replace the two `_at` columns; `setPlaceKeys` syncs only on a changed cell; the rule in `docs/data-model.md`. One `CONFIRM=erase` on the iPhones | Approved, waits for step 6 |
+| L9 per-drive feature table | A `task` over `drive-data/` printing one row per drive (stops, gaps, rejections, accuracy, speed spread) | When the step 9 batch is pulled |
+| L1 + L6 Live Activity, End button | Own plan: orphan cleanup at launch, `staleDate`, push gate, frozen last frame, no place names on the Lock Screen; End-drive intent, never suggested for a disconnect | After the wow track (product decisions) |
+| L5 `docs/solutions/` | Built from [`lessons-inbox.md`](lessons-inbox.md) | At about ten lessons or before the first TestFlight build |
+| L10 store screenshots from UI tests | — | Release prep (step 10) |
+| L7, L8, L11–L14 | — | As their features come up |
+
+**Every pull of drive data sweeps every `Waiting` PV row** in [`technical-debt.md`](technical-debt.md#pending-validations),
+not only the drive's script ([`../field-tests/README.md`](../field-tests/README.md), Rules), so step 9
+is a sweep of PV-1…PV-17 on one batch.
 
 ## Refactors that ride along (no step of their own)
 
