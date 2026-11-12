@@ -270,6 +270,26 @@ town drives; Terrain Reveal after W3 (it depends on what 3D terrain MapKit has i
 - **Privacy (P5, P9):** the video uses the privacy-trimmed route with `t` re-based; no start or end
   place, no clock finer than the share card's part of day unless it is only for the owner's eyes.
 
+### W3 result on the simulator (2026-11-13; the iPhone run is still open)
+
+A throwaway test (not committed) rendered a made-up 10 s drive at 30 fps, 1080 × 1920, with the
+product's camera (`ReplayCameraRig`), three ways, into `AVAssetWriter` (H.264). iPhone 18 Pro
+simulator, tiles cached:
+
+| Route | Per frame | 10 s clip takes | Result |
+|---|---|---|---|
+| (c) the map view drawn per frame (`drawHierarchy(in:afterScreenUpdates: true)` on an `MKMapView` in its own window, the camera set for each frame) | about 40 ms (56 ms with one refresh of waiting) | 17 s | Works, against the expectation above: 3D buildings, the line under them, the annotation, Apple's logo and Legal link all in the frame. Frame-exact, no system prompt, and it is the view Replay already draws |
+| (c) the same, waiting for `mapViewDidFinishRenderingMap(fullyRendered: true)` before each frame | 1.4 s | 7 min | Unusable: with a moving camera the callback did not come within 1.5 s for 267 of 300 frames |
+| (b) `MKMapSnapshotter` with an `MKMapCamera` per frame | 210 ms | 63 s | Works, 3D buildings and the logo; but the route and wheel are drawn on top of the image (over the buildings), and it is a second renderer to keep looking like Replay |
+| (a) `ReplayKit` capture | not run | real time | Not available on the simulator; a system prompt each session |
+
+Answer so far: **(c), the map view drawn per frame**, off screen, paced by the renderer rather than
+the clock (each frame is the rig's pose at `frame / fps`). (a) stays the fallback if (c) fails on
+the iPhone. Still to prove, on the iPhone: that `drawHierarchy` returns the map there (MapKit draws
+with Metal), the time per frame, memory and heat over a 60 s clip, and tiles: a frame is drawn
+whether or not its tiles have arrived, so a first silent pass along the camera's path (or a short
+wait per frame) must load them. Nothing was added to the app: no framework, no Info.plist key.
+
 ### Brief for the next session
 
 ```text
