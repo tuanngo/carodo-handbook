@@ -16,6 +16,7 @@ holds one file per planned drive: its script, then its results.
    the clock time, nothing else (Apple Notes is fine: `12:41 map line jumped`).
 3. **Review (back at the desk).** The owner pastes the time notes; the agent pulls the database,
    reads the logs, matches every note to the events around it, fills **Results** in the same file,
+   sweeps every open PV row against the same data (Rules, below),
    ticks what passed in `plans/`, adds coarse numbers to device-testing.md Results, and proposes
    the next step (a fix, a threshold to tune, a check to repeat). No code changes without the
    owner's go-ahead.
@@ -62,6 +63,17 @@ Review field test <file hoặc ngày>. Ghi chú giờ:
   coordinates.
 - **Close the loop:** tick the matching items in `plans/` with the date, and say which open checks
   are still not run.
+- **Every pull sweeps every open check, not only the drive's script.** Nobody remembers which
+  checks are open, so the list is the register, not memory: at each review (and at any pull of new
+  data, with or without a script), read every `Waiting` row of
+  [`plans/technical-debt.md`](../plans/technical-debt.md#pending-validations) (PV-…) against the pulled
+  data, using its "Missing" and "Review when" columns. For each row: **proven** (the evidence, then
+  Status → Done with the date), **partly** (what this data adds, in "Proven so far"), or **no data**
+  (the drive did not meet its case: say so in one line). The review's Results end with that sweep as
+  a table, so a check met by chance on an ordinary drive is never lost.
+- **A new device check gets its PV row when it is built**, before any field test is written for it:
+  what the tests prove, what only the iPhone can, and which log line or number shows it. A script
+  in this folder may cover several rows; the rows stay the source.
 
 ## Files
 

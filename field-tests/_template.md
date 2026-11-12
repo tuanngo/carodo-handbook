@@ -32,4 +32,10 @@ Pulled: <database file in drive-data/> · Drives: <id prefix, start–end local,
 
 Notes matched to the log: <time → event around it>
 
+Open checks swept (every `Waiting` PV row in `plans/technical-debt.md`, not only this script's):
+
+| PV | Proven / partly / no data | Evidence or why not |
+|---|---|---|
+| PV-… | | |
+
 Next: <fix, tuning or repeat, with the plan item it updates>
