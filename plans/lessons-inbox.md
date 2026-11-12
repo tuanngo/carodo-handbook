@@ -99,3 +99,27 @@ Lessons already paid for that L5 gathers, beside the entries below:
   first; quote nothing through a shell variable holding several paths (zsh does not split it).
 - Rule now in: carodo-ios `AGENTS.md` (Git) covers worktrees and staging; the fast-forward route
   is nowhere yet.
+
+### temp-index-commit-misses-generated-project
+- applies_when: committing new Swift files from a shared tree with `GIT_INDEX_FILE`; adding a file
+  and staging only "your paths"
+- area: workflow, Git, XcodeGen · found: 2026-11-13, carodo-ios 90666be → 2ab8b71 · severity: low
+- Context: two new test files were committed by path through a temporary index; the regenerated
+  `Carodo.xcodeproj/project.pbxproj` was left out, so `HEAD` listed files its project did not
+  build, and the shared tree's regenerated project then blocked the next fast-forward.
+- Guidance: a commit that adds or removes a source file includes the project regenerated from that
+  same tree (`xcodegen generate` in a clean worktree at `HEAD` + your change), checked with
+  `git diff` to name only your files.
+- Rule now in: nowhere yet (`AGENTS.md` Git says the project is generated, not that it travels
+  with an added file).
+
+### debug-destination-outside-the-path
+- applies_when: a DEBUG launch argument that opens a page; `.navigationDestination(item:)` or
+  `isPresented:` on a screen whose links use `NavigationLink(value:)`
+- area: Features (DEBUG), navigation · found: 2026-11-13, TD-23 · severity: low
+- Context: `-carodo.debugOpenMilestones` showed its page with `.navigationDestination(item:)`; a
+  value link on that page appended to the tab's typed path beneath it, so the drive opened under
+  the milestone page. Taps through the app were correct; only the debug route looked broken.
+- Guidance: a debug route pushes onto the same typed path a tap would (`AppRoute` on the tab's
+  stack); judge a link opened from a debug page against the tapped route before calling it a bug.
+- Rule now in: nowhere yet (TD-23, with TD-14).
