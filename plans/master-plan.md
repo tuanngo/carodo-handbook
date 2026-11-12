@@ -25,15 +25,22 @@ parallel.
 | 9 | Device proof | One batch of real drives covering the open pending validations (GPS, Auto Mode, onboarding, live map, places, Feed, replay R.1 checks) | technical-debt.md, Pending validations | Open |
 | 10 | Release prep | Privacy Report, `CollectedDataTypes`, widget "Ready" state, Dynamic Type cap (TD-16) | technical-debt.md | Open |
 
+## Study follow-ups (drive-recorders-study §5)
+
+L2 (hot-phone GPS) built, waiting for its device drive; L3 (MetricKit diagnostics) before step 9;
+L4 (versioned place sweeps) with TD-6 in step 6; L5 (`docs/solutions/`) once
+[`lessons-inbox.md`](lessons-inbox.md) holds about ten lessons or before the first TestFlight
+build. W3 tries the offline, fixed-step capture first (study §6).
+
 ## Refactors that ride along (no step of their own)
 
 Done in the same session as the next feature that edits the file, one `refactor:` commit each:
 
 - `MainTabView.swift` (1,125 lines): extract the drive start/finish flow first (TD-13).
-- `GRDBJourneyRepository.swift` (1,950 lines): split by query family (list, detail, places, atlas).
-- `Repositories.swift` (1,122 lines): one protocol per file.
+- ~~`GRDBJourneyRepository.swift` (1,950 lines): split by query family~~ — done 2026-11-12 (7260c5f): seven files, 322 lines left for the screens' reads.
+- ~~`Repositories.swift` (1,122 lines): one protocol per file~~ — done 2026-11-12 (7260c5f): one file per repository, the trip stores together.
 - `LoadState` declared in ten view models (TD-10); DEBUG launch arguments in 26 files (TD-14).
-- Perf only where measured: TD-12 (Journey Detail decodes 30 routes), M04 with `-carodo.sampleJournal`.
+- Perf only where measured: TD-12 done 2026-11-12 (b39f20c); perf audit 11–12 done (53edd24, b39f20c); 13 needs the iPhone; 14 open.
 
 ## Why this order
 

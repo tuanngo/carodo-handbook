@@ -244,11 +244,41 @@ controls, merging. Product.
 - Saving every 30 s on a timer (Driveline `LocationDataRecorderService`): up to 30 s of fixes lost
   on a kill; Carodo's write per accepted fix is the stronger rule.
 
-## 5. Suggested order
+## 5. Order (revised 2026-11-13)
 
-1. **L4 + L5 together** (S): write the first `docs/solutions/` entries, L4's rule among them; the
-   schema part waits for the TD-6 decision.
-2. **L2** (S): thermal input to the GPS tier; device drive.
-3. **L3** (S): MetricKit diagnostics in Developer, before the next field test.
-4. **L1 + L6** (M): Live Activity with orphan cleanup, `staleDate`, push gate, End button.
-5. The rest as their features come up.
+What decides the order: what the next field test and the TestFlight gates need first, and L5's
+value growing with the number of lessons it holds.
+
+| Order | Item | Why now | State |
+|---|---|---|---|
+| 1 | **L2** thermal-aware GPS tier | A windscreen phone in the sun is the common case; cheap | Built 2026-11-13, uncommitted until its device drive ([`study-followups-thermal-diagnostics-derived.md`](../../plans/study-followups-thermal-diagnostics-derived.md)) |
+| 2 | **L3** MetricKit diagnostics | Must be in the build before the device-proof drives (master plan step 9), or the kills it explains go unseen | Planned, same plan |
+| 3 | **L4** versioned place sweeps | A schema change: one erase, together with TD-6 (master plan step 6), before TestFlight | Planned, same plan |
+| 4 | **L9** per-drive feature table | Judges every threshold change (L2's included) on all of `drive-data/` at once | When the device-proof batch is pulled |
+| 5 | **L1 + L6** Live Activity, End button | Product decisions; after the wow track | Open |
+| 6 | **L5** `docs/solutions/` | Its worth is the lessons it holds: built at about ten entries in [`lessons-inbox.md`](../../plans/lessons-inbox.md) or before the first TestFlight build, whichever comes first. Lessons land in the inbox meanwhile, in L5's shape | Collecting (5 entries) |
+| 7 | **L10** store screenshots from UI tests | Release prep (master plan step 10) | Open |
+| — | L7, L8, L11–L14 | As their features come up | Open |
+
+## 6. ImmersiveMap (read 2026-11-13, commit `463794a5`, MIT)
+
+Not a drive recorder, so not in the table above: a pure Swift + Metal map engine. What matters to
+the wow track is its **tour video export** (`Sources/ImmersiveMap/UI/Export/`, `Documentation/Export.md`),
+the question W3 asks ([`cinematic-replay.md`](../../plans/cinematic-replay.md#w3--what-the-spike-must-decide)):
+
+- **Offline, frame by frame on a fixed step.** The export advances the camera timeline to
+  `frameIndex × 1/fps` (`TourVideoTimelineDriver.advance(to:)`), never by the wall clock, so the
+  video does not depend on whether the phone keeps up at 60 fps.
+- **A frame waits until it is complete.** Each frame renders, checks that its tiles are loaded,
+  and re-renders until settled (10 s timeout) before `AVAssetWriter` takes it: no missing tile in
+  the video whatever the network does. A preroll warms the scene first.
+- **Pixel buffers from the writer's pool**, HEVC by default (H.264 for compatibility), progress
+  reported by phase and fraction, and cancel deletes the partial file.
+- **Stills the same way** (`ImmersiveMapStillRecorder`): offscreen at any size, a fixed scene date
+  for a repeatable picture.
+- **Attribution is the caller's job**: neither picture nor video carries the data credit.
+
+For Carodo: `ReplayCameraRig.pose(atStory:moment:rate:dt:)` already takes time and `dt` as inputs,
+so an export can drive it with a fixed `dt = 1/fps`. With `MKMapSnapshotter` (which itself waits
+for its tiles) per frame, that is W3's option (b) done the way a shipped engine does it. Ideas only:
+no package (P6), and Apple's terms on map imagery in a video still decide (TD-2).

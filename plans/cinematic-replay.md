@@ -238,6 +238,11 @@ For recordings: `-carodo.debugRestoreBackup <path>` and `-carodo.debugReplayRate
   offline and frame-exact, but slow per frame and its 3D fidelity unproven. (c) Drawing the map
   view's layer per frame: likely blank or slow with MapKit's Metal rendering; try only to rule out.
   Expected answer: (a), unless the prompt or the real-time wait is unacceptable to the owner.
+  **Evidence for (b), 2026-11-13:** ImmersiveMap's shipped tour export works exactly that way:
+  a fixed time step per frame, each frame held until its tiles are loaded, `AVAssetWriter`
+  ([`drive-recorders-study.md`](../references/repos/drive-recorders-study.md) §6). Carodo's rig
+  already takes `dt` as an input, so a fixed `dt = 1/fps` drives it without a screen. Try (b) first
+  for render time and 3D fidelity; keep (a) as the fallback if snapshots lose the 3D look.
 - **Contracts (P6, owner approval before code):** `ReplayKit`/`AVFoundation` are Apple frameworks
   but new to the app; saving to Photos needs `NSPhotoLibraryAddUsageDescription` (the share sheet's
   "Save Video" likely needs it too: verify).

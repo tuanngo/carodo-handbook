@@ -126,6 +126,9 @@ own line:
 - **Test evidence**: the run after the last change (counts, failures, warnings, lint).
 - **Real-data verification**: what was replayed or tried on a device, with its figures; or "none".
 - **Bugs found on the way**: each with its root cause and the test now guarding it.
+- **Lesson**: when a bug cost a device round trip, survived a review or was fixed twice, or a
+  measurement overturned an assumption, an entry in [`plans/lessons-inbox.md`](plans/lessons-inbox.md)
+  in its template; "none" said outright.
 - **Left open**: technical debt, known limitations and pending validations, each **entered by the
   agent itself** in [`plans/technical-debt.md`](plans/technical-debt.md) with its ID before the
   report (offering to do it leaves it unrecorded), and the plan's status line updated.
