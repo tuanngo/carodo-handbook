@@ -3,7 +3,7 @@
 Status (2026-11-12): **1–3 fixed and confirmed on the iPhone; 4 fixed in code (`isOffScreen` in
 `JourneyDetailView.isCovered`), its memory not re-measured; 9 built (`-carodo.sampleJournal N`);
 5/11, 12 and TD-12 done (carodo-ios 53edd24, b39f20c); 13 much reduced on the simulator, device
-measurement open**; 6, 7, 8, 10, 14 open.
+measurement open; 14 done (cc2b501)**; 6, 7, 8, 10 open.
 Also recorded: the owner's route-colour decision in `carodo-ios/docs/design-system.md` (Route line
 colours) and `docs/specs/navigation.md`.
 
@@ -233,7 +233,11 @@ is CPU, memory and battery spent on a screen opening, growing with the journal.
   journal before changing anything. If it stays slower: read the end columns only where a caller
   needs them, or keep one result per journal revision for its several callers.
 
-### 14. Low — navigation values that carry journeys
+### 14. Low — navigation values that carry journeys — done 2026-11-13 (carodo-ios cc2b501)
+
+- Pages keep the ids of drives the journal still holds (from the Passport's facts, no read) and
+  link by `AppRoute.journeyID`. Checked on the simulator by taps: a reached tier opens its drive,
+  a locked one has no chevron. A debug-opened milestone page pushes under itself (TD-23, DEBUG only).
 
 - `AppRoute` values stay in the stack while their page is open. `PlaceVisitsPage` no longer holds
   journeys (M04). Still holding one decoded `Journey` per row: the Passport's visited places
