@@ -1,6 +1,9 @@
 # Performance and resource audit — findings and fix plan (2026-11-06)
 
-Status: **issues 1–3 fixed and confirmed on the iPhone (2026-11-06); 4 inconclusive (memory graph next)**; 5–10 open.
+Status (2026-11-12): **1–3 fixed and confirmed on the iPhone; 4 fixed in code (`isOffScreen` in
+`JourneyDetailView.isCovered`), its memory not re-measured; 9 built (`-carodo.sampleJournal N`);
+5/11, 12 and TD-12 done (carodo-ios 53edd24, b39f20c); 13 much reduced on the simulator, device
+measurement open**; 6, 7, 8, 10, 14 open.
 Also recorded: the owner's route-colour decision in `carodo-ios/docs/design-system.md` (Route line
 colours) and `docs/specs/navigation.md`.
 
@@ -195,6 +198,72 @@ No screen's memory grew over its run.
 - Route colours follow the new design-system rule: one drive in `CarodoSurface.accent` (Trim,
   snapshots, onboarding), Journey Detail by speed, the Map tab's Routes layer in
   `DriveHeatPalette.color(.few, …)` on light and dark.
+
+## Second pass — 2026-11-12 (after source audit M04)
+
+Found while fixing M04 (carodo-ios c88007e). Measured with `PlaceVisitsPerformanceTests`
+(opt-in: `TEST_RUNNER_CARODO_PERF=1 TEST_RUNNER_CARODO_PERF_DRIVES=10000`), `SampleJournal` on an
+on-disk WAL database, Debug build on the simulator: absolute times are above a Release build on an
+iPhone; compare before and after on the same setup. Real routes average 2.7 KB (owner's iPhone,
+26 drives; 3 over a 4 KB page), about 3.7 times `SampleJournal`'s, so route-bound costs are higher
+on real data. None is a crash risk at realistic sizes (10,000 drives is years of heavy use); each
+is CPU, memory and battery spent on a screen opening, growing with the journal.
+
+### 11. Medium — Garage and a vehicle's page still load every journey with its route (issue 5, open)
+
+- `GarageViewModel.swift:94` and `VehicleDetailViewModel.swift:85` call `journeys()`: every
+  completed trip, its route decoded, then filtered and totalled on the main actor. The heaviest
+  read left on a screen people open often. Fix as issue 5 says: totals and weekly distance in SQL,
+  a vehicle page's own drives only (`WHERE vehicle_id = ?`), paged.
+
+### 12. Medium — Journey Detail reads the whole journal on every open
+
+- `JourneyDetailViewModel.loadPointCards` calls `passportFacts()` to count the visits of its
+  points' places: every driven trip, each open of any journey with points (~150 ms at 10,000
+  drives, Debug). Fix: for each place the points stand in, `drives(endingNear:)` (the
+  `trips_on_end` index) and `PlaceVisitLog.summaries` on those few drives only; same counts.
+
+### 13. Low — `passportFacts()` is a whole-journal read, ~18 % slower in Debug since M04
+
+- Callers: the Passport (expected), the Map's visit counts (cached per journal revision and
+  places), `BadgeLedger` when no facts are handed in, and issue 12. After M04 it reads four REAL
+  columns per row instead of slicing the route blob: 127 → 150 ms at 10,000 drives in Debug
+  (`GROUP BY` instead of the correlated parent subquery measured no better). Expected to reverse
+  on real routes, whose slice walks overflow pages; **measure on the iPhone** with a real-sized
+  journal before changing anything. If it stays slower: read the end columns only where a caller
+  needs them, or keep one result per journal revision for its several callers.
+
+### 14. Low — navigation values that carry journeys
+
+- `AppRoute` values stay in the stack while their page is open. `PlaceVisitsPage` no longer holds
+  journeys (M04). Still holding one decoded `Journey` per row: the Passport's visited places
+  (`PassportViewModel.swift:273`, the latest drive of each listed place), `PassportStampsPage` and
+  `MilestoneDetailPage` (a drive per reached tier). Bounded by places and badges, so a few MB at
+  most today, but it grows with them and every navigation compares and hashes these values. Fix:
+  rows link by `AppRoute.journeyID` (read when opened), the pages keep only what rows show.
+
+**Done 2026-11-12** (carodo-ios 7260c5f split the repository files first, then 53edd24, b39f20c;
+merged into `main` with caf0915). 10,000 `SampleJournal` drives, Debug, simulator, before → after:
+
+| Read | Before | After |
+|---|---|---|
+| Garage opens (`GarageViewModel.load`) | 149 ms | 51 ms |
+| A vehicle's page (6,925 drives) | 102 ms | 30 ms |
+| `passportFacts()` (issue 13) | 156 ms | 39 ms |
+| A place's visits page, Home (4,959 visits) | 86 ms | 28 ms |
+| Journey Detail point cards' visits, Home + an ordinary place | 50 ms (whole journal) | 39 ms (~2 ms without Home) |
+| 30 earlier drives for the comparison | 0.6 ms (routes) | 0.2 ms (one column) |
+
+- 11: `drives()` / `drives(of:)` (on `trips_on_vehicle`) return `DriveFact`s; the vehicle page
+  lists no drives, so no paging was needed (TD-10's trigger did not fire).
+- 13: the cost was not the SQL (25 ms) but reading each row's 20 columns **by name** (GRDB
+  searches the row per lookup); `driveFacts` now reads by position. Still to measure on the iPhone.
+- The Garage's weeks skip drives older than the bars before the calendar work (36 → 5 ms).
+- Measured by `GaragePerformanceTests` and `PlaceVisitsPerformanceTests` (opt-in).
+
+**Order for a new session (as written before the work):** 11 → 12 (largest and most frequent) → measure 13 on the iPhone over
+USB (`xctrace`, the method above) → 14. Each with a before/after row in `PlaceVisitsPerformanceTests`
+or a sibling test, and no schema change.
 
 ## Tasks to add capability
 
