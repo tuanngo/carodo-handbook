@@ -86,7 +86,7 @@ keep in memory per journey revision, only for the journeys crossing the visible 
 if a measurement on an iPhone shows it is slow. Journey Points have no lasting identity yet (TD-5). Not measured yet: the
 Map's CPU with many annotations.
 
-## 4b. Places from journey points (approved 2026-11-11; P1–P4 built, P2 fixed on device `5686d1f`; place editor redesigned `4692dc9`; P7 built `7e6499e`; UI polish and P6 built 2026-11-12, waiting for the owner's review)
+## 4b. Places from journey points (approved 2026-11-11; P1–P7 built and committed 2026-11-12: carodo-ios `95f41a6` Footprints + visits page + Map freeze fix, `50ba4da` naming from nearby places, `dc2aa15` one callout; next session: polish only, if needed)
 
 Goal (owner, 2026-11-11): like Geofency, Carodo builds the person's places by itself from where they drove, names each
 one once, and can later say how many times a place was visited and list those visits. For the owner personally, this
