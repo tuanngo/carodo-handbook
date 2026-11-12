@@ -15,7 +15,7 @@ parallel.
 |---|---|---|---|---|
 | 0 | In flight | Commit M04 (place visits by start coordinates) from the Places/Map session | [technical-debt.md](technical-debt.md) TD-20 | In progress |
 | 1 | **Wow** | W1: replay stop alignment (TD-1), so labels and highlights agree with the journal | [cinematic-replay.md](cinematic-replay.md#wow-track-owner-2026-11-12) | Done 2026-11-12 (carodo-ios 969ba51) |
-| 2 | **Wow** | W2: R.2B contextual camera, one behaviour at a time (Rest, Hairpin, Terrain), each proven on device drives | cinematic-replay.md, Wow track | Next (Rest first) |
+| 2 | **Wow** | W2: R.2B contextual camera, one behaviour at a time (Rest, Hairpin, Terrain), each proven on device drives | cinematic-replay.md, Wow track | Rest done 2026-11-12 (carodo-ios ba17a06); Hairpin Reveal next |
 | 3 | **Wow** | W3: video spike: how to turn the `MKMapView` replay into frames (ReplayKit capture vs per-frame snapshot) | cinematic-replay.md, Wow track | Planned |
 | 4 | **Wow** | W4: Cinematic Recap (a 30–60 s edit) and a 9:16 video export, privacy trim on | cinematic-replay.md, Wow track | Planned |
 | 5 | TestFlight gate | TD-19: iOS 18 runtime, run the tests there; decide the minimum iOS if the deinit crash repeats | technical-debt.md TD-19 | Open |

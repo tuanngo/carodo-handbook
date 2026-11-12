@@ -211,6 +211,24 @@ not on the held state. `drive-data/carodo-20261111-sim-after-p2.sqlite` does not
 (SQLite error 14) and stops every drive-data replay test at the loader; the run above used a copy
 of the folder without it.
 
+### W2 Rest result (2026-11-12, carodo-ios ba17a06, c6d92e5)
+
+Audit, the screen's camera simulated at 60 fps through the 34 stops of the drives in `drive-data/`
+(each stop is 1.00 s on screen): Follow turned a median of 24° at 15× and 34° at 60× (p90 about
+80°, over 45° at 13 of 34 stops) and at 60× came in to 0.65 of its distance (median), then backed out.
+
+Built: Rest holds the heading and distance through a stop span (the journal's stop after W1); no
+stand-back (owner); Cruise waits as it is. It also holds under the Arrival, unlike the first plan:
+three or four last stops before a finish still turned up to 61° there, and the Arrival moves the
+centre, pitch and distance, not the heading. The pose is composed by `ReplayCameraRig` (pure,
+`Core/Replay`), out of the map coordinator: a drive-data test runs the screen's code (0° turned,
+distance kept, at 15× and 60×), and W3/W4 can render the same camera without a screen. Owner
+accepted it from simulator recordings of a real drive at 15× and 60×.
+
+For recordings: `-carodo.debugRestoreBackup <path>` and `-carodo.debugReplayRate N` (carodo-ios
+`docs/operations/setup.md`); `-carodo.debugOpenJourney` needs Journeys on Explore
+(`-journeys.displayMode explore`). Open: the device pass with the R.1 checks.
+
 ### W3 — what the spike must decide
 
 - **Capture route.** (a) `ReplayKit` in-app capture (`RPScreenRecorder.startCapture`) of the recap
