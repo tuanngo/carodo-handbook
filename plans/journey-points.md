@@ -144,6 +144,32 @@ are not imported. Approved (owner, 2026-11-11): as test data only, from a Develo
 
 Before TestFlight: TD-2 (Apple Maps data kept on the device) must cover stored POI names and ids.
 
+## 4c. One point view, one callout (owner, 2026-11-12; built and committed)
+
+The owner found the point views redundant and inconsistent: Journey Detail's card was larger than
+Footprints', opened with an empty row on top and felt heavy, and a point also opened on the Map tab.
+
+- **A journey's points stay on its own map** (carodo-ios `600d85d`). Exploring a point on the Map tab is
+  removed (its preview sheet, `JourneyPointModel`, `MapPathHandoff`, the journey-point `MapIntent`, the
+  focus overlay and markers). A timeline line lowers the sheet, frames the route and opens the point's
+  card on the detail map. The card's button opens the place's visits only when a drive ended there.
+  carodo-ios ADR 0015 changed in place; the stop position and POI naming rules moved to `places.md`.
+  Lost on purpose: Nearby, Open in Apple Maps and coordinates for a point in no place (Nearby stays on
+  a detected place's visits page).
+- **One callout on every map** (carodo-ios `997b4c4`). The owner kept MapKit's callout. The empty row was
+  the `" "` placeholder title; the name is now MapKit's title (iOS 27 cuts a long one short inside the
+  screen, one line). `PlaceCalloutAccessories` builds the symbol, `PlaceCalloutLines` and the visits
+  button for Footprints and journey points alike. The larger card was the selection's scale: MapKit
+  lays the callout inside the annotation view, so only the drawn marker grows now (1.12×, 0.18 s ease).
+  A point named only by its own line says its time alone ("End", "08:04").
+
+Next session (open):
+- Device check of both callouts on the iPhone; Footprints' callout has not been seen on screen
+  (the sample data has no places).
+- Tune only if the device shows it: a long name now keeps one line; the card near the header still
+  closes, moves the map and reopens (`makeRoom`).
+- Not decided: past journey points on Footprints (§4), the next feature in this plan.
+
 ## 5. Audit (2026-11-09)
 
 **`geocoded_cells`:** schema and meaning unchanged.
@@ -162,7 +188,8 @@ Live Map is separate. The principle is recorded in navigation.md (History at sca
 
 ## 6. Still waiting
 
-- **PV-12:** Journey Points on the Map on a real iPhone. **PV-13:** Nearby POI on stops ≥ 5 min recorded by Carodo.
+- **PV-12:** a journey point's card on the detail map, and a place's callout on Footprints, on a real iPhone
+  (§4c). **PV-13:** Nearby POI (place detection) on stops ≥ 5 min recorded by Carodo.
 - **TD-2:** Apple Maps data kept on the device ([apple-maps-data-review.md](apple-maps-data-review.md)), before TestFlight.
 - **TD-3, TD-4, TD-5:** two POI queries; imported drives without a provenance; Journey Points without a lasting identity.
 - **Walking Evidence (V2.3.4):** Core Motion keeps only ~7 days on the recording device; decide on early collection before
