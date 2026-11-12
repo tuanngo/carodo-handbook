@@ -25,7 +25,7 @@ and see the one long trip I made, or the four errands; one tap takes me to the d
 | D4 | Day opens on today, even with no drives, with a quiet shortcut to the most recent day with drives. |
 | D5 | No between-drive gaps in V1: no inferred places, nothing that duplicates Smart Stops. |
 | D6 | Days stay in the device's current calendar for V1. The conflicting docs are resolved, and days in the recorded zone are written down as deferred. |
-| D7 | Week-based horizontal paging, in the calendar's first weekday and locale. |
+| D7 | ~~Week-based horizontal paging~~ Replaced by the owner, 2026-11-12: a free-scrolling day strip that ends today (view-aligned, tap selects, scroll never does), in the calendar's first weekday and locale. |
 | D8 | The heatmap lives on as the expandable month calendar. |
 | D9 | Two calendar states in one screen: a compact week strip (default) and an inline month overview, opened by tapping the month/year header. No modal `MonthYearPicker` as the main navigation. |
 | D10 | The content adapts: one journey (a prominent summary), several (compact entries), none (an empty note in context). |
@@ -236,6 +236,8 @@ are shared with other sessions: stage by hunk).
   `modeList`, `modeActivity`.
 
 ### Phase 2 — week strip and expandable month calendar
+
+(Built as week pages, then replaced on 2026-11-12 by the free-scrolling day strip of D7.)
 
 - `JourneyWeekStrip` (new): horizontal `ScrollView` of week pages (`LazyHStack`,
   `.scrollTargetBehavior(.paging)`, `.scrollPosition(id:)` on the week start), a window of weeks
