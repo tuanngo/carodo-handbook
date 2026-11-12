@@ -290,6 +290,35 @@ with Metal), the time per frame, memory and heat over a 60 s clip, and tiles: a 
 whether or not its tiles have arrived, so a first silent pass along the camera's path (or a short
 wait per frame) must load them. Nothing was added to the app: no framework, no Info.plist key.
 
+### W3: Carodo Studio and a second engine (2026-11-13)
+
+For the iPhone run the spike became a small app outside the repos, `~/code/carodo/carodo-studio`
+(bundle id `app.carodo.studio`, owner approved; it holds no drive data and never touches Carodo's
+database). It renders the same made-up 10 s drive in four places (Ho Chi Minh City, Da Lat, San
+Francisco, Zermatt) three ways and writes its measurements beside the clips;
+`./run-device.sh "iPhone name"` builds, installs, renders and pulls them back. The writer follows
+ImmersiveMap's `VideoExportAssetWriter` (pool buffers, fixed step, back-pressure, BT.709, HEVC).
+
+The third way is ImmersiveMap (`~/code/oss/swift/ImmersiveMap`, MIT, a Swift + Metal map engine,
+linked as a local package; owner asked for a short spike before the W4 renderer is chosen): its
+own offscreen export, which waits for each frame's tiles, on OpenStreetMap data from a hosted
+planet PMTiles archive, with open terrain relief.
+
+Simulator, 300 frames of 1080 × 1920 (iPhone 18 Pro simulator; not the iPhone):
+
+| Route | Per frame | 10 s clip takes | Seen in the frames |
+|---|---|---|---|
+| MapKit view (with a silent first pass for tiles) | 80 to 130 ms | 32 to 46 s | Apple's map: many buildings and places, logo and Legal in frame; terrain flat at this camera, in Zermatt too |
+| MapKit snapshotter (10 fps) | 170 to 190 ms | about 55 s at 30 fps | as above, route over the buildings |
+| ImmersiveMap | 130 to 145 ms | 39 to 43 s | OpenStreetMap: fewer buildings in Vietnam; relief and hillshade in Zermatt; no credit in the frame (must be added); the spike's camera mapping (zoom, bearing) is still off |
+
+Open: the iPhone 12 Pro Max run (blocked until Xcode is signed in to the developer account: the
+new bundle id needs a profile); whether `drawHierarchy` returns the map on the iPhone; for
+ImmersiveMap, who hosts the planet archive in production (the default is the maintainer's), its
+detail outside Europe, a moving wheel in the export, the camera mapping, and the dependency itself
+(P6, ADR 0015 names MKMapView). Both engines cover the world: MapKit by Apple, ImmersiveMap by
+OpenStreetMap.
+
 ### Brief for the next session
 
 ```text
