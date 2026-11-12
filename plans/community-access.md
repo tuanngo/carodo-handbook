@@ -1,6 +1,6 @@
 # Community access and Feed permissions — plan
 
-Status: **approved 2026-11-12** (owner). S0 done (docs and contract 0.28.0-draft, uncommitted, waiting for the owner's review); S1 next.
+Status: **approved 2026-11-12** (owner). S0 `3743f7b`, S1 `2f862a3`, S2 `23a4e00` committed; S3 done (`cfff8fd`, `f5d0c50`, `82985f8`); S4 deferred until App Review asks (owner); S5 backend next.
 Source: the owner's draft "Community Access & Feed Permissions" (2026-11-12), the audit below and
 the brainstorm of the same day (mockups: Settings option A, Join flow A without the Apple step).
 
@@ -121,7 +121,7 @@ Settings → Set up your profile.
    description, the field with a fixed `@` prefix and the status icon **inside** the field
    (✓ green, ! when taken), one status line under it ("@tuanngo is free."), suggestion chips only
    when the name is taken or reserved, **Claim @name**, Not now. One line under the button: "By
-   claiming you agree to the Community Guidelines" (link). The field opens with a free suggestion.
+   claiming you agree to the Terms of Use" (link). The field opens with a free suggestion.
 2. **Share your drives?** (optional): two radio cards, **As Someone** (default) / **As @name**,
    Show vehicle name, **Start sharing** / **Just react for now**. Opened from a drive summary,
    Start sharing also publishes that drive (the person asked for it); nothing else from before.
@@ -143,7 +143,7 @@ Reached from Settings' top row and the Feed avatar. A settings list:
 Username (→ change page: same field with the icon inside, "You can change it 3 times in 30 days", Save) ·
 **Feed:** Share my drives, Show as (Someone / @name), Show vehicle name, the line "Others see your
 car, time and distance. Never your route or places." · Blocked drivers (count → Unblock all) ·
-Community Guidelines · Contact support · Delete account.
+Delete account (owner 2026-11-12: support stays Settings → Send Feedback; the Terms of Use move to Settings → About).
 Turning sharing off still asks "Stop sharing?" and removes every row.
 
 **Delete account** (`account.md`, unchanged except the Apple step): offer Export → what is lost
@@ -168,7 +168,7 @@ Without network it waits and says so; nothing reads as deleted before the server
   to list, hide, rename a username, ban). Vehicle names and usernames pass the same VI + EN
   profanity filter at publish and at claim; a vehicle name that fails is dropped from the row, not
   refused (the drive still publishes).
-- **Community Guidelines and contact:** one short page (zero tolerance for offensive names,
+- **Terms of Use and contact** (owner 2026-11-12: one Terms of Use page holds the community rules; no separate Community Guidelines page): one short page (zero tolerance for offensive names,
   impersonation, spam; how to report; contact address), served by carodo-web and linked from the
   Claim screen, Profile and the report sheet.
 
@@ -189,10 +189,10 @@ Without network it waits and says so; nothing reads as deleted before the server
 |---|---|---|---|
 | S0 | Docs and contract: ADR 0008 amended (no Apple, join ≠ share), ADR 0007 note (no backfill), `feed.md`, `account.md`, `settings.md`, `passport.md`, contract 0.28.0; TD-21 recorded | carodo-ios, handbook | Owner approves the contract before S2 |
 | S1 | Settings + Passport one identity: remove `driverName`, top row "Set up your profile" / @username, Passport name | carodo-ios | Local only |
-| S2 | Join flow on the local mock: Claim screen polish, Share step; `FeedPublisher` without the 72 h backfill (`startSharing` and `catchUp` only for drives ending after sharing turned on); remove `Features/Authentication` | carodo-ios | |
-| S3 | Profile page replacing `FeedSharingView`; username change page; Delete account against the mock | carodo-ios | |
-| S4 | Report and block: row menu, report sheet, local hide, block + Unblock all; `CommunityRepository` `report`/`block`/`blocks`/`deleteAccount`; mock server stores them | carodo-ios | Closes the iOS side of TD-8 |
-| S5 | Backend: accounts, delete, report/block routes, threshold auto-hide, vehicle-name filter, moderation script, Guidelines page | carodo-app | Its own plan in carodo-app |
+| S2 | Join flow on the local mock: Claim screen polish, Share step; `FeedPublisher` without the 72 h backfill (`startSharing` and `catchUp` only for drives ending after sharing turned on); remove `Features/Authentication` | carodo-ios | done `23a4e00` |
+| S3 | Profile replacing `FeedSharingView`. Owner 2026-11-12: Edit profile is a fitted, flat sheet (no cards) from Settings and the avatar; the username is edited in the sheet (Save @name); how others see you stays two radio cards (owner: clearer than a switch); the Settings Privacy → Feed sharing row is removed. Then Blocked drivers, Guidelines, Support, Delete account against the mock | carodo-ios | sheet `cfff8fd`, field `f5d0c50`; Delete account + Terms of Use in About `82985f8` (support stays Send Feedback); Blocked drivers moves to S4; S3 done |
+| S4 | Report and block: row menu, report sheet, local hide, block + Unblock all; `CommunityRepository` `report`/`block`/`blocks`/`deleteAccount`; mock server stores them | carodo-ios | **Deferred** (owner, 2026-11-12): built only if App Review asks; designed and in the contract (TD-8) |
+| S5 | Backend: accounts (claim with sharing off), rename, `DELETE /v1/account` with the 90-day name hold, vehicle-name and username profanity filter, the Terms of Use page; report/block routes, threshold auto-hide and the moderation script last (deferred in the app) | carodo-app | Its own plan in carodo-app; contract 0.28.1-draft (`3516b7c`) |
 
 Each iOS slice: tests (view models, publisher no-backfill on both sides of the sharing moment,
 report hides locally, block filters every row of an author, delete leaves the journal untouched),
@@ -200,6 +200,26 @@ strings EN + VI, screenshots Light, Dark, large Dynamic Type, Vietnamese.
 
 Before submission, outside these slices: privacy policy URL and the App Privacy label (username,
 identifiers), already listed in the release-readiness follow-ups.
+
+## Handoff to carodo-app (2026-11-12)
+
+The iOS side of S0–S3 is built on the local mock; S4 is deferred (owner: only if App Review asks).
+The session that builds S5 starts from contract **0.28.1-draft** (carodo-ios `3516b7c`, its
+version note lists what the app calls) and carodo-ios ADR 0007 and 0008. Found in carodo-web's
+uncommitted pages (`apps/web/src/pages/`, another session's work), to fix there:
+
+1. **One name for the terms.** The app links "Terms of Use" (Claim, Settings → About) to
+   `carodo.app/terms`; the page is titled "Terms of Service". Rename the page (and the footer
+   links) to Terms of Use.
+2. **The community rules Guideline 1.2 needs.** The terms must say plainly that there is no
+   tolerance for objectionable content or abusive users (offensive usernames or vehicle names,
+   impersonation, harassment, spam), how to report (support@carodo.app), and that breaking them
+   hides the content or suspends the account. Today only "harass, threaten, or abuse" appears
+   under Acceptable use.
+3. **Privacy page out of date.** It still mentions Sign in with Apple, an optional display name and
+   live status; none exist (ADR 0008: a username only, no sign-in; no Live in Feed V1). It should
+   also say what deletion does as built: rows and reactions gone at once, everything within 30
+   days, the username held 90 days as a hash.
 
 ## Acceptance
 
