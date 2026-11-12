@@ -229,6 +229,25 @@ For recordings: `-carodo.debugRestoreBackup <path>` and `-carodo.debugReplayRate
 `docs/operations/setup.md`); `-carodo.debugOpenJourney` needs Journeys on Explore
 (`-journeys.displayMode explore`). Open: the device pass with the R.1 checks.
 
+### W2 Reveal result (2026-11-13, carodo-ios b525900)
+
+Audit on the drives in `drive-data/`: no mountain road (the three highway drives have no tight bend,
+the 338 km trip four); the bends are in town drives of 2 to 14 km (U-turns, blocks, roundabouts at
+20 to 40 km/h), where Follow turned at 45° a second or faster for 15 to 30 % of the time on screen.
+So the drafts' Hairpin Reveal and Junction Reveal became one behaviour, the Reveal, tuned in town
+(owner, 2026-11-13).
+
+Built: pitch 40°, distance × 1.8, heading eased slowly (at most 25° a second) toward the road's
+overall direction. The trigger changed from the approved plan: chord / path under 0.60 cut hard
+turning by half only, because a jog right then left reads straight; it is now the corners ahead
+summed (`CameraScript.turning`: 30 m steps, a corner is 15° or more; enter at 150°, leave at 60°,
+hold and cooldown 2 s on screen), read over 0.75 × the camera's distance. Measured, Follow alone →
+with the Reveal: seconds turning hard 280 → 83 at 15×, 143 → 45 at 60×; swings 56 → 4 and 52 → 15;
+up 18 % and 30 % of the time on screen. The owner accepted it from simulator recordings of a town drive.
+
+Open: hairpins on a real mountain drive (none in the data); 15 swings left at 60× on very short
+town drives; Terrain Reveal after W3 (it depends on what 3D terrain MapKit has in Vietnam).
+
 ### W3 — what the spike must decide
 
 - **Capture route.** (a) `ReplayKit` in-app capture (`RPScreenRecorder.startCapture`) of the recap
