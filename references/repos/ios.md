@@ -17,6 +17,10 @@ licence governs.
 
 ## Closest to Carodo (drive recording, journal, share)
 
+Read in depth against Carodo's source (OutRun, Pilgrim, Driveline; 2026-11-12):
+[`drive-recorders-study.md`](drive-recorders-study.md): what Carodo already does, the candidates
+to learn from, and Pilgrim's written lessons.
+
 | Repo | Licence | Stack | Learn from it | Caution |
 |---|---|---|---|---|
 | [dglancy/Driveline](https://github.com/dglancy/Driveline) | MIT | SwiftUI, SwiftData, App Intents, Live Activity | Closest product: background drive logging; start/stop via Shortcuts + App Intents on car Bluetooth (our `carodo://trip/start` idea); route list grouped by date with place names; PNG map snapshot export (share card); GPX export; Live Activity; Spotlight indexing; "no live map while recording" to save battery; merging two drives | Manual/Shortcuts start, no automatic detection; SwiftData |
