@@ -1,0 +1,401 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Share card — the image and its editor</title>
+<style>
+  :root { --charcoal:#242321; --copper:#BD8053; --ivory:#F3EEE5; --stone:#77736D; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:#1a1917; color:var(--ivory); font-family:-apple-system,"SF Pro Text",system-ui,sans-serif; padding:44px 40px 60px; width:2180px; }
+  h1 { font-size:30px; margin:0 0 6px; font-weight:700; }
+  h2 { font-size:20px; margin:46px 0 14px; font-weight:650; }
+  p.lead { margin:0 0 8px; color:#b9b3a8; font-size:15px; max-width:1400px; line-height:1.45; }
+  .row { display:flex; gap:32px; align-items:flex-start; }
+  figure { margin:0; }
+  figcaption { font-size:13.5px; color:#b9b3a8; margin-top:10px; line-height:1.4; }
+  figcaption b { color:var(--ivory); font-weight:650; }
+  .notes { font-size:14.5px; color:#cfc9be; line-height:1.55; max-width:1350px; margin:22px 0 0; padding-left:20px; }
+  .notes b { color:var(--ivory); }
+
+  /* The card: 360 points wide; 640 tall (9:16) or 360 (1:1). Written at 3x: 1080 × 1920 / 1080. */
+  .shot { position:relative; overflow:hidden; border-radius:14px; box-shadow:0 8px 28px rgba(0,0,0,.35); flex:none; }
+  .card { position:relative; width:360px; overflow:hidden; }
+  .card.light { --ink:#242321; --ink2:rgba(36,35,33,.68); --ground:243,238,229; --line:#B97A4C; }
+  .card.dark  { --ink:#F3EEE5; --ink2:rgba(243,238,229,.72); --ground:30,29,27; --line:#D09264; }
+  .card { background:rgb(var(--ground)); color:var(--ink); }
+  .card svg.map { position:absolute; inset:0; }
+  .card .scrim { position:absolute; left:0; right:0; }
+  .card .scrim.top { top:0; background:linear-gradient(rgba(var(--ground),.96) 0, rgba(var(--ground),.94) 62%, rgba(var(--ground),0) 100%); }
+  .card .scrim.foot { bottom:0; background:linear-gradient(rgba(var(--ground),0) 0, rgba(var(--ground),.94) 38%, rgba(var(--ground),.96) 100%); }
+  .card .lockup { position:absolute; height:22px; left:18px; }
+  .card .addr { position:absolute; left:18px; font-size:11.5px; font-weight:600; color:var(--line); }
+  .card .meta { position:absolute; right:18px; text-align:right; }
+  .day { font-size:12.5px; font-weight:600; } .car { font-size:12.5px; color:var(--ink2); font-weight:500; margin-top:1px; }
+  .card .figs { position:absolute; left:18px; right:18px; display:flex; justify-content:space-between; align-items:baseline; }
+  .km { font:700 40px/1 ui-rounded,"SF Pro Rounded",-apple-system,sans-serif; font-variant-numeric:tabular-nums; letter-spacing:-.5px; }
+  .km small { font-size:17px; font-weight:600; color:var(--ink2); margin-left:3px; letter-spacing:0; }
+  .time { font:650 22px/1 ui-rounded,"SF Pro Rounded",-apple-system,sans-serif; color:var(--ink2); }
+  .card.square .km { font-size:30px; } .card.square .km small { font-size:14px; } .card.square .time { font-size:17px; }
+  .card .apple { position:absolute; left:12px; bottom:9px; font-size:12px; font-weight:600; color:var(--ink); opacity:.62; }
+  .card .apple u { font-size:7.5px; font-weight:500; margin-left:7px; }
+  .guide { position:absolute; border:1.5px dashed #e2574c; border-radius:6px; }
+  .guide span { position:absolute; left:6px; bottom:5px; font-size:10px; font-weight:650; color:#e2574c; }
+
+  /* A phone: 393 × 852 points, shown at 0.8. */
+  .phone { zoom:.8; position:relative; width:393px; height:852px; overflow:hidden; border-radius:44px; border:1px solid #3a3835; }
+  .phone.light { --bg:243,238,229; --elev:250,247,241; --card:255,252,247; --stroke:222,214,201; --text:36,35,33; --text2:119,115,109; --accent:150,94,54; }
+  .phone.dark  { --bg:36,35,33; --elev:46,44,41; --card:55,52,48; --stroke:78,74,68; --text:243,238,229; --text2:164,158,149; --accent:208,146,100; }
+  .phone { background:rgb(var(--bg)); color:rgb(var(--text)); }
+  .status { position:absolute; left:0; right:0; top:0; height:54px; padding:18px 34px 0; font-weight:650; font-size:16px; display:flex; justify-content:space-between; z-index:5; }
+  .status i { font-style:normal; font-size:12px; letter-spacing:1px; padding-top:2px; }
+  .nav { position:absolute; left:16px; right:16px; top:56px; height:44px; }
+  .round { width:44px; height:44px; border-radius:50%; background:rgb(var(--elev)); border:.5px solid rgba(var(--stroke),.6); display:flex; align-items:center; justify-content:center; flex:none; }
+  .round svg { width:18px; height:18px; stroke:rgb(var(--text)); fill:none; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+  .round.on svg { stroke:rgb(var(--accent)); }
+  .cap { position:absolute; left:52px; right:0; top:0; height:44px; border-radius:22px; background:rgb(var(--elev)); border:.5px solid rgba(var(--stroke),.6); display:flex; flex-direction:column; align-items:center; justify-content:center; }
+  .cap b { font-size:14.5px; font-weight:650; } .cap small { font-size:12px; color:rgb(var(--text2)); font-weight:500; }
+  .ed { position:absolute; left:16px; right:16px; top:112px; bottom:30px; display:flex; flex-direction:column; align-items:center; }
+  .stage { flex:1; width:100%; display:flex; align-items:center; justify-content:center; min-height:0; }
+  .stage .shot { border-radius:16px; box-shadow:0 6px 14px rgba(0,0,0,.18); }
+  .tools { display:flex; gap:10px; margin:12px 0; align-items:center; }
+  .seg { height:44px; padding:3px; border-radius:22px; background:rgb(var(--elev)); border:.5px solid rgba(var(--stroke),.6); display:flex; }
+  .seg div { min-width:58px; padding:0 14px; border-radius:19px; display:flex; align-items:center; justify-content:center; font-size:15px; font-weight:650; color:rgb(var(--text2)); font-variant-numeric:tabular-nums; }
+  .seg div.on { background:rgb(var(--text)); color:rgb(var(--bg)); }
+  .cta { width:100%; height:52px; border-radius:26px; background:var(--copper); color:var(--charcoal); font-weight:650; font-size:17px; display:flex; align-items:center; justify-content:center; gap:8px; flex:none; }
+  .cta svg { width:18px; height:18px; stroke:var(--charcoal); fill:none; stroke-width:2.2; stroke-linecap:round; stroke-linejoin:round; }
+  .shade { position:absolute; inset:0; background:rgba(0,0,0,.38); z-index:6; }
+  .sheet { position:absolute; left:0; right:0; bottom:0; z-index:7; background:rgb(var(--elev)); border-radius:28px 28px 44px 44px; padding:10px 20px 34px; }
+  .sheet .grab { width:36px; height:5px; border-radius:3px; background:rgba(var(--text),.2); margin:0 auto 14px; }
+  .sheet .item { display:flex; gap:12px; align-items:center; margin-bottom:16px; } .sheet .thumb { width:44px; height:78px; border-radius:6px; overflow:hidden; flex:none; position:relative; }
+  .sheet .item b { font-size:15px; font-weight:650; display:block; } .sheet .item small { font-size:12.5px; color:rgb(var(--text2)); }
+  .apps { display:flex; gap:16px; margin-bottom:16px; } .apps div { width:58px; text-align:center; font-size:11px; color:rgb(var(--text2)); }
+  .apps i { display:block; width:58px; height:58px; border-radius:14px; margin-bottom:5px; background:rgba(var(--text),.12); }
+  .act { background:rgba(var(--text),.06); border-radius:12px; padding:14px 16px; font-size:16px; font-weight:500; display:flex; justify-content:space-between; margin-bottom:8px; }
+
+  /* Direction C: a page of the drive journal. Paper, the map as a window, a postmark for the day. */
+  .card.light { --inkrgb:36,35,33; --stamp:#A9683C; } .card.dark { --inkrgb:243,238,229; --stamp:#D09264; }
+  .page .win { position:absolute; overflow:hidden; border-radius:18px; background:rgba(var(--inkrgb),.05); }
+  .page .win::after { content:""; position:absolute; inset:0; border-radius:18px; box-shadow:inset 0 0 0 .75px rgba(var(--inkrgb),.20); }
+  .page .veh { position:absolute; right:20px; font-size:12.5px; font-weight:600; color:var(--ink2); }
+  .page .big { position:absolute; left:20px; font:700 52px/1 ui-rounded,"SF Pro Rounded",-apple-system,sans-serif; letter-spacing:-1px; font-variant-numeric:tabular-nums; }
+  .page .big small { font-size:20px; font-weight:600; color:var(--ink2); margin-left:4px; letter-spacing:0; }
+  .page.square .big { font-size:36px; } .page.square .big small { font-size:15px; }
+  .page .stats { position:absolute; left:20px; right:20px; display:flex; gap:26px; align-items:flex-end; }
+  .page .stats b { display:block; font:650 19px/1 ui-rounded,"SF Pro Rounded",-apple-system,sans-serif; }
+  .page .stats i { display:block; font-style:normal; font-size:8.5px; font-weight:650; letter-spacing:1.3px; color:var(--ink2); margin-top:5px; text-transform:uppercase; }
+  .page .stats .site { margin-left:auto; font-size:11.5px; font-weight:650; color:var(--line); }
+  .page .strip { position:absolute; left:20px; right:20px; height:26px; display:flex; gap:1.5px; align-items:flex-end; }
+  .page .strip i { flex:1; border-radius:1.5px; min-height:2px; }
+  .page .site2 { position:absolute; left:20px; font-size:11.5px; font-weight:650; color:var(--line); }
+  .stampbox { position:absolute; color:var(--stamp); opacity:.92; }
+  .card.light .stampbox { mix-blend-mode:multiply; }
+  .stampbox svg { position:absolute; inset:0; width:100%; height:100%; overflow:visible; }
+  .visa { position:absolute; color:var(--stamp); opacity:.85; border:2px solid currentColor; border-radius:7px; padding:3px; transform:rotate(7deg); }
+  .visa div { border:1px dashed currentColor; border-radius:4px; padding:5px 9px; text-align:center; font-weight:800; font-size:9px; letter-spacing:1.6px; color:var(--stamp); line-height:1.35; }
+  .visa div small { display:block; font-size:6.5px; letter-spacing:1.2px; font-weight:700; }
+  .card.light .visa { mix-blend-mode:multiply; }
+  .savebtn { width:52px; height:52px; border-radius:50%; background:rgb(var(--elev)); border:.5px solid rgba(var(--stroke),.6); display:flex; align-items:center; justify-content:center; flex:none; }
+  .savebtn svg { width:21px; height:21px; stroke:rgb(var(--text)); fill:none; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+  .bottom { width:100%; display:flex; gap:12px; } .bottom .cta { flex:1; width:auto; }
+
+  /* Direction D: the blend. The map fills the card (as A); the day is the Passport's round stamp. */
+  .blend .sub { position:absolute; left:18px; font:600 15px/1 ui-rounded,"SF Pro Rounded",-apple-system,sans-serif; color:var(--ink2); }
+  .blend .veh2 { position:absolute; left:18px; font-size:12.5px; font-weight:600; color:var(--ink2); }
+  .blend .km { position:absolute; left:18px; font-size:44px; }
+  .blend.square .km { font-size:32px; }
+  .blend .addr { letter-spacing:.2px; }
+  .stampbox .wheel { position:absolute; left:26%; top:26%; width:48%; height:48%; background:currentColor;
+    -webkit-mask:url(../../brand/svg/carodo-mark-small-mono.svg) center/contain no-repeat; mask:url(../../brand/svg/carodo-mark-small-mono.svg) center/contain no-repeat; }
+</style>
+</head>
+<body>
+<h1>Share card — the image and its editor</h1>
+<p class="lead">A drive as one image for social apps and messages (carodo-ios <code>docs/specs/share.md</code>). The whole route on a muted map, with the Replay video's block of figures: one look for the image and the video. Cards are 360 points wide, written at 3x (1080 × 1920 and 1080 × 1080). The map here is drawn for the mock-up (no real place); the app uses a map snapshot.</p>
+
+<h2>1 · The card</h2>
+<div class="row" id="cards"></div>
+
+<h2>2 · The editor: Share on the journey detail opens it</h2>
+<div class="row" id="phones"></div>
+
+<h2>4 · Direction D — the blend (owner, 2026-11-13): the map fills the card, the day is a stamp; Stamp or Simple is a choice</h2>
+<p class="lead">The map is never boxed in. The block stays at the top on its soft ground, which is also the paper the stamp is pressed on. One brand element a card: in <b>Stamp</b> the wheel is inside the stamp, so the lockup is left out and the stamp is the logo; in <b>Simple</b> (direction A) the lockup and a line of text. carodo.app names Carodo in both.</p>
+<div class="row" id="blend"></div>
+<ul class="notes">
+  <li><b>D · The stamp</b> is the Passport's round stamp (A · Round stamp, with lettering), unchanged in shape: double ring, the wheel in the centre. Its band carries what the lockup's line carried: the day above, the part of day below. Copper ink, pressed a little off straight, never a clock.</li>
+  <li><b>D · The line is always Copper</b> (owner, 2026-11-13): never coloured by speed, the colours mean nothing to someone who sees the image. C3 and the strip in section 3 are kept only as the record of what was tried.</li>
+  <li><b>D · Style is a tool in the editor:</b> Stamp (default) or Simple. Everything else is the same card: the same fit, the same figures, the same privacy zone.</li>
+</ul>
+
+<h2>3 · Direction C — a page of the drive journal (after the owner's reference, 2026-11-13)</h2>
+<p class="lead">The reference's strength kept: the map above, the figures on a calm ground under it. Made Carodo's own: the ground is the journal's paper, the map is a window in the page (Apple's logo stays whole inside it), the day is a postmark of the Driving Passport instead of a line of text, and the drive's speed profile is its signature at the foot.</p>
+<div class="row" id="pages"></div>
+
+<ul class="notes">
+  <li><b>C · What is Carodo's and nobody else's:</b> the postmark (the Passport's stamp family: day and part of day, never a clock), Copper ink on ivory paper, the speed profile strip of Replay, and later the stamp of a badge earned on this drive.</li>
+  <li><b>C · Left out on purpose:</b> start and end clock times (P9), a top speed (only if the person adds it, later), accent colour swatches (one brand ink), names of places written by Carodo.</li>
+  <li><b>C · Tools:</b> size, paper (Ivory or Charcoal), line (Copper or Speed), privacy zone. Share is the Copper button; Save beside it writes straight to Photos (needs the add-only Photos permission: an Info.plist key, the owner's approval).</li>
+</ul>
+
+<ul class="notes">
+  <li><b>The block is at the top (A, recommended):</b> the same block as a frame of the Replay video (lockup and carodo.app, day and part of day, vehicle, distance, duration); Apple's logo and Legal link stay clear at the foot; apps that show a 9:16 image full screen cover its foot more than its head. B is drawn only to compare: the block covers Apple's logo there.</li>
+  <li><b>The map is fitted to the route, not the route to the map:</b> the route (after the privacy zone is cut) is fitted into the area the block leaves free (the dashed box in 2), north up, with a floor on the zoom so a very short drive never shows at house level. Nothing of the route is ever under the block.</li>
+  <li><b>The line:</b> the real route on its roads, drawn with the Feed shape's soft curve (Catmull-Rom through the points, round ends), Copper on a casing of the ground colour. Not the Feed's shape itself: that one is turned and mirrored on purpose and matches no road.</li>
+  <li><b>Privacy zone on</b> (the person's setting, 300 m by default): the first and last metres are cut and the line simply ends, with no marker. <b>Off for this card:</b> the whole route with the start and end markers of the design system.</li>
+  <li><b>No map</b> (offline, nothing cached): the same card on the plain ground, so a card can always be made without a network.</li>
+  <li><b>Never on a card:</b> a clock time, the journey's title, a place's name or symbol written by Carodo (the map's own labels stay), a stop, a speed.</li>
+  <li><b>The editor:</b> the preview is the image. Three tools: size (9:16, 1:1), look (Light or Dark map), privacy zone (shown only when the setting is not Off). The image is ready at once, so the one button is Share: the system sheet with Save Image, Messages, AirDrop.</li>
+</ul>
+
+<script>
+const ICON = {
+  x: `<svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg>`,
+  share: `<svg viewBox="0 0 24 24"><path d="M12 15V3M8 7l4-4 4 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"/></svg>`,
+  eye: `<svg viewBox="0 0 24 24"><path d="M3 3l18 18M10.6 6.2A9.5 9.5 0 0121.5 12a10 10 0 01-2.6 3.6M6.3 7.6A10 10 0 002.5 12a9.5 9.5 0 0012.4 5.4M9.9 9.9a3 3 0 004.2 4.2"/></svg>`,
+  sun: `<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>`,
+};
+const T = {
+  en: { day: "Saturday 14 Nov · Morning", min: "29 min", title: "Share Card", share: "Share", save: "Save Image", copy: "Copy", image: "Image" },
+  vi: { day: "Thứ Bảy, 14 thg 11 · Buổi sáng", min: "29 phút", title: "Thẻ chia sẻ", share: "Chia sẻ", save: "Lưu hình ảnh", copy: "Sao chép", image: "Hình ảnh" },
+};
+
+// The mock-up's world: a drawn map and one route, in its own units.
+const ROUTE = [[250,940],[270,860],[330,800],[420,770],[500,720],[520,640],[470,570],[380,540],[330,480],[350,400],[430,360],[540,350],[640,320],[700,250],[690,170],[720,90]];
+const ROAD = [[190,1500],[230,1050], ...ROUTE, [760,-40],[700,-500]];
+const RIVER = [[-900,250],[-300,330],[100,250],[420,300],[800,210],[1200,290],[1900,180]];
+const CANAL = [[800,210],[860,600],[820,1000],[940,1500],[900,2000]];
+const PARKS = [[[560,420],[760,400],[820,560],[700,660],[580,600]], [[60,560],[250,600],[230,760],[80,800],[-20,680]], [[300,40],[470,10],[500,150],[380,210],[290,150]], [[880,760],[1100,740],[1150,930],[960,980]], [[-300,900],[-80,940],[-120,1200],[-340,1150]]];
+const LABELS = [["RIVERSIDE", 130, 420, 1], ["OLD MARKET", 610, 760, 1], ["NORTH QUARTER", 430, 140, 1], ["Canal St", 780, 470, 0], ["LAKE GARDENS", 150, 690, 1], ["Mill Rd", 330, 620, 0], ["EAST FIELDS", 980, 560, 1]];
+
+function smooth(points) { // uniform Catmull-Rom, as RouteShape(smoothed:) draws a Feed shape
+  if (points.length < 3) return "M" + points.map(p => p.join(" ")).join("L");
+  let d = `M${points[0][0].toFixed(1)} ${points[0][1].toFixed(1)}`;
+  for (let i = 0; i < points.length - 1; i++) {
+    const p0 = points[Math.max(0, i - 1)], p1 = points[i], p2 = points[i + 1], p3 = points[Math.min(points.length - 1, i + 2)];
+    const c1 = [p1[0] + (p2[0] - p0[0]) / 6, p1[1] + (p2[1] - p0[1]) / 6], c2 = [p2[0] - (p3[0] - p1[0]) / 6, p2[1] - (p3[1] - p1[1]) / 6];
+    d += `C${c1[0].toFixed(1)} ${c1[1].toFixed(1)} ${c2[0].toFixed(1)} ${c2[1].toFixed(1)} ${p2[0].toFixed(1)} ${p2[1].toFixed(1)}`;
+  }
+  return d;
+}
+
+// The fit: the route's box into the free rectangle, centred, one scale.
+function fit(route, free) {
+  const xs = route.map(p => p[0]), ys = route.map(p => p[1]);
+  const box = { x: Math.min(...xs), y: Math.min(...ys), w: Math.max(...xs) - Math.min(...xs), h: Math.max(...ys) - Math.min(...ys) };
+  const s = Math.min(free.w / box.w, free.h / box.h);
+  const dx = free.x + free.w / 2 - (box.x + box.w / 2) * s, dy = free.y + free.h / 2 - (box.y + box.h / 2) * s;
+  return { s, at: p => [p[0] * s + dx, p[1] * s + dy] };
+}
+
+function mapSVG(theme, W, H, f, route, opts) {
+  const C = theme === "light"
+    ? { land: "#F5F2EB", park: "#D8E7C6", water: "#A8D2EC", minor: "#FFFFFF", edge: "#E4DED2", major: "#FBF1CF", majorEdge: "#E7D9AC", label: "#8E8A82", ground: "243,238,229", line: "#B97A4C" }
+    : { land: "#2A2B30", park: "#233F3A", water: "#1C3766", minor: "#3D3F47", edge: "#33353B", major: "#565966", majorEdge: "#3A3C45", label: "#9A9CA6", ground: "30,29,27", line: "#D09264" };
+  const path = pts => smooth(pts.map(f.at));
+  let g = "";
+  if (opts.map) {
+    g += `<rect width="${W}" height="${H}" fill="${C.land}"/>`;
+    for (const park of PARKS) g += `<path d="${path([...park, park[0], park[1]])}" fill="${C.park}"/>`;
+    g += `<path d="${path(RIVER)}" fill="none" stroke="${C.water}" stroke-width="${52 * f.s}" stroke-linecap="round"/>`;
+    g += `<path d="${path(CANAL)}" fill="none" stroke="${C.water}" stroke-width="${18 * f.s}" stroke-linecap="round"/>`;
+    // A street grid, turned a little, every fourth street wider.
+    const turn = -0.21, cos = Math.cos(turn), sin = Math.sin(turn), rot = (x, y) => [x * cos - y * sin + 480, x * sin + y * cos + 500];
+    let streets = "", avenues = "";
+    for (let i = -22; i <= 22; i++) {
+      const o = i * 105 + ((i * 37) % 23);
+      const a = `M${f.at(rot(o, -2400)).map(v => v.toFixed(1)).join(" ")}L${f.at(rot(o, 2400)).map(v => v.toFixed(1)).join(" ")}`;
+      const b = `M${f.at(rot(-2400, o)).map(v => v.toFixed(1)).join(" ")}L${f.at(rot(2400, o)).map(v => v.toFixed(1)).join(" ")}`;
+      if (i % 4 === 0) avenues += a + b; else streets += a + b;
+    }
+    const minor = Math.max(1, 8 * f.s), major = Math.max(1.6, 15 * f.s);
+    g += `<path d="${streets}" stroke="${C.edge}" stroke-width="${minor + 1}" fill="none"/><path d="${streets}" stroke="${C.minor}" stroke-width="${minor}" fill="none"/>`;
+    g += `<path d="${avenues}" stroke="${C.majorEdge}" stroke-width="${major + 1.2}" fill="none"/><path d="${avenues}" stroke="${C.major}" stroke-width="${major}" fill="none"/>`;
+    g += `<path d="${path(ROAD)}" stroke="${C.majorEdge}" stroke-width="${major + 3.2}" fill="none"/><path d="${path(ROAD)}" stroke="${C.major}" stroke-width="${major + 2}" fill="none"/>`;
+    for (const [text, x, y, area] of LABELS) {
+      const p = f.at([x, y]);
+      g += `<text x="${p[0].toFixed(1)}" y="${p[1].toFixed(1)}" text-anchor="middle" font-size="${area ? 7.5 : 6.5}" font-weight="${area ? 600 : 500}" letter-spacing="${area ? .6 : 0}" fill="${C.label}" stroke="${C.land}" stroke-width="2" paint-order="stroke">${text}</text>`;
+    }
+    // The map is muted so the route and the figures lead.
+    g += `<rect width="${W}" height="${H}" fill="rgb(${C.ground})" opacity=".24"/>`;
+  }
+  const d = path(route), a = f.at(route[0]), b = f.at(route[route.length - 1]);
+  g += `<path d="${d}" fill="none" stroke="rgb(${C.ground})" stroke-width="8.5" stroke-linecap="round" stroke-linejoin="round" opacity=".95"/>`;
+  if (opts.speed) {
+    const pts = route.map(f.at), order = [1, 1, 2, 2, 3, 3, 2, 1, 0, 1, 2, 3, 3, 2, 1, 1];
+    for (let i = 0; i < pts.length - 1; i++) {
+      const p0 = pts[Math.max(0, i - 1)], p1 = pts[i], p2 = pts[i + 1], p3 = pts[Math.min(pts.length - 1, i + 2)];
+      g += `<path d="M${p1[0]} ${p1[1]}C${p1[0] + (p2[0] - p0[0]) / 6} ${p1[1] + (p2[1] - p0[1]) / 6} ${p2[0] - (p3[0] - p1[0]) / 6} ${p2[1] - (p3[1] - p1[1]) / 6} ${p2[0]} ${p2[1]}" fill="none" stroke="${BAND[order[i % order.length]]}" stroke-width="4.6" stroke-linecap="round"/>`;
+    }
+  } else g += `<path d="${d}" fill="none" stroke="${C.line}" stroke-width="4.6" stroke-linecap="round" stroke-linejoin="round"/>`;
+  if (opts.ends) {
+    g += `<circle cx="${a[0]}" cy="${a[1]}" r="6" fill="rgb(${C.ground})" stroke="${C.line}" stroke-width="3"/>`;
+    g += `<circle cx="${b[0]}" cy="${b[1]}" r="7.5" fill="${C.line}" stroke="rgb(${C.ground})" stroke-width="2.5"/>`;
+  }
+  return `<svg class="map" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" font-family="-apple-system,sans-serif">${g}</svg>`;
+}
+
+// o: theme, lang, square, zoneOff, noMap, foot, guide, scale
+function card(o) {
+  const theme = o.theme || "light", t = T[o.lang || "en"], W = 360, H = o.square ? 360 : 640, scale = o.scale || 1;
+  const L = o.square ? { scrim: 132, lockup: 18, figs: 60, free: { x: 34, y: 146, w: 292, h: 172 } }
+    : o.foot ? { scrim: 250, lockup: 110, figs: 60, free: { x: 34, y: 44, w: 292, h: 350 } }
+    : { scrim: 236, lockup: 46, figs: 96, free: { x: 34, y: 250, w: 292, h: 336 } };
+  const route = o.zoneOff ? ROUTE : ROUTE.slice(1, -1);
+  const f = fit(route, L.free), edge = o.foot ? "bottom" : "top";
+  const block = o.foot
+    ? `<img class="lockup" style="bottom:${L.lockup}px" src="../../brand/svg/carodo-lockup-on-${theme}.svg"><div class="addr" style="bottom:${L.lockup - 17}px">carodo.app</div>
+       <div class="meta" style="bottom:${L.lockup - 10}px"><div class="day">${t.day}</div><div class="car">Mazda CX-5</div></div>
+       <div class="figs" style="bottom:28px"><div class="km">17.8<small>km</small></div><div class="time">${t.min}</div></div>`
+    : `<img class="lockup" style="top:${L.lockup}px" src="../../brand/svg/carodo-lockup-on-${theme}.svg"><div class="addr" style="top:${L.lockup + 24}px">carodo.app</div>
+       <div class="meta" style="top:${L.lockup - 2}px"><div class="day">${t.day}</div><div class="car">Mazda CX-5</div></div>
+       <div class="figs" style="top:${L.figs + (o.square ? 0 : 6)}px"><div class="km">17.8<small>km</small></div><div class="time">${t.min}</div></div>`;
+  return `<div class="shot" style="width:${W * scale}px;height:${H * scale}px"><div class="card ${theme} ${o.square ? "square" : ""}" style="height:${H}px;zoom:${scale}">
+    ${mapSVG(theme, W, H, f, route, { map: !o.noMap, ends: o.zoneOff })}
+    ${o.noMap ? "" : `<div class="apple">&#xF8FF;Maps<u>Legal</u></div>`}
+    <div class="scrim ${o.foot ? "foot" : "top"}" style="height:${L.scrim}px"></div>${block}
+    ${o.guide ? `<div class="guide" style="left:${L.free.x}px;top:${L.free.y}px;width:${L.free.w}px;height:${L.free.h}px"><span>the route is fitted here</span></div>` : ""}
+  </div></div>`;
+}
+
+function fig(inner, caption, width) { return `<figure style="width:${width}px">${inner}<figcaption>${caption}</figcaption></figure>`; }
+
+const S = 0.8, CW = 360 * S;
+document.getElementById("cards").innerHTML =
+  fig(card({ scale: S }), `<b>1 · A, 9:16, Light.</b> The block at the top, the whole route under it. Privacy zone on: the line ends short of the real start and end, no marker.`, CW) +
+  fig(card({ scale: S, guide: true }), `<b>2 · How it is fitted.</b> The route's box is centred in the area the block leaves free, above Apple's logo; the map follows the route.`, CW) +
+  fig(card({ scale: S, theme: "dark", lang: "vi", zoneOff: true }), `<b>3 · Dark · Vietnamese, zone off.</b> The whole route, with its start and end markers.`, CW) +
+  fig(card({ scale: S, noMap: true }), `<b>4 · No map.</b> Offline with nothing cached: the same card on the plain ground.`, CW) +
+  fig(card({ scale: S, square: true }), `<b>5 · 1:1.</b> The same block, closed up; a tall route is smaller here, a wide one fills it.`, CW) +
+  fig(card({ scale: S, foot: true }), `<b>B · The block at the foot (not recommended).</b> Reads as a caption, but covers Apple's logo and sits where apps draw their own bar.`, CW);
+
+function editor(o) {
+  const theme = o.theme || "light", t = T[o.lang || "en"];
+  const preview = card({ ...o, scale: o.square ? 0.98 : 0.84 });
+  const sheet = o.sheet ? `<div class="shade"></div><div class="sheet"><div class="grab"></div>
+      <div class="item"><div class="thumb">${card({ ...o, scale: 44 / 360 }).replace('class="shot"', 'class="shot" style="box-shadow:none;border-radius:0"')}</div><div><b>Carodo</b><small>${t.image} · 1080 × 1920</small></div></div>
+      <div class="apps"><div><i></i>AirDrop</div><div><i></i>Messages</div><div><i></i>Mail</div><div><i></i>Notes</div><div><i></i>…</div></div>
+      <div class="act"><span>${t.save}</span><span>↓</span></div><div class="act"><span>${t.copy}</span><span>⧉</span></div></div>` : "";
+  return `<div class="phone ${theme}"><div class="status"><span>9:41</span><i>●●● ▮</i></div>
+    <div class="nav"><div class="round">${ICON.x}</div><div class="cap"><b>${t.title}</b><small>17.8 km · ${t.min}</small></div></div>
+    <div class="ed"><div class="stage">${preview}</div>
+      <div class="tools"><div class="seg"><div class="${o.square ? "" : "on"}">9:16</div><div class="${o.square ? "on" : ""}">1:1</div></div>
+        <div class="round">${ICON.sun}</div><div class="round ${o.zoneOff ? "" : "on"}">${ICON.eye}</div></div>
+      <div class="cta">${ICON.share}${t.share}</div></div>${sheet}</div>`;
+}
+const PW = 393 * 0.8;
+document.getElementById("phones").innerHTML =
+  fig(editor({}), `<b>1 · The editor.</b> The preview is the image; size, look and privacy zone under it; one Copper button.`, PW) +
+  fig(editor({ square: true }), `<b>2 · 1:1 chosen.</b> The preview changes at once; nothing else moves.`, PW) +
+  fig(editor({ theme: "dark", lang: "vi", zoneOff: true }), `<b>3 · Dark · Vietnamese.</b> Zone turned off for this card: the tool loses its Copper, the markers appear.`, PW) +
+  fig(editor({ sheet: true }), `<b>4 · Share.</b> The system sheet: Save Image, Copy, Messages, AirDrop. Nothing is sent anywhere by Carodo.`, PW);
+
+const BAND = ["#5E8C6A", "#C9A24B", "#BD8053", "#B5533C"];
+Object.assign(T.en, { part: "MORNING DRIVE", date: "14 NOV", time: "Time", avg: "Avg speed", badge: "EARLY BIRD", badgeSub: "BEFORE 7 AM" });
+Object.assign(T.vi, { part: "CHUYẾN BUỔI SÁNG", date: "14 THG 11", time: "Thời gian", avg: "Tốc độ TB", badge: "CHIM SỚM", badgeSub: "TRƯỚC 7 GIỜ" });
+let uid = 0;
+function stamp(t, size, x, y) { // the Passport's round stamp, as a postmark: the day, never a clock
+  const id = ++uid;
+  return `<div class="stampbox" style="left:${x - size / 2}px;top:${y - size / 2}px;width:${size}px;height:${size}px;transform:rotate(-11deg)"><svg viewBox="0 0 120 120">
+    <g fill="none" stroke="currentColor"><circle cx="60" cy="60" r="56" stroke-width="3.2"/><circle cx="60" cy="60" r="40.5" stroke-width="1.3"/>
+      <path d="M-78 44q9-7 18 0t18 0 18 0 18 0M-78 60q9-7 18 0t18 0 18 0 18 0M-78 76q9-7 18 0t18 0 18 0 18 0" stroke-width="2.2" stroke-linecap="round" opacity=".8"/></g>
+    <path id="st${id}" d="M 13 60 A 47 47 0 0 1 107 60" fill="none"/><path id="sb${id}" d="M 9.5 60 A 50.5 50.5 0 0 0 110.5 60" fill="none"/>
+    <text font-family="-apple-system,system-ui" font-weight="800" font-size="${t.part.length > 14 ? 7.6 : 9}" letter-spacing="${t.part.length > 14 ? 1.2 : 2}" fill="currentColor"><textPath href="#st${id}" startOffset="50%" text-anchor="middle">${t.part}</textPath></text>
+    <text font-family="-apple-system,system-ui" font-weight="800" font-size="9" letter-spacing="3" fill="currentColor"><textPath href="#sb${id}" startOffset="50%" text-anchor="middle">CARODO</textPath></text>
+    <circle cx="16" cy="60" r="1.8" fill="currentColor"/><circle cx="104" cy="60" r="1.8" fill="currentColor"/>
+    <text x="60" y="63" text-anchor="middle" font-family="ui-rounded,-apple-system" font-weight="800" font-size="${t.date.length > 6 ? 14 : 17}" fill="currentColor">${t.date}</text>
+    <text x="60" y="78" text-anchor="middle" font-family="ui-rounded,-apple-system" font-weight="700" font-size="9.5" letter-spacing="1.5" fill="currentColor">2026</text>
+  </svg></div>`;
+}
+function strip() {
+  return Array.from({ length: 72 }, (_, i) => {
+    const v = 0.14 + 0.86 * Math.abs(Math.sin(i * 0.37) * Math.cos(i * 0.11 + 1));
+    return `<i style="height:${v * 100}%;background:${BAND[Math.min(3, Math.floor(v * 4))]}"></i>`;
+  }).join("");
+}
+// o: theme, lang, square, zoneOff, noMap, speed, badge, scale
+function page(o) {
+  const theme = o.theme || "light", t = T[o.lang || "en"], W = 360, H = o.square ? 360 : 640, scale = o.scale || 1;
+  const L = o.square ? { head: 16, win: { x: 16, y: 48, w: 328, h: 192 }, pad: { x: 34, y: 20, w: 260, h: 138 }, stamp: 78, big: 256, stats: 306 }
+    : { head: 46, win: { x: 16, y: 84, w: 328, h: 318 }, pad: { x: 34, y: 28, w: 260, h: 246 }, stamp: 98, big: 424, stats: 494 };
+  const route = o.zoneOff ? ROUTE : ROUTE.slice(1, -1), f = fit(route, L.pad);
+  return `<div class="shot" style="width:${W * scale}px;height:${H * scale}px"><div class="card page ${theme} ${o.square ? "square" : ""}" style="height:${H}px;zoom:${scale}">
+    <img class="lockup" style="top:${L.head}px;left:20px" src="../../brand/svg/carodo-lockup-on-${theme}.svg"><div class="veh" style="top:${L.head + 4}px">Mazda CX-5</div>
+    <div class="win" style="left:${L.win.x}px;top:${L.win.y}px;width:${L.win.w}px;height:${L.win.h}px">${mapSVG(theme, L.win.w, L.win.h, f, route, { map: !o.noMap, ends: o.zoneOff, speed: o.speed })}
+      ${o.noMap ? "" : `<div class="apple">&#xF8FF;Maps<u>Legal</u></div>`}</div>
+    ${stamp(t, L.stamp, L.win.x + L.win.w - L.stamp * 0.52, L.win.y + L.win.h - 4)}
+    <div class="big" style="top:${L.big}px">17.8<small>km</small></div>
+    ${o.badge ? `<div class="visa" style="right:22px;top:${L.big + 78}px"><div>${t.badge}<small>${t.badgeSub}</small></div></div>` : ""}
+    <div class="stats" style="top:${L.stats}px"><div><b>${t.min}</b><i>${t.time}</i></div><div><b>37 km/h</b><i>${t.avg}</i></div>${o.square ? `<div class="site">carodo.app</div>` : ""}</div>
+    ${o.square ? "" : `<div class="strip" style="top:548px">${strip()}</div><div class="site2" style="top:590px">carodo.app</div>`}
+  </div></div>`;
+}
+function editorC(o) {
+  const t = T[o.lang || "en"];
+  return `<div class="phone light"><div class="status"><span>9:41</span><i>●●● ▮</i></div>
+    <div class="nav"><div class="round">${ICON.x}</div><div class="cap"><b>${t.title}</b><small>17.8 km · ${t.min}</small></div></div>
+    <div class="ed"><div class="stage">${page({ ...o, scale: 0.84 })}</div>
+      <div class="tools"><div class="seg"><div class="on">9:16</div><div>1:1</div></div>
+        <div class="round">${ICON.sun}</div><div class="round">${ICON.path}</div><div class="round on">${ICON.eye}</div></div>
+      <div class="bottom"><div class="cta">${ICON.share}${t.share}</div><div class="savebtn">${ICON.save}</div></div></div></div>`;
+}
+ICON.path = `<svg viewBox="0 0 24 24"><circle cx="6" cy="6" r="2"/><circle cx="18" cy="18" r="2"/><path d="M8 6h6a3 3 0 010 6h-4a3 3 0 000 6h6"/></svg>`;
+ICON.save = `<svg viewBox="0 0 24 24"><path d="M12 3v12M8 11l4 4 4-4M5 14v5a2 2 0 002 2h10a2 2 0 002-2v-5"/></svg>`;
+const SC = 0.72, CC = 360 * SC;
+document.getElementById("pages").innerHTML =
+  fig(page({ scale: SC }), `<b>C1 · 9:16, Ivory.</b> The map window, the postmark on its corner, distance, time and average speed, the speed profile, carodo.app.`, CC) +
+  fig(page({ scale: SC, theme: "dark", lang: "vi", zoneOff: true }), `<b>C2 · Charcoal · Vietnamese, zone off.</b> The whole route with its markers.`, CC) +
+  fig(page({ scale: SC, speed: true }), `<b>C3 · Line by speed.</b> The route in Replay's speed colours; the strip under it reads the same way.`, CC) +
+  fig(page({ scale: SC, badge: true }), `<b>C4 · A badge earned on this drive</b> (later): its visa stamp is pressed on the page.`, CC) +
+  fig(page({ scale: SC, noMap: true }), `<b>C5 · No map.</b> The window stays; the route alone on the paper.`, CC) +
+  fig(page({ scale: SC, square: true }), `<b>C6 · 1:1.</b> The window is wide; the strip is left out.`, CC) +
+  fig(editorC({}), `<b>C · The editor.</b> Size, paper, line, privacy zone; Share, and Save beside it.`, 393 * 0.8);
+
+Object.assign(T.en, { sDay: "14 NOV 2026", sPart: "MORNING DRIVE" });
+Object.assign(T.vi, { sDay: "14 THG 11 2026", sPart: "BUỔI SÁNG" });
+ICON.seal = `<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/></svg>`;
+function seal(t, size, x, y) {
+  const id = ++uid;
+  return `<div class="stampbox" style="left:${x - size / 2}px;top:${y - size / 2}px;width:${size}px;height:${size}px;transform:rotate(-9deg)"><svg viewBox="0 0 120 120">
+    <g fill="none" stroke="currentColor"><circle cx="60" cy="60" r="56" stroke-width="3.4"/><circle cx="60" cy="60" r="40.5" stroke-width="1.4"/></g>
+    <path id="st${id}" d="M 13 60 A 47 47 0 0 1 107 60" fill="none"/><path id="sb${id}" d="M 9.5 60 A 50.5 50.5 0 0 0 110.5 60" fill="none"/>
+    <text font-family="-apple-system,system-ui" font-weight="800" font-size="9.2" letter-spacing="2.2" fill="currentColor"><textPath href="#st${id}" startOffset="50%" text-anchor="middle">${t.sDay}</textPath></text>
+    <text font-family="-apple-system,system-ui" font-weight="800" font-size="9.2" letter-spacing="2.4" fill="currentColor"><textPath href="#sb${id}" startOffset="50%" text-anchor="middle">${t.sPart}</textPath></text>
+    <circle cx="16" cy="60" r="1.8" fill="currentColor"/><circle cx="104" cy="60" r="1.8" fill="currentColor"/>
+  </svg><div class="wheel"></div></div>`;
+}
+// o: theme, lang, square, zoneOff, noMap, speed, scale
+function blend(o) {
+  const theme = o.theme || "light", t = T[o.lang || "en"], W = 360, H = o.square ? 360 : 640, scale = o.scale || 1;
+  const L = o.square ? { scrim: 138, km: 20, sub: 60, veh: 82, addr: 100, seal: 86, sx: 298, sy: 64, free: { x: 34, y: 150, w: 292, h: 168 } }
+    : { scrim: 250, km: 48, sub: 102, veh: 126, addr: 146, seal: 108, sx: 284, sy: 106, free: { x: 34, y: 262, w: 292, h: 324 } };
+  const route = o.zoneOff ? ROUTE : ROUTE.slice(1, -1), f = fit(route, L.free);
+  return `<div class="shot" style="width:${W * scale}px;height:${H * scale}px"><div class="card blend ${theme} ${o.square ? "square" : ""}" style="height:${H}px;zoom:${scale}">
+    ${mapSVG(theme, W, H, f, route, { map: !o.noMap, ends: o.zoneOff, speed: o.speed })}
+    ${o.noMap ? "" : `<div class="apple">&#xF8FF;Maps<u>Legal</u></div>`}
+    <div class="scrim top" style="height:${L.scrim}px"></div>
+    <div class="km" style="top:${L.km}px">17.8<small>km</small></div>
+    <div class="sub" style="top:${L.sub}px">${t.min} · 37 km/h</div>
+    <div class="veh2" style="top:${L.veh}px">Mazda CX-5</div>
+    <div class="addr" style="top:${L.addr}px">carodo.app</div>
+    ${seal(t, L.seal, L.sx, L.sy)}
+  </div></div>`;
+}
+function editorD(o) {
+  const t = T[o.lang || "en"];
+  return `<div class="phone light"><div class="status"><span>9:41</span><i>●●● ▮</i></div>
+    <div class="nav"><div class="round">${ICON.x}</div><div class="cap"><b>${t.title}</b><small>17.8 km · ${t.min}</small></div></div>
+    <div class="ed"><div class="stage">${blend({ ...o, scale: 0.84 })}</div>
+      <div class="tools"><div class="seg"><div class="on">9:16</div><div>1:1</div></div>
+        <div class="round on">${ICON.seal}</div><div class="round">${ICON.sun}</div><div class="round on">${ICON.eye}</div></div>
+      <div class="bottom"><div class="cta">${ICON.share}${t.share}</div><div class="savebtn">${ICON.save}</div></div></div></div>`;
+}
+document.getElementById("blend").innerHTML =
+  fig(blend({ scale: SC }), `<b>D1 · Stamp, 9:16, Light.</b> Distance, time and average speed, the vehicle, carodo.app; the stamp carries the day.`, CC) +
+  fig(card({ scale: SC }), `<b>D2 · Simple</b> (direction A): the lockup and a line of text, for a quieter card.`, CC) +
+  fig(blend({ scale: SC, theme: "dark", lang: "vi", zoneOff: true }), `<b>D3 · Stamp, Dark · Vietnamese, zone off.</b>`, CC) +
+  fig(blend({ scale: SC, noMap: true }), `<b>D4 · Stamp, no map.</b> The stamp on plain paper reads best of all.`, CC) +
+  fig(blend({ scale: SC, square: true }), `<b>D5 · Stamp, 1:1.</b>`, CC) +
+  fig(editorD({}), `<b>D · The editor.</b> Size, style (Stamp or Simple), look, privacy zone; Share and Save.`, 393 * 0.8);
+</script>
+</body>
+</html>

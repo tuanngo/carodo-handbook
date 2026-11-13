@@ -12,6 +12,7 @@ below describe the review at that time, not proof that a board matches the curre
 - [`drive/`](drive/): recording, Auto Mode and recording polish.
 - [`journeys/`](journeys/): the list, detail, replay, trim and provinces.
 - [`replay/`](replay/): the Replay video's frame.
+- [`share/`](share/): the share card and its editor.
 - [`garage/`](garage/): Garage, vehicle identity, showcase and editor concepts.
 - [`passport/`](passport/): milestone and Passport concepts.
 - [`feed/`](feed/): early Feed concepts.
@@ -98,7 +99,7 @@ file in the table above.
 
 | Screen | Spec | States to draw | Status |
 |---|---|---|---|
-| Share card | [`share.md`](../../../carodo-ios/docs/specs/share.md) Share card, Time | 9:16 and 1:1, the size picker, trim on and off, "Sunday 1 Nov · Morning" | To do |
+| Share card | [`share.md`](../../../carodo-ios/docs/specs/share.md) Share card, Time | 9:16 and 1:1, the size picker, trim on and off, "Sunday 1 Nov · Morning" | Drawn: [`share/share-card.png`](share/share-card.png); direction D approved by the owner 2026-11-13 ([plan](../../plans/share-card.md)) |
 | Share page and link preview | [`share.md`](../../../carodo-ios/docs/specs/share.md) Share link, Link preview | the web page (static route, figures), the 1200 × 630 preview in a chat, a revoked link | To do |
 | Journeys search and filters | [`journeys.md`](../../../carodo-ios/docs/specs/journeys.md) Search | the search field, vehicle and tag tokens, no results | To do |
 | Journey edit | [`journeys.md`](../../../carodo-ios/docs/specs/journeys.md) Edit | vehicle, custom name (empty = automatic), note | To do |
