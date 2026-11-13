@@ -123,3 +123,19 @@ Lessons already paid for that L5 gathers, beside the entries below:
 - Guidance: a debug route pushes onto the same typed path a tap would (`AppRoute` on the tab's
   stack); judge a link opened from a debug page against the tapped route before calling it a bug.
 - Rule now in: nowhere yet (TD-23, with TD-14).
+
+### restore-a-backup-on-an-iphone-without-touching-it
+- applies_when: putting journeys back on a physical iPhone after `CONFIRM=erase`; using
+  `-carodo.debugRestoreBackup` on a device; passing app arguments with `devicectl`
+- area: operations, DEBUG launch arguments · found: 2026-11-13 · severity: low
+- Context: the argument takes an absolute path, and a relative one resolves against `/`, not the
+  app's container, so it silently restores nothing; `devicectl device info files` gives no
+  absolute path, and the app's Documents are not visible in Files. `devicectl … process launch`
+  read `-carodo.…` as its own option until the app's arguments followed `--`.
+- Guidance: `task pull-db` first (the backup), `task backup-db DB=…` for a `.carodo`, then
+  `devicectl device copy to --domain-type appDataContainer --domain-identifier app.carodo.ios
+  --destination Documents/x.carodo`; the container's path comes from a unit test hosted in the
+  app printing `NSHomeDirectory()` on that device; launch with `-- app.carodo.ios
+  -carodo.debugRestoreBackup <container>/Documents/x.carodo`; verify by pulling and counting trips.
+- Rule now in: nowhere yet (a candidate for a `task restore-db`, or the argument resolving a
+  relative path against Documents).
