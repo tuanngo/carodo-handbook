@@ -494,7 +494,9 @@ is left"; a stop inside the zone goes, one outside stays whole).
 
 **The address (owner, 2026-11-13; carodo-ios, the commit after 3d2f925):** `carodo.app` as text, not a
 QR code (a person watching on the phone that plays the video cannot scan it), and only over the
-arrival's hold: it fades in under the figures in 0.3 s. The hold is two seconds now, so it can be
+arrival's hold: it fades in under the lockup in 0.3 s (first built under the time, where it read
+as a fourth figure; moved by the owner the same day: columns 1 and 3 of the picture are before,
+2 and 4 after). The hold is two seconds now, so it can be
 read ([`replay-video-address.png`](../design/mockups/replay/replay-video-address.png)). The pages
 of carodo.app are not built yet: needed before export leaves the Developer screen.
 
