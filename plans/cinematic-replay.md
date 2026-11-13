@@ -420,17 +420,46 @@ iPhone 17 Pro Max, iOS 27.2, a real town drive, 30 s asked (31 s, 930 frames, ra
 So the wait is kept: without it MapKit has not laid out the labels or redrawn the line when the
 frame is taken. Heat: `nominal` to `fair` in the first clip.
 
+**Where a frame's time went (iPhone 17 Pro Max, the same 31 s clip, carodo-ios 587a94a).**
+The report now splits a frame into setting the camera, the wait, drawing and the encoder.
+
+| Run | Per frame | Wait (asked → real) | Draw | Encoder | Export | Frames repeated (of 930) |
+|---|---|---|---|---|---|---|
+| As first built | 60.5 ms | 16 → 19.7 ms | 40.1 ms | 0.3 ms | 59.1 s | 26 |
+| The app's windows hidden | 46.4 ms | 16 → 21.5 ms | 24.3 ms | 0.3 ms | 46.1 s | 25 |
+| … and no wheel / flat ground / line grown at 10 Hz | 46 to 48 ms | | 24 to 26 ms | | | |
+| … and the wait 9 ms (one refresh at 120 Hz) | 35.5 ms | 9 → 11.3 ms | 23.5 ms | 0.3 ms | 35.9 s | 31 |
+| … and the wait 4 ms | 32 to 33 ms | 4 → 5.2 or 8.0 ms | 25 ms | 0.3 ms | 32 to 34 s | 134 when 5.2 ms was waited, 25 when 8.0 |
+| … 9 ms, drawn without the screen's updates | 25.0 ms | 9 → 14.3 ms | 10.3 ms | 0.2 ms | 26.1 s | 326, and 338 jumps |
+| … 17 ms, drawn without the screen's updates | 33.3 ms | 17 → 21.6 ms | 11.3 ms | 0.2 ms | 33.9 s | 46 |
+
+"Frames repeated" counts pairs of consecutive frames that are nearly the same; about 25 are the
+drive's own standstills and the hold at the arrival.
+
+Kept: the app's own windows hidden while a debug export renders (Replay's screen and map under
+the stage cost 16 ms a frame; W4c's Export screen must take them down); the wait is one refresh
+of the screen, rounded up (9 ms at 120 Hz, 17 ms at 60 Hz); the map is always drawn after the
+screen's updates. Rejected: a shorter wait and drawing without the screen's updates (both repeat
+and skip frames); the wheel, the elevation and the line's growth cost nothing measurable. The
+encoder is not the cost on a device (it was most of a frame on the simulator).
+
+Result: 63 → 35 ms a frame; a clip renders in about 1.15 times its length on the iPhone 17 Pro
+Max. The 24 ms of drawing is `drawHierarchy` itself and did not move.
+
 Open:
 
-- **Slower than the spike.** 63 ms a frame on the fastest iPhone, where Carodo Studio took 37 ms
-  on the iPhone 12 Pro Max. Not yet explained; candidates: Replay's screen and its own map alive
-  under the stage, the stage's window over the whole screen, the SwiftUI wheel, the casing and
-  way-ahead overlays. A 30 s clip takes 62 s here, twice the "under a minute for 60 s" target.
+- **"Under a minute for a 60 s clip" is not met** on the fastest iPhone (about 70 s), and a
+  60 Hz iPhone waits 17 ms a frame, not 9: about 1.3 to 1.5 times the clip's length expected on
+  the iPhone 12 Pro Max, not measured. The owner decides: accept it, 24 fps, or a 30 s default.
 - **The iPhone 12 Pro Max** has not run it: time per frame, memory and heat there, a 60 s clip.
 - **Very high rates.** On the simulator the 312 km drive asked for in 10 s (about 3,000 ×) drew
-  an empty grid: tiles cannot follow. 60 s of it is about 250 to 300 ×, not yet tried.
+  an empty grid: tiles cannot follow. 60 s of it is about 250 to 300 ×, not tried on a device:
+  `-carodo.debugOpenJourney` reaches only the first 20 journeys and the long drives on the
+  owner's iPhone are older.
+- **A saved place's marker** (Home) shows at the drive's end in the frame: with the privacy zone
+  in W4b, a shared video shows no place mark.
 - A test that waits on real time (`AtlasMapViewTests.testATapReleasesTheHoldAfterTheGrace`)
-  failed once in three full runs; it is not part of this work.
+  failed once in four full runs; it is not part of this work.
 
 Not in W4: highlights chips (R.2C), a 1:1 size, music, a 3D car model, web replay, the share card
 image (its own slice in `share.md`; W4b's frame should be designed so the card can reuse it).
