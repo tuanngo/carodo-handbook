@@ -36,7 +36,7 @@ W3 tries the offline, fixed-step capture first (study §6).
 |---|---|---|
 | **L2** hot-phone GPS | Read from the log of real drives (no desk check: Xcode 27 has no thermal condition for an iPhone); thermal is read fresh on every fix | Committed `1c29c11` (2026-11-13); **PV-17** |
 | **L3** MetricKit exits and diagnostics | Device check only: Xcode → Debug → Simulate MetricKit Payloads on the iPhone, then a real payload the day after a field test | Committed `03bafd8` (2026-11-13); **PV-18** |
-| **L4** versioned place sweeps | Build with TD-6 (step 6): `places_version`, `points_version` replace the two `_at` columns; `setPlaceKeys` syncs only on a changed cell; the rule in `docs/data-model.md`. One `CONFIRM=erase` on the iPhones | Approved, waits for step 6 |
+| **L4** versioned place sweeps | One `CONFIRM=erase` on each iPhone (TuanNgo 17 Pro Max, VanSam 14, OnPhatSam 12 Pro Max) with a `.carodo` restore; titles and journey points come back over a few launches | Committed `f218b10` (2026-11-13), last in-place edit of `v1_initial` so far; TD-6 (the freeze) stays at step 6, owner: no hurry before TestFlight |
 | L9 per-drive feature table | A `task` over `drive-data/` printing one row per drive (stops, gaps, rejections, accuracy, speed spread) | When the step 9 batch is pulled |
 | L1 + L6 Live Activity, End button | Own plan: orphan cleanup at launch, `staleDate`, push gate, frozen last frame, no place names on the Lock Screen; End-drive intent, never suggested for a disconnect | After the wow track (product decisions) |
 | L5 `docs/solutions/` | Built from [`lessons-inbox.md`](lessons-inbox.md) | At about ten lessons or before the first TestFlight build |
