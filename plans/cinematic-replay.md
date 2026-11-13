@@ -520,23 +520,53 @@ Open:
   moving there. Left as the fact it is.
 - Still from W4a: the iPhone 12 Pro Max run, a long drive at a high rate.
 
-### Brief for the next session
+### W4c plan: an editor, then a sheet (approved by the owner, 2026-11-13)
 
-```text
-Outcome: W4c of the wow track: the Export screen, from Replay's header to the share sheet.
-Start with a plan and a mock-up of the screen for the owner; no code before it is approved.
-Existing behaviour (files read): carodo-ios Features/Journeys/Views/{ReplayVideoRenderer,
-  ReplayVideoOverlay,ReplayExportDebug,ReplayView}.swift, Core/Replay/{ReplayVideoDrive,
-  ReplayMovieWriter}.swift, docs/specs/{replay,share}.md (R.3, The frame); this plan's W4 sections.
-Decided (owner, 2026-11-13): layout A for the frame; Length 15 / 30 / 60 s with the rate shown,
-  30 s the default; the privacy zone on by default, a switch turns it off for one export; export
-  behind the Developer screen until TD-2 is read; NSPhotoLibraryAddUsageDescription approved.
-Acceptance: the W4c row of the slice table; the preview is the video's own frame
-  (ReplayVideoStage + overlay), not a second drawing.
-Non-goals: the recap edit (W4d), the range bar (W4e), private regions in a video (TD-25).
-Constraints: the Export screen takes Replay's screen and map down while it renders (16 ms a
-  frame); the rules measured in W4a are kept.
-Validation: task lint, task warnings, task test; screenshots Light, Dark, large Dynamic Type,
-  Vietnamese; device: the owner installs with task device from Terminal.
-Still open: the iPhone 12 Pro Max run, a long drive at a high rate, the overlay's cost on a device.
-```
+The first mock-up (a preview over a form) was set aside for the shape of the owner's reference,
+another drive app's editor: the preview is the screen and plays, small round tools sit under it, a
+range bar lies on the speed profile, Play stands beside the one button. Board:
+[`replay-export.png`](../design/mockups/replay/replay-export.png) (source
+`design/mockups/source/replay-export.html`). Carodo's own: its surfaces and Copper, the frame of
+W4b, and its rules (no clock and no title in a frame; the privacy zone drawn on the bar).
+
+**Decided (owner, 2026-11-13).**
+
+- **Two steps.** The editor decides what the video shows; Make Video opens a sheet that says what
+  will be made and asks the length (15 s · 30 s · 60 s, each with its rate; 30 s chosen), then
+  starts. Play in the editor runs at the length last chosen.
+- **Three slices**, one screen, one commit each (below).
+- **The CARODO lockup and carodo.app at the end cannot be turned off.**
+- **Replay's header** takes one more round control (Share) for now; the header is tidied in its
+  own change later.
+- W4d (the recap edit) comes after W4c: the owner judges it from this screen, on any drive
+  (the DEBUG argument reaches only the first 20 journeys).
+
+| Slice | Outcome | Done when |
+|---|---|---|
+| **W4c-1** The editor | From Replay's header (Developer only, TD-2): the preview (the stage and its overlay) that plays and scrubs on the speed profile, no handles; tools Look (Light or Dark, Copper or Speed, Standard or Satellite) and Privacy zone; Make Video → the Length sheet → making (bar, time left, Cancel, the screen awake) → the system share sheet → Share again; "not finished" when Carodo leaves the foreground; `NSPhotoLibraryAddUsageDescription` | A real drive exported and saved to Photos on the iPhone; Light, Dark, large Dynamic Type, Vietnamese on the simulator; backgrounded mid-export leaves no file |
+| **W4c-2** Aa | What the frame shows: Date, Vehicle, Distance, Time, Speed, each on or off; the block closes up around what is left | Frames of each combination that changes the layout; the owner approves them |
+| **W4e** A part of the drive | Two handles on the bar choose the part exported; they stop at the privacy zone while it is on; the header and the figures follow | Tests on both sides of each limit; exported on the iPhone |
+
+**W4c-1 in code.** New `Features/Journeys`: `ReplayExportView`, `ReplayExportModel` (states
+ready → making → done / failed, cancel; the file in the temporary folder under a neutral name,
+removed when the screen closes). Changed: `ReplayView` (the Share control; Replay's own map is
+taken down while the editor is open), `ReplayVideoStage` (shown as the preview, its overlay drawn
+by the same `ReplayVideoOverlay`), `ReplayExportDebug` (shares the stage's set-up). `project.yml`:
+the Photos key. Strings in `Journeys`, English and Vietnamese. `docs/specs/replay.md`. No schema,
+API or package change.
+
+Open after W4c-1: TD-25 (private regions) and the carodo.app pages before export leaves the
+Developer screen; the iPhone 12 Pro Max run; a long drive at a high rate (reachable from this
+screen now).
+
+### W4d plan (drafted 2026-11-13, not approved; after W4c)
+
+A pure `RecapScript` in `Core/Replay`, made once before rendering: the map from the video's
+seconds to the drive's story, in place of one rate. Slow (toward Replay's 15 ×): the opening and
+the arrival, about 3 s of video each, and winding stretches (the Reveal's own fact,
+`CameraScript.turning`, with a minimum length, near ones merged). The rest is compressed, its
+rate solved so the clip has the length asked. Rate changes ease over about 0.75 s on screen; stops
+keep their second. Limits: the slow parts take at most about half the clip, the fast rate has a
+ceiling (tiles), and a short or all-winding drive plays as the one-rate clip. All figures are
+hypotheses for a first step that prints them for the drives in `drive-data/`. Open for the owner:
+ramps (proposed) or cuts; which moments count in the first version; top speed is not one (ADR 0007).

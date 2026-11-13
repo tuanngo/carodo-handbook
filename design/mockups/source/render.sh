@@ -16,4 +16,5 @@ shot journey-trim.html 1880 5060 journeys/journey-trim.png
 # Frames are 3x: rendered at 2x so the map stays sharp.
 "$chrome" --headless=new --disable-gpu --hide-scrollbars --allow-file-access-from-files \
   --force-device-scale-factor=2 --window-size=1720,2720 --screenshot="$here/../replay/replay-video-frame.png" "file://$here/replay-video.html" 2>/dev/null
+shot replay-export.html 1900 2150 replay/replay-export.png
 echo done
