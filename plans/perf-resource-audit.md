@@ -1,9 +1,10 @@
 # Performance and resource audit — findings and fix plan (2026-11-06)
 
-Status (2026-11-12): **1–3 fixed and confirmed on the iPhone; 4 fixed in code (`isOffScreen` in
+Status (2026-11-13): **1–3 fixed and confirmed on the iPhone; 4 fixed in code (`isOffScreen` in
 `JourneyDetailView.isCovered`), its memory not re-measured; 9 built (`-carodo.sampleJournal N`);
 5/11, 12 and TD-12 done (carodo-ios 53edd24, b39f20c); 13 measured on the iPhone (4.5× faster);
-14 done (cc2b501)**; 6, 7, 8, 10 open.
+14 done (cc2b501); 6 done (6947f81, merged e147432)**; 7, 8, 10 and Replay's Speed overlays open
+(Still pending, at the end).
 Also recorded: the owner's route-colour decision in `carodo-ios/docs/design-system.md` (Route line
 colours) and `docs/specs/navigation.md`.
 
