@@ -545,6 +545,12 @@ W4b, and its rules (no clock and no title in a frame; the privacy zone drawn on 
   colours), so the look tool is Light or Dark; a length that would play faster than 120× is
   dimmed like one under 5× (237 km in 15 s would be 2,637×): the fastest rate is always offered,
   and the Trim shortens a long drive.
+- **Then (owner, 21:45):** privacy in words, a pill "Hide 300 m" opening a menu of the start and
+  the end, each Off · 300 m · 500 m · 1 km (not in Aa: it decides what route is cut, so it stays
+  in sight); only the length is chosen, 15 · 30 · 60 s, never over a minute, the rate worked out
+  and shown; a drive too short for a length plays at 5× in a shorter clip; no ceiling above, but
+  over 120× a line suggests the Trim (312 km in 60 s ≈ 250×). Tiles at 250–300× still to be
+  measured on the iPhone with the longest drive.
 - **Three slices**, one screen, one commit each (below).
 - **The CARODO lockup and carodo.app at the end cannot be turned off.**
 - **Replay's header** takes one more round control (Share) for now; the header is tidied in its
