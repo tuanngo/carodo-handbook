@@ -151,3 +151,27 @@ Lessons already paid for that L5 gathers, beside the entries below:
   in one transaction is then seen whole or not at all. Test with a fake store whose first read
   returns the old state and every later read the new one.
 - Rule now in: carodo-ios `e14c6fa` (`PlaceDetectionRun.swift` comment, `PlaceDetectionTests`).
+
+### one-overlay-per-colour-not-per-run
+- applies_when: drawing a route split by colour (speed bands, estimated vs measured, driven vs
+  ahead) on `MKMapView` or SwiftUI `Map`; adding `MKPolyline`s in a loop; `addOverlays` with one
+  entry per segment
+- area: map rendering (Journey Detail, Replay, Map tab) · found: 2026-11-13, carodo-ios `6947f81`
+  · severity: medium
+- Context: Journey Detail's Speed added one `MKPolyline` per speed-band run. Sample drives have
+  smooth speeds, so the risk never showed; 31 real drives gave a median of 42 overlays, city
+  drives up to 77, a 337 km drive 259. Grouped into one `MKMultiPolyline` per band: 2–4 overlays
+  on every drive, same look. On an iPhone 12 Pro Max, panning that drive: Carodo 41 → 38 % CPU,
+  backboardd 31 → 27 %; on `MKMapView` per-run overlays cost far less than SwiftUI's (ADR 0015:
+  708 `MapPolyline`s held 100–170 % CPU), but the count was unbounded by the drive's length.
+- Guidance: one overlay per style (colour, dash, width), each a multi-polyline of every run in that
+  style; draw order between styles is the overlay order. Count overlays on real drives
+  (`SpeedOverlayCountReplayTests`, `CARODO_DRIVE_DATA`), never on sample data. Where a piece must
+  animate on its own (Replay's driven line, `strokeEnd` per piece), keep the animated piece
+  separate and group the rest.
+- Why it matters: the overlay count grows with how a person drives, not with the screen; a long
+  or stop-and-go drive turns a fine map into a slow one only on real data.
+- Still to apply: Replay's Speed (one `ReplayLine` per band run, `ReplayMapView`); the Trim sheet
+  draws two `MapPolyline`s (fine).
+- Rule now in: `carodo-ios/docs/design-system.md`, Map rules ("Overlays, not points, are the
+  limit").
