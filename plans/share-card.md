@@ -142,6 +142,9 @@ plates. Not the speed profile strip in speed colours (D6 applies to it too).
   and **Save** (a control's surface) side by side, one above the other at accessibility text
   sizes. Save: `PhotoSaver` (add only), "Saved" with a check until the card changes, an alert with
   Open Settings when refused. The mock-up's editor (header, one button) is older than this.
+- Second look (2026-11-13): the sheet is Charcoal in both appearances; its height follows the card
+  on screen (1:1 shorter), eased with `.snappy` (none under Reduce Motion); a selection haptic on
+  every choice, success or error on Save.
 - QA: `-carodo.debugOpenShareCard YES`, `-carodo.debugShareCard simple,square,dark,whole`.
 - Checks: lint, a clean build with no warning, the whole test suite (27 new tests).
 
