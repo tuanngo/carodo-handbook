@@ -1,7 +1,7 @@
 # Share card — a drive as one image
 
-Status: **S1 built, uncommitted, waiting for the owner's review** (carodo-ios working tree,
-2026-11-13). Direction D of the mock-up and Q1–Q4 approved by the owner the same day. Open: PV-19
+Status: **S1 committed** (carodo-ios `393045d`, 2026-11-13, after the owner's reviews on the
+iPhone; not pushed). Direction D of the mock-up and Q1–Q4 approved by the owner the same day. Open: PV-19
 (device), TD-26 (private regions, Apple's map terms), TD-27 (pieces shared with the Replay Export
 editor).
 Audit: this session, 2026-11-13 (files read are listed under Existing behaviour).
