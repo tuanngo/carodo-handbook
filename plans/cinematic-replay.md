@@ -186,7 +186,7 @@ build, device check, one commit. The behaviours and the Director's rules stay th
 |---|---|---|
 | **W1** TD-1 stop alignment | Replay's compressed stops and the journal's `JourneyAnalysis.stopIntervals` answer "a finished stop on the timeline" with one rule | A replay test on the owner's drives shows the same stops as the detail page's route timeline |
 | **W2** R.2B one behaviour per slice | Rest first (the most frequent, the cheapest trigger), then Hairpin Reveal, then Terrain Reveal where MapKit has 3D terrain; Junction Reveal last or never | Each: thresholds on both sides tested, `docs/tracking.md`-style table in `replay.md`, a screen recording of a real drive at 15× and 60× approved by the owner |
-| **W3** Video spike | A one-day answer, written here, to: how frames of the replay reach a video file | A 10 s 9:16 clip of a synthetic drive plays in Photos, with its frame rate and render time measured on the iPhone |
+| **W3** Video spike (done 2026-11-13: the MapKit view drawn per frame) | A one-day answer, written here, to: how frames of the replay reach a video file | A 10 s 9:16 clip of a synthetic drive plays in Photos, with its frame rate and render time measured on the iPhone |
 | **W4** Recap + export | The 30–60 s Cinematic Recap (an edit: highlights near real rate, the rest compressed) and a 9:16 export from it, through the share sheet | Exported on the iPhone from a real drive, privacy trim on, attribution visible, under a minute to render |
 
 ### W1 result (2026-11-12, carodo-ios 969ba51)
@@ -348,18 +348,75 @@ export does when the iPhone is already `serious`; TD-2 before a video leaves the
 the signing key (`errSecInternalComponent`). Launching the app and pulling the results work from
 either. The clips are in `carodo-studio/results/`.
 
+**Owner, 2026-11-13: agreed.** W4 renders with the MapKit view; ImmersiveMap is looked at again
+only if a Terrain Reveal wants real relief.
+
+### W4 plan (draft, waiting for the owner's approval)
+
+**Reference (owner, 2026-11-13): another drive app's export screen.** What it does: a 9:16 preview
+card (map above; distance, a speed dial and the clock below; the drive's name, date and the app's
+address at the foot); toggles for theme, text and the car; a range bar over the speed profile with
+two handles to pick a part of the drive; an Export sheet with Length 15 / 30 / 60 s, each showing
+the rate it means (60 s of a 312 km drive is about 248 ×), or a Speed (1 × to 60 ×) showing the
+length it means; 1080 × 1920 at 60 fps. Worth taking: length first with the rate shown, the range
+bar on the speed profile (Carodo's scrubber already draws one), the preview being the video's own
+frame. Not taken: its video is one fast rate, not an edit; it shows exact times and the start with
+place names around it (P5, P9).
+
+**Audit of what exists.**
+
+- `ReplayCameraRig`, `ReplayTimeline`, `CameraScript`, `ReplayRoute` are pure and already take
+  `dt`: a renderer steps them at `1 / fps` with no screen. Stops already play in about 1 s.
+- The map's dressing (overlays, casing, the wheel, the ends) lives inside `ReplayMapView`'s
+  coordinator (569 lines); the renderer needs the same dressing on its own off-screen `MKMapView`,
+  so that part is extracted and used by both, not copied.
+- `PrivacyZone` exists and trims a route for the Feed (`FeedPublication`); the share card, the
+  share sheet for a drive and the part-of-day line are specified in `share.md` but not built.
+- Carodo Studio's `MovieWriter` (HEVC, pool buffers, back-pressure) and the map-view render loop
+  are the spike's code to bring over. Of its 37 ms a frame, 16 ms is a fixed wait before each draw.
+
+**Slices** (each: plan detail, build, device check, one commit).
+
+| Slice | Outcome | Done when |
+|---|---|---|
+| **W4a** Renderer | `ReplayVideoRenderer` in the app: an off-screen `MKMapView` with Replay's dressing, the rig stepped at a fixed `dt`, a first pass for tiles, `AVAssetWriter`, progress and cancel. The whole drive at one rate fitted to the length asked. Reached from a DEBUG launch argument only | A real drive from `drive-data/` exports to a 30 s and a 60 s clip on the iPhone 12 Pro Max; per frame, total time, memory and heat written here; the wait before each draw reduced or justified by a count of frames with missing tiles |
+| **W4b** The frame | What the video shows beside the map: distance so far, the speed dial, the drive's line (day and part of day, vehicle), the CARODO mark; Apple's logo and Legal link left visible. The privacy zone applied: trimmed route, time from 0, opening and closing frames on the trimmed route only | Owner approves frames in Light and Dark, English and Vietnamese; a test asserts no fix inside the zone reaches the renderer |
+| **W4c** Export screen | From Replay's header: a preview of the frame, Length 15 / 30 / 60 s with the rate shown, Export with progress and cancel, then the system share sheet (Save Video, Messages, …) | Exported and saved to Photos on the iPhone from a real drive; the screen in Light, Dark, large Dynamic Type, Vietnamese; the app backgrounded mid-export fails cleanly |
+| **W4d** Recap edit | The length is spent unevenly: the opening, the Reveals, the arrival and the highlights near Replay's rate, the long straight parts compressed harder; a pure `RecapScript` made before rendering | Tests on both sides of each rule; the owner prefers it to the one-rate clip of the same drive |
+| **W4e** A part of the drive | The reference's range bar: two handles on the speed profile choose the part exported | After W4c, if the owner wants it |
+
+**Decisions the owner must make before W4a.**
+
+1. **One rate first, the edit after (W4d)?** `replay.md` says the recap is an edit, not a faster
+   rate. Proposed: ship the fitted single rate first (the reference does only this, and stops are
+   already compressed), then judge the edit against it.
+2. **Frame rate.** 30 fps proposed. At 60 fps the render takes twice as long: a 60 s clip is 3,600
+   frames, over two minutes on the iPhone 12 Pro Max at today's 37 ms.
+3. **Time in a shared video (P9).** Proposed: the day and part of day, and time elapsed from 0;
+   no clock. The reference shows the exact clock.
+4. **Start and end (P5).** Proposed: the privacy zone setting applies as on the Feed shape (300 m
+   by default), and can be turned off for one export.
+5. **TD-2 gate.** Until Apple's terms on map imagery in an exported video are read, export stays
+   behind the DEBUG argument (W4a, W4b) and the Developer screen (W4c); nothing in a release build.
+6. **Contracts (P6), approved 2026-11-13, restated:** `AVFoundation` in the app;
+   `NSPhotoLibraryAddUsageDescription` in `project.yml` with W4c. No schema, API or package change.
+
+Not in W4: highlights chips (R.2C), a 1:1 size, music, a 3D car model, web replay, the share card
+image (its own slice in `share.md`; W4b's frame should be designed so the card can reuse it).
+
 ### Brief for the next session
 
 ```text
-Outcome: W1 then W2 (Rest) of the wow track; W3 spike only after W2's first commit.
-Existing behaviour (files read): carodo-ios Core/Replay/{ReplayTimeline,CameraDirector,CameraScript,
-  FollowCamera,ReplayRoute}.swift, Features/Journeys/Views/ReplayMapView.swift, docs/specs/replay.md.
-Owner decisions needed: W2 order confirmed; W3 capture route and the Photos permission (P6).
-Acceptance: per step table above.
-Non-goals: a 3D car model, web replay, highlights from Journey Enrichment (R.2C), new map styles.
-Constraints: one MKMapView, Director pure and prepared off the main actor, per-frame cost O(log n),
-  the performance rules above; nothing queried while playing; no schema or API change.
-Validation: task lint, task warnings, task test; device: a real drive replayed at 15× and 60×,
-  Time Profiler + FPS over USB.
-Do not: rewrite FollowCamera or the player; touch MainTabView beyond wiring.
+Outcome: W4a of the wow track (the renderer in the app), after the owner answers the six decisions.
+Existing behaviour (files read): carodo-ios Core/Replay/{ReplayCameraRig,ReplayTimeline,CameraScript,
+  ReplayRoute}.swift, Features/Journeys/Views/ReplayMapView.swift, ViewModels/ReplayPlayer.swift,
+  Core/Domain/PrivacyZone.swift, docs/specs/{replay,share}.md; carodo-studio Studio/{Renderers,
+  MapKitStage,MovieWriter}.swift.
+Acceptance: per slice table above.
+Non-goals: see "Not in W4".
+Constraints: the rig and timeline unchanged; the map's dressing extracted from ReplayMapView, never
+  copied; no coordinates in logs; no schema or API change.
+Validation: task lint, task warnings, task test; device: iPhone 12 Pro Max, a 30 s and a 60 s clip
+  of a real drive (the owner runs the signed build from Terminal).
+Do not: rewrite FollowCamera or the player; put export in a release build before TD-2.
 ```
