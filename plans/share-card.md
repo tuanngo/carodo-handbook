@@ -1,7 +1,9 @@
 # Share card — a drive as one image
 
-Status: **Direction approved, not built** (owner, 2026-11-13: direction D of the mock-up). No code
-before the owner approves this plan and answers the decisions below.
+Status: **S1 built, uncommitted, waiting for the owner's review** (carodo-ios working tree,
+2026-11-13). Direction D of the mock-up and Q1–Q4 approved by the owner the same day. Open: PV-19
+(device), TD-26 (private regions, Apple's map terms), TD-27 (pieces shared with the Replay Export
+editor).
 Audit: this session, 2026-11-13 (files read are listed under Existing behaviour).
 Mock-up: [`design/mockups/share/share-card.png`](../design/mockups/share/share-card.png), section 4
 (source `design/mockups/source/share-card.html`). Sections 1 and 3 are the directions it came from.
@@ -29,12 +31,12 @@ Made (2026-11-13):
 | D5 | The editor reuses the Replay Export editor's shape: preview, a row of tools, one Copper button. |
 | D6 | The line is always Copper, never coloured by speed: on a shared image the colours have no meaning to the viewer and they make the card worse. No such option. |
 
-Still needed (each with a recommendation):
+Answered as recommended (owner, 2026-11-13):
 
-| # | Question | Recommendation |
+| # | Question | Decision |
 |---|---|---|
 | Q1 | Which style is the default? | Stamp: it is the one no other app has. |
-| Q2 | Average speed on the card? The spec lists distance, duration and vehicle only. | Yes, moving average, beside the duration. No top speed (backlog: only if the person adds it). |
+| Q2 | Average speed on the card? The spec listed distance, duration and vehicle only. | Yes, moving average, beside the duration. No top speed (backlog: only if the person adds it). |
 | Q3 | A Save button that writes straight to Photos? It needs the add-only Photos permission: an Info.plist key with English and Vietnamese text (P6). | Not in S1: the share sheet already has Save Image and needs no permission. Add the button in S2 if the extra tap bothers. |
 | Q4 | Is 1:1 in the first slice? | Yes: it is the same renderer with another layout table, and the spec already decided two sizes. |
 
@@ -118,6 +120,24 @@ TD-25).
 
 **S3 (backlog):** a badge earned on the drive pressed as its visa stamp, photo background, hidden
 plates. Not the speed profile strip in speed colours (D6 applies to it too).
+
+## S1 as built (2026-11-13)
+
+- `PrivacyZone.hidingEnds(of:)`: the display route's ends cut on the line. The Feed's cut
+  (`DriveShapeMaker.trimmed`) is left as it is: it drops whole recorded fixes, which a simplified
+  route cannot afford (two points on a straight road).
+- `ShareCard` (layout, `mapRect(for:size:area:)`, `Content`), `ShareCardRenderer` (one snapshot a
+  size, appearance and zone; both styles share it), `ShareCardModel`, `ShareCardView`.
+- `RouteCurve` extracted from `RouteShape`; `PassportStamp` takes its two arcs' lettering and its
+  ink; new `CarodoLockup` and `ActivitySheet` in the design system.
+- The card's figures are the whole drive's (distance, elapsed time, moving average), whatever the
+  zone hides: they say nothing about where.
+- The block's ground is opaque to 0.7 of its height: a map label showing through the figures made
+  both unreadable on the first run.
+- Map labels are drawn at two thirds of MapKit's size (the snapshot is taken larger at a lower
+  scale), as the journal's list images do.
+- QA: `-carodo.debugOpenShareCard YES`, `-carodo.debugShareCard simple,square,dark,whole`.
+- Checks: lint, a clean build with no warning, the whole test suite (25 new tests).
 
 ## Acceptance criteria
 
