@@ -314,3 +314,40 @@ There is no way to load a large journal today: the sample journal is ~72 drives 
 
 1 → 2 → 3 → 4 (each small, each measured on the device) → 9 → 5 and 6 (they need the large or a
 real journal) → 7, 8 → 10.
+
+## Next session — issue 6, then what is still open (written 2026-11-13)
+
+### Brief
+
+```text
+Outcome: issue 6 answered by measurement, and fixed only if the count says so.
+Existing behaviour (read before planning): carodo-ios Features/Journeys/Views/JourneyDetailMap.swift
+  (the detail map is an MKMapView now; `speedOverlays: [MKPolyline]` built on the first switch to
+  Speed, one per `RouteMapContent.Line`), Core/Journal/RouteMapContent.swift,
+  Core/Domain/JourneyAnalysis.swift `segments(of:)`, ADR 0015, docs/design-system.md (Map rules).
+  The issue's text above predates the move to MKMapView: no SwiftUI MapPolyline is left there.
+Step 1, measure (no device needed): count the speed-band segments per drive in the real journals
+  in drive-data/ (newest TuanNgo iPhone pull: 29 drives, 1,135 km; VanSam now holds the same plus
+  its own 3). Report the distribution (median, max, the city drives) locally only (P5, Development
+  data: no plots or coordinates committed).
+Step 2, decide: over ~50 overlays on a real drive → one MKMultiPolyline per band (4 overlays),
+  the speed share bars keeping exact values; else record "measured, not a problem" and close 6.
+Acceptance: before/after overlay count and a frame check of Speed on VanSam (USB, xctrace Activity
+  Monitor, Method above) on the drive with the most segments; task lint, warnings, test pass.
+Owner decisions needed: none for the multipolyline (a rendering detail, same look); any
+  change to how bands look (merging short runs) is the owner's.
+```
+
+### Still pending (do not lose)
+
+| Item | Where it stands | Next step |
+|---|---|---|
+| Issue 4, Detail map memory | Fixed in code (`isOffScreen`), memory not re-measured | Xcode memory graph after Detail → Map tab on an iPhone: count live `MKMapView` |
+| Issue 7, recording panel | Open: the 1 s `TimelineView` in `RecordingPanels.swift` (~l.447) wraps the panel body | Scope it to the time rows; measure with issue 1's method |
+| Issue 8, Place editor | Open: `onMapCameraChange(.continuous)` writes the model per frame | Careful: the same handler detects the camera leaving the fallback frame; split that from the model write |
+| Issue 10, UI scroll test | `CarodoUITests` target approved 2026-11-06, not started | Scroll/hitch metrics on Journeys and Feed with `-carodo.sampleJournal 2000` |
+| TD-23 | DEBUG-opened Passport page pushes links under itself | With TD-14 (debug arguments in one place) |
+| Lessons inbox | 8 of ~10 entries ([`lessons-inbox.md`](lessons-inbox.md)) | Build L5 (`docs/solutions/`) at ~10 or before TestFlight |
+| Branches | `refactor/repo-split`, `perf/passport-routes` merged into carodo-ios `main` | Owner: delete when wanted |
+| VanSam iPhone | Restored 32 drives; `Documents/restore.carodo`, `restore29.carodo` left in the app container | Leave, or delete with the app; never copy them elsewhere (P5) |
+| Other sessions, uncommitted in carodo-ios `main` | L2 hot-phone GPS (waits for its device drive), Replay W2, `LaunchMark` staged | Theirs: never stage them; work in a worktree |
