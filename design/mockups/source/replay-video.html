@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Replay video — the frame (W4b)</title>
+<style>
+  :root { --charcoal:#242321; --copper:#BD8053; --ivory:#F3EEE5; --stone:#77736D; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:#1a1917; color:var(--ivory); font-family:-apple-system,"SF Pro Text",system-ui,sans-serif; padding:44px 40px 60px; width:1720px; }
+  h1 { font-size:30px; margin:0 0 6px; font-weight:700; }
+  h2 { font-size:20px; margin:46px 0 4px; font-weight:650; }
+  p.lead { margin:0 0 20px; color:#b9b3a8; font-size:15px; max-width:1300px; line-height:1.45; }
+  .row { display:flex; gap:40px; align-items:flex-start; }
+  figure { margin:0; width:360px; }
+  figcaption { font-size:13.5px; color:#b9b3a8; margin-top:10px; line-height:1.4; }
+  figcaption b { color:var(--ivory); font-weight:650; }
+  .tag { display:inline-block; background:var(--copper); color:#1a1917; font-weight:700; font-size:11px; padding:2px 7px; border-radius:6px; margin-left:6px; vertical-align:1px; }
+
+  /* A frame: 360 × 640 points, the video's 1080 × 1920 pixels at 3×. */
+  .frame { position:relative; width:360px; height:640px; overflow:hidden; border-radius:6px; background:#333 center/cover; }
+  .frame.light { --ink:#242321; --ink2:rgba(36,35,33,.68); --ground:243,238,229; --track:rgba(36,35,33,.14); }
+  .frame.dark  { --ink:#F3EEE5; --ink2:rgba(243,238,229,.72); --ground:30,29,27; --track:rgba(243,238,229,.18); }
+  .frame * { color:var(--ink); }
+  .lockup { position:absolute; height:22px; }
+  .day { font-size:12.5px; font-weight:600; letter-spacing:.1px; }
+  .car { font-size:12.5px; color:var(--ink2); font-weight:500; }
+  .km { font:700 40px/1 ui-rounded,"SF Pro Rounded",-apple-system,sans-serif; font-variant-numeric:tabular-nums; letter-spacing:-.5px; }
+  .km small { font-size:17px; font-weight:600; color:var(--ink2); margin-left:3px; letter-spacing:0; }
+  .time { font:600 15px/1 ui-rounded,"SF Pro Rounded",-apple-system,sans-serif; color:var(--ink2); margin-top:6px; font-variant-numeric:tabular-nums; }
+  .dial { position:relative; width:72px; height:72px; flex:none; }
+  .dial svg { position:absolute; inset:0; }
+  .dial .n { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; padding-top:2px; }
+  .dial .n b { font:700 25px/1 ui-rounded,"SF Pro Rounded",-apple-system,sans-serif; font-variant-numeric:tabular-nums; }
+  .dial .n i { font:500 10px/1.2 -apple-system,sans-serif; font-style:normal; color:var(--ink2); }
+
+  /* A — top block on a soft scrim: the far ground of a tilted map, the part a viewer needs least. */
+  .A .scrim { position:absolute; left:0; right:0; top:0; height:230px;
+    background:linear-gradient(rgba(var(--ground),.94) 0, rgba(var(--ground),.86) 45%, rgba(var(--ground),0) 100%); }
+  .A .lockup { left:18px; top:60px; }
+  .A .meta { position:absolute; right:18px; top:60px; text-align:right; }
+  .A .figs { position:absolute; left:18px; right:18px; top:98px; display:flex; justify-content:space-between; align-items:center; }
+
+  /* B — a card above Apple's logo, as Replay's own panel. */
+  .B .lockup { left:18px; top:22px; filter:drop-shadow(0 0 6px rgba(var(--ground),.9)); }
+  .B .card { position:absolute; left:12px; right:12px; bottom:46px; border-radius:24px; padding:14px 16px 14px 18px;
+    background:rgba(var(--ground),.9); box-shadow:0 6px 24px rgba(0,0,0,.18); display:flex; justify-content:space-between; align-items:center; }
+  .B .meta { margin-bottom:8px; white-space:nowrap; } .B .meta .day { display:inline; }
+  .B .meta .car { display:inline; } .B .meta .car::before { content:" · "; }
+
+  /* C — no surface: figures set on the map with a halo. */
+  .C * { text-shadow:0 0 5px rgb(var(--ground)),0 0 10px rgb(var(--ground)),0 0 2px rgb(var(--ground)); }
+  .C .lockup { left:18px; top:22px; filter:drop-shadow(0 0 5px rgb(var(--ground))); }
+  .C .meta { position:absolute; right:18px; top:20px; text-align:right; }
+  .C .figs { position:absolute; left:18px; right:18px; bottom:50px; display:flex; justify-content:space-between; align-items:flex-end; }
+  .C .dial { filter:drop-shadow(0 0 5px rgb(var(--ground))); }
+
+  /* What Reels / TikTok / Shorts draw over a 9:16 video (approximate). */
+  .zone { position:absolute; background:repeating-linear-gradient(45deg,rgba(220,60,60,.34) 0 6px,rgba(220,60,60,.18) 6px 12px); }
+  .zone span { position:absolute; left:8px; top:6px; font-size:10.5px; font-weight:700; color:#fff !important; text-shadow:0 1px 2px #000; }
+  .notes { font-size:14.5px; color:#cfc9be; line-height:1.55; max-width:1250px; margin:8px 0 0; padding-left:20px; }
+  .notes b { color:var(--ivory); }
+</style>
+</head>
+<body>
+<h1>Replay video — what the frame shows beside the map (W4b)</h1>
+<p class="lead">Each frame below is a real frame of the renderer built in W4a (sample drive, 1080 × 1920), with the proposed overlay drawn on it. Shown at 360 × 640 points. The overlay follows the map: ivory on a Light map, charcoal on a Dark one; Copper only in the speed arc and the mark. Apple's logo and Legal link stay clear in every layout. No clock, no place name, no start or end marker of a saved place.</p>
+
+<h2>1 · Three layouts, the same moment</h2>
+<p class="lead">Pick one. A is recommended: social apps draw their own caption, buttons and progress bar over the bottom fifth and the right edge of a 9:16 video, and the top of a tilted map is the far ground the viewer needs least.</p>
+<div class="row" id="layouts"></div>
+
+<h2>2 · Layout A in Light and Dark, English and Vietnamese</h2>
+<div class="row" id="matrix"></div>
+
+<h2>3 · The opening and the arrival (privacy zone on)</h2>
+<p class="lead">The video opens on the whole trimmed route and ends a second after the last point kept: the first and last 300 m are never drawn, the distance and the time count from 0 at the first point kept, and the flag is where the trimmed route ends, not where the car parked.</p>
+<div class="row" id="ends"></div>
+
+<ul class="notes">
+  <li><b>Figures:</b> distance so far (counts up), time so far ("14 min", "1 h 12 min"; from 0, never a clock), the speed dial (Replay's own, at the drive's recorded speed).</li>
+  <li><b>The drive's line:</b> the local day and part of day (as the share card), then the vehicle's name. No journey title: titles often carry place names.</li>
+  <li><b>The mark:</b> the CARODO lockup, small, never over the wheel.</li>
+  <li><b>Not shown:</b> the clock, the scrubber, the rate, speed-band legend, place names of the app (the map's own street labels remain), saved-place markers (Home, Work).</li>
+</ul>
+
+<script>
+const T = {
+  en: { day: "Saturday 14 Nov · Morning", min: n => `${n} min`, kmh: "km/h" },
+  vi: { day: "Thứ Bảy, 14 thg 11 · Buổi sáng", min: n => `${n} phút`, kmh: "km/h" },
+};
+function dial(speed, theme) {
+  const r = 32, c = 2 * Math.PI * r, f = Math.min(speed / 160, 1) * 0.75;
+  return `<div class="dial"><svg viewBox="0 0 72 72">
+    <circle cx="36" cy="36" r="${r}" fill="none" stroke="var(--track)" stroke-width="4.5" stroke-linecap="round" stroke-dasharray="${0.75 * c} ${c}" transform="rotate(135 36 36)"/>
+    <circle cx="36" cy="36" r="${r}" fill="none" stroke="${f > 0 ? "#BD8053" : "none"}" stroke-width="4.5" stroke-linecap="round" stroke-dasharray="${f * c} ${c}" transform="rotate(135 36 36)"/>
+  </svg><div class="n"><b>${speed}</b><i>km/h</i></div></div>`;
+}
+function frame({ layout, theme, lang = "en", img, km, min, speed, zones }) {
+  const t = T[lang];
+  const lockup = `<img class="lockup" src="../../brand/svg/carodo-lockup-on-${theme === "dark" ? "dark" : "light"}.svg">`;
+  const meta = `<div class="meta"><div class="day">${t.day}</div><div class="car">Mazda CX-5</div></div>`;
+  const left = `<div><div class="km">${km}<small>km</small></div><div class="time">${t.min(min)}</div></div>`;
+  let inner;
+  if (layout === "A") inner = `<div class="scrim"></div>${lockup}${meta}<div class="figs">${left}${dial(speed)}</div>`;
+  if (layout === "B") inner = `${lockup}<div class="card"><div>${meta}${left}</div>${dial(speed)}</div>`;
+  if (layout === "C") inner = `${lockup}${meta}<div class="figs">${left}${dial(speed)}</div>`;
+  const z = zones ? `<div class="zone" style="left:0;right:0;bottom:0;height:128px"><span>caption, sound, progress bar</span></div>
+    <div class="zone" style="right:0;width:56px;bottom:128px;height:230px"><span style="writing-mode:vertical-rl;left:20px">like · comment · share</span></div>
+    <div class="zone" style="left:0;right:0;top:0;height:44px"><span>status, tabs</span></div>` : "";
+  return `<div class="frame ${layout} ${theme}" style="background-image:url(replay-video/${img}.jpg)">${inner}${z}</div>`;
+}
+function fig(opts, caption) { return `<figure>${frame(opts)}<figcaption>${caption}</figcaption></figure>`; }
+
+const mid = { km: "8.6", min: 14, speed: 62 };
+document.getElementById("layouts").innerHTML =
+  fig({ layout: "A", theme: "light", img: "light-14", ...mid }, `<b>A · Top block</b><span class="tag">recommended</span><br>Mark and the drive's line, then distance, time and the dial, on a soft scrim over the far ground. The road ahead of the wheel and the bottom stay clear.`) +
+  fig({ layout: "B", theme: "light", img: "light-14", ...mid }, `<b>B · Bottom card</b><br>Replay's own panel shape, above Apple's logo. Familiar, but it sits where Reels and TikTok put their caption, and it covers the road just driven.`) +
+  fig({ layout: "C", theme: "light", img: "light-14", ...mid }, `<b>C · No surface</b><br>Figures straight on the map with a halo. Lightest, but street labels run under the numbers and it is harder to read on a busy city map.`) +
+  fig({ layout: "A", theme: "light", img: "light-14", ...mid, zones: true }, `<b>A under a social app's own controls</b> (hatched, approximate). Nothing of ours is covered; with B or C the figures would be.`);
+
+document.getElementById("matrix").innerHTML =
+  fig({ layout: "A", theme: "light", lang: "en", img: "light-4", km: "2.3", min: 4, speed: 38 }, "<b>Light · English</b>") +
+  fig({ layout: "A", theme: "dark", lang: "en", img: "dark-4", km: "2.3", min: 4, speed: 38 }, "<b>Dark · English</b>") +
+  fig({ layout: "A", theme: "light", lang: "vi", img: "light-14", ...mid }, "<b>Light · Vietnamese</b>") +
+  fig({ layout: "A", theme: "dark", lang: "vi", img: "dark-14", ...mid }, "<b>Dark · Vietnamese</b>");
+
+document.getElementById("ends").innerHTML =
+  fig({ layout: "A", theme: "light", img: "light-0_3", km: "0.0", min: 0, speed: 0 }, "<b>Opening · Light.</b> The whole trimmed route, figures at zero.") +
+  fig({ layout: "A", theme: "dark", img: "dark-0_3", km: "0.0", min: 0, speed: 0 }, "<b>Opening · Dark.</b>") +
+  fig({ layout: "A", theme: "light", lang: "vi", img: "light-30_5", km: "18.4", min: 31, speed: 0 }, "<b>Arrival · Light · Vietnamese.</b> The totals held for the last second.") +
+  fig({ layout: "A", theme: "dark", img: "dark-30_5", km: "18.4", min: 31, speed: 0 }, "<b>Arrival · Dark.</b>");
+</script>
+</body>
+</html>

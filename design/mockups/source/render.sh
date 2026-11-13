@@ -13,4 +13,7 @@ shot first-run-day0.html 1720 4560 onboarding/first-run-day0.png
 shot auto-mode.html 1720 2150 drive/auto-mode.png
 shot recording-polish.html 1800 5380 drive/recording-polish.png
 shot journey-trim.html 1880 5060 journeys/journey-trim.png
+# Frames are 3x: rendered at 2x so the map stays sharp.
+"$chrome" --headless=new --disable-gpu --hide-scrollbars --allow-file-access-from-files \
+  --force-device-scale-factor=2 --window-size=1720,2720 --screenshot="$here/../replay/replay-video-frame.png" "file://$here/replay-video.html" 2>/dev/null
 echo done

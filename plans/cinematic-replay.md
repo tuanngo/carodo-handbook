@@ -465,27 +465,59 @@ Open:
 Not in W4: highlights chips (R.2C), a 1:1 size, music, a 3D car model, web replay, the share card
 image (its own slice in `share.md`; W4b's frame should be designed so the card can reuse it).
 
+### W4b result (2026-11-13, carodo-ios 3d2f925; the owner approved the built frames)
+
+**The layout (owner, 2026-11-13): A, the top block**, chosen from three on the mock-up board
+([`replay-video-frame.png`](../design/mockups/replay/replay-video-frame.png), source
+`design/mockups/source/replay-video.html`; B was a card at the foot, C figures with no surface).
+The top because apps that play a 9:16 video draw their own caption and buttons over its foot.
+
+Built:
+
+- `ReplayTimeline.trimmed(endsBy:)` and `ReplayVideoDrive`: the privacy zone is cut from the
+  timeline before anything of the video is made; the line, the camera's script, the opening and
+  the arrival are read from what is left. A drive that is all zone has no video.
+- `ReplayVideoOverlay`: the lockup, the day and part of day, the vehicle, distance, time from 0
+  and the dial, drawn into each frame after the map from that frame's figures
+  (`ReplayVideoFigures`); no hosted view, so nothing runs on the screen's clock.
+- The stage takes no saved place's mark: the ends are the plain start and end markers.
+- `DisplayFormat.dayAndPartOfDay` and seven `Common` strings (`partOfDay.*`, English and
+  Vietnamese): the first code of `share.md`'s time line.
+- `-carodo.debugReplayExportPrivacyZone NO`: the zone off for one export.
+
+Checked on the simulator (sample drive, 12 s and 30 s clips): Light and Dark, English and
+Vietnamese, the opening with the zone on and off
+([`replay-video-built.png`](../design/mockups/replay/replay-video-built.png): real frames of the
+build). `task lint`, `task warnings`, 2,040 tests pass; seven new in `ReplayVideoDriveTests`
+(no fix inside the zone in the timeline, the drawn line or any moment; both sides of "something
+is left"; a stop inside the zone goes, one outside stays whole).
+
+Open:
+
+- A run on the iPhone (what the overlay
+  adds to a frame's 35 ms is not measured; on the simulator the export time did not move).
+- **Private regions are not cut from a video** (TD-25): only the zone at the two ends.
+- The arrival is where the zone begins, so the last frame can show a speed above 0: the car was
+  moving there. Left as the fact it is.
+- Still from W4a: the iPhone 12 Pro Max run, a long drive at a high rate.
+
 ### Brief for the next session
 
 ```text
-Outcome: W4b of the wow track: what a Replay video shows beside the map, and the privacy zone.
-Start with mock-ups of a few frames (Light, Dark, English, Vietnamese) for the owner; no code
-  before the owner approves the layout.
+Outcome: W4c of the wow track: the Export screen, from Replay's header to the share sheet.
+Start with a plan and a mock-up of the screen for the owner; no code before it is approved.
 Existing behaviour (files read): carodo-ios Features/Journeys/Views/{ReplayVideoRenderer,
-  ReplayExportDebug,ReplayMapView,ReplayView}.swift, Core/Replay/ReplayMovieWriter.swift,
-  Core/Domain/{PrivacyZone,FeedPublication}.swift, docs/specs/{replay,share}.md (R.3, the video
-  renderer); this plan's W4 sections and the reference export screen described in them.
-Decided (owner, 2026-11-13): 30 fps; 30 s the default length, an export may outlast its clip;
-  day and part of day and time from 0, no clock; the privacy zone as on the Feed, off for one
-  export; the CARODO mark drawn over the map's frame; export stays DEBUG / Developer only until
-  TD-2 is read.
-Acceptance: the W4b row of the slice table; no saved place's marker in a frame (Home showed at
-  the end of a clip); a test asserts no fix inside the zone reaches the renderer.
-Non-goals: the Export screen (W4c), the recap edit (W4d), the range bar (W4e), see "Not in W4".
-Constraints: the overlay is drawn into the frame after the map, never a second map dressing;
-  Apple's logo and Legal link stay visible; the rules measured in W4a (one refresh waited, drawn
-  after the screen's updates, nothing else of the app drawn) are kept.
-Validation: task lint, task warnings, task test; device: the owner installs with task device
-  from Terminal, the agent launches with -carodo.debugReplayExport and pulls the clip.
-Still open from W4a: the iPhone 12 Pro Max run, a long drive at a high rate.
+  ReplayVideoOverlay,ReplayExportDebug,ReplayView}.swift, Core/Replay/{ReplayVideoDrive,
+  ReplayMovieWriter}.swift, docs/specs/{replay,share}.md (R.3, The frame); this plan's W4 sections.
+Decided (owner, 2026-11-13): layout A for the frame; Length 15 / 30 / 60 s with the rate shown,
+  30 s the default; the privacy zone on by default, a switch turns it off for one export; export
+  behind the Developer screen until TD-2 is read; NSPhotoLibraryAddUsageDescription approved.
+Acceptance: the W4c row of the slice table; the preview is the video's own frame
+  (ReplayVideoStage + overlay), not a second drawing.
+Non-goals: the recap edit (W4d), the range bar (W4e), private regions in a video (TD-25).
+Constraints: the Export screen takes Replay's screen and map down while it renders (16 ms a
+  frame); the rules measured in W4a are kept.
+Validation: task lint, task warnings, task test; screenshots Light, Dark, large Dynamic Type,
+  Vietnamese; device: the owner installs with task device from Terminal.
+Still open: the iPhone 12 Pro Max run, a long drive at a high rate, the overlay's cost on a device.
 ```

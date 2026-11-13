@@ -11,6 +11,7 @@ below describe the review at that time, not proof that a board matches the curre
 - [`onboarding/`](onboarding/): Day 0, Day 1 and the first-car concept.
 - [`drive/`](drive/): recording, Auto Mode and recording polish.
 - [`journeys/`](journeys/): the list, detail, replay, trim and provinces.
+- [`replay/`](replay/): the Replay video's frame.
 - [`garage/`](garage/): Garage, vehicle identity, showcase and editor concepts.
 - [`passport/`](passport/): milestone and Passport concepts.
 - [`feed/`](feed/): early Feed concepts.
@@ -50,6 +51,7 @@ These boards are retained as explorations; their presence does not establish app
 | [`first-run-day1.png`](onboarding/first-run-day1.png) | Day 1: the Start panel (no, one, several vehicles; AX size), the compact recording panel with Undo and the vehicle pill, Journeys with one drive, the detail before and after place names (source: `source/first-run-day1.html`) | Drawn and built 2026-11-03 |
 | [`auto-mode.png`](drive/auto-mode.png) | The Auto Mode sheet: off, running with a car-audio link prompt, all set (Dark), Set Up Automation steps, blocked without Always (source: `source/auto-mode.html`; spec `carodo-ios/docs/specs/auto-mode.md`) | Visual target, decisions 2026-11-03 |
 | [`journey-trim.png`](journeys/journey-trim.png) | Trim as a video-editor timeline: **chosen** A with B's chips (figures with what the trim takes away in Copper, speed-coloured bar timeline, Starts/Ends with the old time struck through, chips After leaving Home · Leave out the walks · After the stop); explored: A Photos-style (map above, speed-profile timeline with two Copper handles, recommended), B the same with one-tap smart ends (leave out the walks, after a stop) and snapping, C full-screen map with the timeline in a glass card and a scrubbing playhead; the detail after a trim; largest Dynamic Type; open decisions (source: `source/journey-trim.html`; spec `carodo-ios/docs/specs/journeys.md`, Trim) | Drawn 2026-11-05; A + chips chosen 2026-11-05 |
+| [`replay-video-frame.png`](replay/replay-video-frame.png), [`replay-video-built.png`](replay/replay-video-built.png) | What a Replay video shows beside the map, on real frames of the renderer (sample drive): three layouts (A top block, B card at the foot, C no surface), A in Light and Dark, English and Vietnamese, the opening and the arrival; then frames of the build (source: `source/replay-video.html`, frames in `source/replay-video/`; plan `plans/cinematic-replay.md`, W4b) | Drawn 2026-11-13; **A chosen** and built 2026-11-13 |
 | [`recording-polish.png`](drive/recording-polish.png) | Recording polish: the Map while recording (live line, "Recording · time · distance" chip, Auto Mode button marking its own drive), the stop and car-audio countdowns, the source in the panels (by hand · Auto Mode · Shortcut), paused, the toast after an automatic end, the 24 h dropped-drive line with Keep it, the source filter and detail line, largest Dynamic Type (source: `source/recording-polish.html`; plan `plans/recording-polish.md`) | Drawn and approved 2026-11-03 |
 
 ## Where the ideas differ from the current docs
