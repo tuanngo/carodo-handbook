@@ -37,7 +37,7 @@ Answered as recommended (owner, 2026-11-13):
 |---|---|---|
 | Q1 | Which style is the default? | Stamp: it is the one no other app has. |
 | Q2 | Average speed on the card? The spec listed distance, duration and vehicle only. | Yes, moving average, beside the duration. No top speed (backlog: only if the person adds it). |
-| Q3 | A Save button that writes straight to Photos? It needs the add-only Photos permission: an Info.plist key with English and Vietnamese text (P6). | Not in S1: the share sheet already has Save Image and needs no permission. Add the button in S2 if the extra tap bothers. |
+| Q3 | A Save button that writes straight to Photos? It needs the add-only Photos permission: an Info.plist key with English and Vietnamese text (P6). | ~~Not in S1~~ Replaced by the owner the same evening: **Share and Save side by side**. The recommendation's reason was also wrong: the share sheet's Save Image needs the same key (`NSPhotoLibraryAddUsageDescription`), which the Replay Export session had already added for Save Video; its text now names a card as well as a video. |
 | Q4 | Is 1:1 in the first slice? | Yes: it is the same renderer with another layout table, and the spec already decided two sizes. |
 
 ## The card (direction D)
@@ -136,8 +136,14 @@ plates. Not the speed profile strip in speed colours (D6 applies to it too).
   both unreadable on the first run.
 - Map labels are drawn at two thirds of MapKit's size (the snapshot is taken larger at a lower
   scale), as the journal's list images do.
+- After the owner's first look (2026-11-13): the editor is a **sheet** with no header (no title,
+  no Close; pulled down to close), so the card sits higher; the chosen size is a pale Copper fill
+  with a Copper border (the design system's "chosen", not a Charcoal segment); **Share** (Copper)
+  and **Save** (a control's surface) side by side, one above the other at accessibility text
+  sizes. Save: `PhotoSaver` (add only), "Saved" with a check until the card changes, an alert with
+  Open Settings when refused. The mock-up's editor (header, one button) is older than this.
 - QA: `-carodo.debugOpenShareCard YES`, `-carodo.debugShareCard simple,square,dark,whole`.
-- Checks: lint, a clean build with no warning, the whole test suite (25 new tests).
+- Checks: lint, a clean build with no warning, the whole test suite (27 new tests).
 
 ## Acceptance criteria
 
