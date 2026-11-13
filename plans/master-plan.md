@@ -34,7 +34,7 @@ W3 tries the offline, fixed-step capture first (study §6).
 
 | Item | What is left | State (2026-11-13) |
 |---|---|---|
-| **L2** hot-phone GPS | Desk check on the iPhone ([field test](../field-tests/2026-11-13-hot-phone-gps.md), steps 3–5, Xcode Device Conditions), then commit **only** its 12 carodo-ios files: `Carodo/App/DependencyContainer.swift`, `Core/Diagnostics/{BatteryMonitor,DiagnosticsLogFormat,TrackingLog}.swift`, `Core/Recording/{DriveSessionManager,RecordingGPS}.swift`, `CarodoTests/{DeveloperModeTests,RecordingGPSTests,TrackingLogFieldsTests}.swift`, `docs/tracking.md`, `docs/specs/developer-mode.md`, `docs/operations/device-testing.md`. Suggested message: `feat(tracking): a hot phone gives up navigation accuracy` | Built, uncommitted; lint, warnings, 1,990 tests pass; **PV-17** |
+| **L2** hot-phone GPS | Read from the log of real drives (no desk check: Xcode 27 has no thermal condition for an iPhone); thermal is read fresh on every fix | Committed `1c29c11` (2026-11-13); **PV-17** |
 | **L3** MetricKit exits and diagnostics | Device check only: Xcode → Debug → Simulate MetricKit Payloads on the iPhone, then a real payload the day after a field test | Committed `03bafd8` (2026-11-13); **PV-18** |
 | **L4** versioned place sweeps | Build with TD-6 (step 6): `places_version`, `points_version` replace the two `_at` columns; `setPlaceKeys` syncs only on a changed cell; the rule in `docs/data-model.md`. One `CONFIRM=erase` on the iPhones | Approved, waits for step 6 |
 | L9 per-drive feature table | A `task` over `drive-data/` printing one row per drive (stops, gaps, rejections, accuracy, speed spread) | When the step 9 batch is pulled |

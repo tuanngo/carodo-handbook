@@ -13,6 +13,12 @@ The battery line carries `thermal=`. Rule and reasons: carodo-ios `docs/tracking
 Part 1 needs the Mac (Xcode simulates the thermal state only while the iPhone is connected); part 2
 is an ordinary drive whose log shows the real thermal state.
 
+> **2026-11-13: part 1 dropped.** Xcode 27's Device Hub offers no thermal condition for an iPhone,
+> and L2 now reads the thermal state fresh on every fix (committed `1c29c11`), so the
+> notification question is answered by the log of real drives: a `gps … why=hot` line with a
+> `battery … thermal=` line just before it came from the notification, one without was found by a
+> fix. Only part 2 (an ordinary drive) remains.
+
 ## Before leaving (parked, at the desk, iPhone on the cable)
 
 1. **parked** · `task device`. If it stops on a schema change, the owner decides (`CONFIRM=erase`).

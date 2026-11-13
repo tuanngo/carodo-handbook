@@ -1,9 +1,7 @@
 # Study follow-ups: hot-phone GPS, MetricKit diagnostics, versioned place sweeps (L2, L3, L4)
 
 Status: approved 2026-11-13 with every recommended decision (D2.1 no, D2.2 no, D3.1 Developer
-only, D4.1 yes). **L2 built** 2026-11-13, uncommitted in carodo-ios until the device check below
-(lint, warnings and 1,988 tests pass); the reasons for its thresholds are in carodo-ios
-`docs/tracking.md` (Recording GPS, "Why a hot phone gives up navigation"). **L3 built and committed** 2026-11-13 (carodo-ios `03bafd8`; device check PV-18). L4: not started.
+only, D4.1 yes). **L2 committed** 2026-11-13 (carodo-ios `1c29c11`): the thermal state is read fresh on every fix (Pilgrim's guard re-reads it the same way), so the desk check was dropped (Xcode 27 has no thermal condition for an iPhone) and the log of real drives measures it (PV-17). **L3 built and committed** 2026-11-13 (carodo-ios `03bafd8`; device check PV-18). L4: not started.
 L5 is handed to another agent.
 Source: [`references/repos/drive-recorders-study.md`](../references/repos/drive-recorders-study.md)
 L2, L3, L4. Audited at carodo-ios `caf0915` (after the repository split `7260c5f` and the perf
