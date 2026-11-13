@@ -159,6 +159,11 @@ plates. Not the speed profile strip in speed colours (D6 applies to it too).
   40 characters, no explaining note); one line over the distance, the block's text moving down to
   make room, the stamp and the map staying. Drawn 350 ms after the last key, so typing does not
   draw a card per key.
+- Owner's look at the stamp (2026-11-13): smaller (88 pt on 9:16, 70 on 1:1, was 108 and 86) and
+  without its inner ring (`PassportStamp(innerRing: false)`): the outer ring, the lettering and
+  the wheel's own ring are enough. All seven parts of day fit the band in English and Vietnamese
+  (rendered once); the longest ("CHUYẾN ĐI SỚM TINH MƠ") is set smaller by the band's own rule. The
+  day on a card is the local day and part of day the spec allows (P9: nothing finer than the hour).
 - QA: `-carodo.debugOpenShareCard YES`, `-carodo.debugShareCard simple,square,dark,whole`.
 - Checks: lint, a clean build with no warning, the whole test suite (27 new tests).
 
