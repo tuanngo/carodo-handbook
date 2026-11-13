@@ -540,6 +540,11 @@ W4b, and its rules (no clock and no title in a frame; the privacy zone drawn on 
 - **Replay's map is Standard only; Overview and Follow are one control that cycles; the video's
   top block sits 14 pt higher** (owner, 2026-11-13, after W4c-1 on the simulator).
 - **Trim (W4e) before Aa (W4c-2)** (owner, 2026-11-13).
+- **After the first look (owner, 21:15):** the editor's bar is Trim Journey's, with its haptics
+  (one shared `TrimBar`); the video's route is Signature only (a viewer has no legend for speed
+  colours), so the look tool is Light or Dark; a length that would play faster than 120× is
+  dimmed like one under 5× (237 km in 15 s would be 2,637×): the fastest rate is always offered,
+  and the Trim shortens a long drive.
 - **Three slices**, one screen, one commit each (below).
 - **The CARODO lockup and carodo.app at the end cannot be turned off.**
 - **Replay's header** takes one more round control (Share) for now; the header is tidied in its
