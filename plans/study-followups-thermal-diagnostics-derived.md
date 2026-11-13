@@ -3,7 +3,7 @@
 Status: approved 2026-11-13 with every recommended decision (D2.1 no, D2.2 no, D3.1 Developer
 only, D4.1 yes). **L2 built** 2026-11-13, uncommitted in carodo-ios until the device check below
 (lint, warnings and 1,988 tests pass); the reasons for its thresholds are in carodo-ios
-`docs/tracking.md` (Recording GPS, "Why a hot phone gives up navigation"). L3, L4: not started.
+`docs/tracking.md` (Recording GPS, "Why a hot phone gives up navigation"). **L3 built and committed** 2026-11-13 (carodo-ios `03bafd8`; device check PV-18). L4: not started.
 L5 is handed to another agent.
 Source: [`references/repos/drive-recorders-study.md`](../references/repos/drive-recorders-study.md)
 L2, L3, L4. Audited at carodo-ios `caf0915` (after the repository split `7260c5f` and the perf
@@ -129,7 +129,7 @@ No schema, permission, entitlement or dependency change.
 
 ### Found on the way (to confirm while building)
 
-`MetricKitStore` is not `@Observable`, so `latest` changing on the main actor may not refresh an
+Done in `03bafd8`: the store is `@Observable` now. `MetricKitStore` was not `@Observable`, so `latest` changing on the main actor may not refresh an
 open Developer page. If so, fix it in this slice (a one-word change, with the store's
 `nonisolated deinit` kept).
 
