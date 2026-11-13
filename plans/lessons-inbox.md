@@ -137,5 +137,17 @@ Lessons already paid for that L5 gathers, beside the entries below:
   --destination Documents/x.carodo`; the container's path comes from a unit test hosted in the
   app printing `NSHomeDirectory()` on that device; launch with `-- app.carodo.ios
   -carodo.debugRestoreBackup <container>/Documents/x.carodo`; verify by pulling and counting trips.
-- Rule now in: nowhere yet (a candidate for a `task restore-db`, or the argument resolving a
-  relative path against Documents).
+- Rule now in: carodo-ios `004647b`: the argument resolves a relative path in Documents
+  (`docs/operations/setup.md`); no container path needed.
+
+### read-the-queue-before-the-state-it-is-checked-against
+- applies_when: a sweep reads a work queue and, separately, the existing records it must not
+  duplicate (places, cells, badges), while another writer (restore, iCloud) can commit between
+- area: persistence, after-drive work · found: 2026-11-13 · severity: medium
+- Context: `PlaceDetection.run` read the places, then the queue; a `.carodo` restore committed
+  between the two reads, so the restored journeys were queued without their places and made 10
+  duplicate places on an iPhone. The restore is one transaction.
+- Guidance: read the queue first, then the state it is checked against; a writer that adds both
+  in one transaction is then seen whole or not at all. Test with a fake store whose first read
+  returns the old state and every later read the new one.
+- Rule now in: carodo-ios `e14c6fa` (`PlaceDetectionRun.swift` comment, `PlaceDetectionTests`).
