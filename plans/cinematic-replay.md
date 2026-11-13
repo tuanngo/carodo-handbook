@@ -608,7 +608,38 @@ seconds to the drive's story, in place of one rate. Slow (toward Replay's 15 ×)
 the arrival, about 3 s of video each, and winding stretches (the Reveal's own fact,
 `CameraScript.turning`, with a minimum length, near ones merged). The rest is compressed, its
 rate solved so the clip has the length asked. Rate changes ease over about 0.75 s on screen; stops
-keep their second. Limits: the slow parts take at most about half the clip, the fast rate has a
+keep a video's own hold (0.6 s, a tenth of the clip at most: W4c result) and gaps play at the rate.
+It builds on `ReplayVideoPace.videoTimeline` (the video's story axis and stop rules) rather than
+beside it; the pace menu's "one rate" line becomes the edit's. Limits: the slow parts take at most about half the clip, the fast rate has a
 ceiling (tiles), and a short or all-winding drive plays as the one-rate clip. All figures are
 hypotheses for a first step that prints them for the drives in `drive-data/`. Open for the owner:
 ramps (proposed) or cuts; which moments count in the first version; top speed is not one (ADR 0007).
+
+### Brief for the next session
+
+```text
+Outcome: the W4c polish pass the owner asked for ("tạm ổn, polish later"), then Aa (W4c-2).
+Start by asking the owner what to polish from their own use on the iPhone; no code before that.
+State: carodo-ios 2d79687 (editor, Trim, pace, the video's stops), handbook cfa6601. Unpushed.
+Existing behaviour (read first): carodo-ios docs/specs/replay.md (The Export screen, The video
+  renderer, The frame); Features/Journeys/{ViewModels/ReplayExportModel, Views/ReplayExportView,
+  Views/ReplayVideoRenderer, Views/ReplayVideoOverlay}.swift; Core/Replay/{ReplayVideoPace,
+  ReplayVideoDrive, ReplayTimeline}.swift; DesignSystem/Components/TrimBar.swift; this plan's
+  W4c sections.
+Decided (owner, 2026-11-13): one editor, no sheet; Hide is a word and a hand, its menu the start
+  and the end each Off/300 m/500 m/1 km; a length (15/30/60 s) or a speed (15/30/60/120×), one of
+  the two, offered only for 15×–300× and a 6–60 s clip; the route Signature only, Light or Dark;
+  the Trim is Trim Journey's bar; a video's stops 0.6 s with "Stopped 45 min", gaps at the rate,
+  the clock on the move; the CARODO lockup and carodo.app cannot be turned off.
+Open: PV-20 (device: the 312 km drive at 60 s ≈ 250–300× tiles, Save Video, background, music,
+  haptics, CPU at rest), TD-25 (private regions), TD-27 (adopt ActivitySheet and CarodoLockup
+  once the share card is committed).
+Next after the polish: Aa (W4c-2: Date, Vehicle, Distance, Time, Speed on or off; the block closes
+  up), then W4d (the recap edit, plan above, not approved).
+Tools: my simulator "Carodo Replay Export" D75D4A8B-F975-448B-ADD4-404BE5FADB48 with
+  -derivedDataPath build/dd (it holds a real-drive restore; -carodo.sampleData YES for frames that
+  may be committed); -carodo.debugReplayEditor YES (+ Phase, Part); menus can be tapped on the
+  simulator only through a subagent with the Xcode device-interaction tools; task device works
+  from the agent shell (unlock the iPhone first). Commit through a temporary index: other
+  sessions edit the same tree.
+```
