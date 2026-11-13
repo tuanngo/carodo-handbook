@@ -3,8 +3,8 @@
 Status (2026-11-13): **1–3 fixed and confirmed on the iPhone; 4 fixed in code (`isOffScreen` in
 `JourneyDetailView.isCovered`), its memory not re-measured; 9 built (`-carodo.sampleJournal N`);
 5/11, 12 and TD-12 done (carodo-ios 53edd24, b39f20c); 13 measured on the iPhone (4.5× faster);
-14 done (cc2b501); 6 done (6947f81, merged e147432)**; 7, 8, 10 and Replay's Speed overlays open
-(Still pending, at the end).
+14 done (cc2b501); 6 done (6947f81, merged e147432); 4, 7, 8 measured on the iPhone 2026-11-13
+and closed without a code change (Still pending, at the end)**; 10 and Replay's Speed overlays open.
 Also recorded: the owner's route-colour decision in `carodo-ios/docs/design-system.md` (Route line
 colours) and `docs/specs/navigation.md`.
 
@@ -359,9 +359,9 @@ Owner decisions needed: none for the multipolyline (a rendering detail, same loo
 | Item | Where it stands | Next step |
 |---|---|---|
 | Issue 6, speed overlays | Done 2026-11-13 (`6947f81`, merged `e147432`) | Replay's Speed: same rule after the Replay session lands |
-| Issue 4, Detail map memory | Fixed in code (`isOffScreen`), memory not re-measured | Xcode memory graph after Detail → Map tab on an iPhone: count live `MKMapView` |
-| Issue 7, recording panel | Open: the 1 s `TimelineView` in `RecordingPanels.swift` (~l.447) wraps the panel body | Scope it to the time rows; measure with issue 1's method |
-| Issue 8, Place editor | Open: `onMapCameraChange(.continuous)` writes the model per frame | Careful: the same handler detects the camera leaving the fallback frame; split that from the model write |
+| Issue 4, Detail map memory | **Measured 2026-11-13, accepted (no code change).** iPhone 17 Pro Max, device journal, 3 runs each: Detail → Map tab ends at 344–354 MB, the Map tab alone 243–253 MB (+~95 MB); CPU 0 %, flat. `isOffScreen` works (`dismantleUIView` runs), but SwiftUI keeps the hidden tab's leaf view (`ViewLeafView`) and with it the representable's coordinator and the `MKMapView` (`heap` on the simulator: 2 live map views). Dropping the coordinator in `dismantleUIView` freed it but not the memory (344–354 vs 344–348 MB); emptying the map's overlays and annotations neither | None unless memory pressure is seen; iOS reclaims MapKit's caches under pressure. Revisit only with a different structure (one map per tab) |
+| Issue 7, recording panel | **Measured 2026-11-13, not a problem (no code change).** iPhone, expanded panel at Ready on the Journeys tab: 0.5–0.6 % (Map tab 0.5 %). Under way (simulator, Freeway Drive): scoping the clock to the time rows changed nothing (44–45 % → 43.8–43.9 %); the simulator's cost is a blur drawn in software (`vSepConvolveARGB8`), done by the GPU on an iPhone | Glance at the expanded panel's CPU under way on the next device drive (step 9 batch) |
+| Issue 8, Place editor | **Measured 2026-11-13, no gain found (no code change).** `.onEnd` was not an option: the circle is drawn at the model's centre and follows the drag. Tried the map as its own view (only it reads the centre): dragging by hand on the iPhone, 65.9 % → 87.0 % median (hand drags differ; the second ran longer), memory +~140 MB both times: the cost is MapKit's tiles, not the panel | None; a short screen, used rarely |
 | Issue 10, UI scroll test | `CarodoUITests` target approved 2026-11-06, not started | Scroll/hitch metrics on Journeys and Feed with `-carodo.sampleJournal 2000` |
 | TD-23 | DEBUG-opened Passport page pushes links under itself | With TD-14 (debug arguments in one place) |
 | Lessons inbox | 8 of ~10 entries ([`lessons-inbox.md`](lessons-inbox.md)) | Build L5 (`docs/solutions/`) at ~10 or before TestFlight |

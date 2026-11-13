@@ -55,7 +55,7 @@ Done in the same session as the next feature that edits the file, one `refactor:
 - ~~`GRDBJourneyRepository.swift` (1,950 lines): split by query family~~ — done 2026-11-12 (7260c5f): seven files, 322 lines left for the screens' reads.
 - ~~`Repositories.swift` (1,122 lines): one protocol per file~~ — done 2026-11-12 (7260c5f): one file per repository, the trip stores together.
 - `LoadState` declared in ten view models (TD-10); DEBUG launch arguments in 26 files (TD-14).
-- Perf only where measured: TD-12 done 2026-11-12 (b39f20c); perf audit 6, 11–14 done (6947f81, 53edd24, b39f20c, cc2b501; 11–13 measured on the iPhone 2026-11-13); 4 (re-measure), 7, 8, 10 open.
+- Perf only where measured: TD-12 done 2026-11-12 (b39f20c); perf audit 6, 11–14 done (6947f81, 53edd24, b39f20c, cc2b501; 11–13 measured on the iPhone 2026-11-13); 4, 7, 8 measured 2026-11-13 and closed without a change; 10 and Replay's Speed open.
 
 ## Why this order
 
