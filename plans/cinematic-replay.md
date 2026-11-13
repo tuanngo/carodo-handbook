@@ -187,7 +187,7 @@ build, device check, one commit. The behaviours and the Director's rules stay th
 | **W1** TD-1 stop alignment | Replay's compressed stops and the journal's `JourneyAnalysis.stopIntervals` answer "a finished stop on the timeline" with one rule | A replay test on the owner's drives shows the same stops as the detail page's route timeline |
 | **W2** R.2B one behaviour per slice | Rest first (the most frequent, the cheapest trigger), then Hairpin Reveal, then Terrain Reveal where MapKit has 3D terrain; Junction Reveal last or never | Each: thresholds on both sides tested, `docs/tracking.md`-style table in `replay.md`, a screen recording of a real drive at 15× and 60× approved by the owner |
 | **W3** Video spike (done 2026-11-13: the MapKit view drawn per frame) | A one-day answer, written here, to: how frames of the replay reach a video file | A 10 s 9:16 clip of a synthetic drive plays in Photos, with its frame rate and render time measured on the iPhone |
-| **W4** Recap + export | The 30–60 s Cinematic Recap (an edit: highlights near real rate, the rest compressed) and a 9:16 export from it, through the share sheet | Exported on the iPhone from a real drive, privacy trim on, attribution visible, under a minute to render |
+| **W4** Recap + export | The 30–60 s Cinematic Recap (an edit: highlights near real rate, the rest compressed) and a 9:16 export from it, through the share sheet | Exported on the iPhone from a real drive, privacy trim on, attribution visible; the export may take somewhat longer than the clip (owner, 2026-11-13) |
 
 ### W1 result (2026-11-12, carodo-ios 969ba51)
 
@@ -448,9 +448,10 @@ Max. The 24 ms of drawing is `drawHierarchy` itself and did not move.
 
 Open:
 
-- **"Under a minute for a 60 s clip" is not met** on the fastest iPhone (about 70 s), and a
-  60 Hz iPhone waits 17 ms a frame, not 9: about 1.3 to 1.5 times the clip's length expected on
-  the iPhone 12 Pro Max, not measured. The owner decides: accept it, 24 fps, or a 30 s default.
+- **Export time (owner, 2026-11-13):** an export may take somewhat longer than its clip; how the
+  video looks comes first. 30 s is the default length; 60 s may take over a minute. The "under a
+  minute to render" in the W4 table is replaced by this. Expected on a 60 Hz iPhone: 1.3 to 1.5
+  times the clip's length, not measured.
 - **The iPhone 12 Pro Max** has not run it: time per frame, memory and heat there, a 60 s clip.
 - **Very high rates.** On the simulator the 312 km drive asked for in 10 s (about 3,000 ×) drew
   an empty grid: tiles cannot follow. 60 s of it is about 250 to 300 ×, not tried on a device:
