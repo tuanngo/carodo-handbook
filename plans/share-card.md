@@ -50,8 +50,9 @@ In points, 360 wide; written at 3x: 1080 × 1920 (9:16, default) and 1080 × 108
   (above Apple's logo), centred, with a floor on the zoom so a very short drive never shows at house
   level. The map follows the route; nothing of the route is under the block.
 - **Line:** Catmull-Rom through the route's points, round ends, Copper on a casing of the ground
-  colour. Zone on: the line simply ends, no marker. Zone off for this card: the design system's
-  start and end markers.
+  colour. ~~Zone on: the line simply ends, no marker. Zone off: the start and end markers.~~
+  Replaced by the owner (2026-11-13, third look): both ends are always the design system's plain
+  discs (no flag), at the ends of what is shown, so a cut end looks like a real one.
 - **Block (top, on a ground that fades into the map):** distance (large), duration and average
   speed, the vehicle, `carodo.app` in Copper.
   - Stamp: the round stamp at the right, the wheel in its centre, the day around the top
@@ -145,6 +146,10 @@ plates. Not the speed profile strip in speed colours (D6 applies to it too).
 - Second look (2026-11-13): the sheet is Charcoal in both appearances; its height follows the card
   on screen (1:1 shorter), eased with `.snappy` (none under Reduce Motion); a selection haptic on
   every choice, success or error on Save.
+- Third look (2026-11-13): the line and map are the journey detail's (`CarodoRouteStyle`: brand
+  Copper 6 pt on a 10 pt casing; `CarodoMapLook`: Apple's map not muted in Light), ends as plain
+  discs whatever the zone; the other size's map is taken right after the first card, so 9:16 ↔ 1:1
+  is one drawing with no card shown without its map, and each new card fades in over the last.
 - QA: `-carodo.debugOpenShareCard YES`, `-carodo.debugShareCard simple,square,dark,whole`.
 - Checks: lint, a clean build with no warning, the whole test suite (27 new tests).
 
