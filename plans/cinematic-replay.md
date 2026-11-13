@@ -468,16 +468,24 @@ image (its own slice in `share.md`; W4b's frame should be designed so the card c
 ### Brief for the next session
 
 ```text
-Outcome: W4a of the wow track (the renderer in the app), after the owner answers the six decisions.
-Existing behaviour (files read): carodo-ios Core/Replay/{ReplayCameraRig,ReplayTimeline,CameraScript,
-  ReplayRoute}.swift, Features/Journeys/Views/ReplayMapView.swift, ViewModels/ReplayPlayer.swift,
-  Core/Domain/PrivacyZone.swift, docs/specs/{replay,share}.md; carodo-studio Studio/{Renderers,
-  MapKitStage,MovieWriter}.swift.
-Acceptance: per slice table above.
-Non-goals: see "Not in W4".
-Constraints: the rig and timeline unchanged; the map's dressing extracted from ReplayMapView, never
-  copied; no coordinates in logs; no schema or API change.
-Validation: task lint, task warnings, task test; device: iPhone 12 Pro Max, a 30 s and a 60 s clip
-  of a real drive (the owner runs the signed build from Terminal).
-Do not: rewrite FollowCamera or the player; put export in a release build before TD-2.
+Outcome: W4b of the wow track: what a Replay video shows beside the map, and the privacy zone.
+Start with mock-ups of a few frames (Light, Dark, English, Vietnamese) for the owner; no code
+  before the owner approves the layout.
+Existing behaviour (files read): carodo-ios Features/Journeys/Views/{ReplayVideoRenderer,
+  ReplayExportDebug,ReplayMapView,ReplayView}.swift, Core/Replay/ReplayMovieWriter.swift,
+  Core/Domain/{PrivacyZone,FeedPublication}.swift, docs/specs/{replay,share}.md (R.3, the video
+  renderer); this plan's W4 sections and the reference export screen described in them.
+Decided (owner, 2026-11-13): 30 fps; 30 s the default length, an export may outlast its clip;
+  day and part of day and time from 0, no clock; the privacy zone as on the Feed, off for one
+  export; the CARODO mark drawn over the map's frame; export stays DEBUG / Developer only until
+  TD-2 is read.
+Acceptance: the W4b row of the slice table; no saved place's marker in a frame (Home showed at
+  the end of a clip); a test asserts no fix inside the zone reaches the renderer.
+Non-goals: the Export screen (W4c), the recap edit (W4d), the range bar (W4e), see "Not in W4".
+Constraints: the overlay is drawn into the frame after the map, never a second map dressing;
+  Apple's logo and Legal link stay visible; the rules measured in W4a (one refresh waited, drawn
+  after the screen's updates, nothing else of the app drawn) are kept.
+Validation: task lint, task warnings, task test; device: the owner installs with task device
+  from Terminal, the agent launches with -carodo.debugReplayExport and pulls the clip.
+Still open from W4a: the iPhone 12 Pro Max run, a long drive at a high rate.
 ```
