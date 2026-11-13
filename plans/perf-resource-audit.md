@@ -2,8 +2,8 @@
 
 Status (2026-11-12): **1–3 fixed and confirmed on the iPhone; 4 fixed in code (`isOffScreen` in
 `JourneyDetailView.isCovered`), its memory not re-measured; 9 built (`-carodo.sampleJournal N`);
-5/11, 12 and TD-12 done (carodo-ios 53edd24, b39f20c); 13 much reduced on the simulator, device
-measurement open; 14 done (cc2b501)**; 6, 7, 8, 10 open.
+5/11, 12 and TD-12 done (carodo-ios 53edd24, b39f20c); 13 measured on the iPhone (4.5× faster);
+14 done (cc2b501)**; 6, 7, 8, 10 open.
 Also recorded: the owner's route-colour decision in `carodo-ios/docs/design-system.md` (Route line
 colours) and `docs/specs/navigation.md`.
 
@@ -264,6 +264,25 @@ merged into `main` with caf0915). 10,000 `SampleJournal` drives, Debug, simulato
   searches the row per lookup); `driveFacts` now reads by position. Still to measure on the iPhone.
 - The Garage's weeks skip drives older than the bars before the calendar work (36 → 5 ms).
 - Measured by `GaragePerformanceTests` and `PlaceVisitsPerformanceTests` (opt-in).
+
+**On the iPhone (2026-11-13):** iPhone 14 "VanSam" (iOS 27), USB, Debug build, the same two tests
+at 10,000 `SampleJournal` drives; before = carodo-ios 7260c5f (split, not optimised), after =
+b525900. Warm runs (cold within a few ms):
+
+| Read | Before | After |
+|---|---|---|
+| Garage opens | 539 ms | 138 ms |
+| A vehicle's page (6,925 drives) | 346 ms | 74 ms |
+| `passportFacts()` (issue 13) | 496 ms | 109 ms |
+| A place's visits page, Home (4,959 visits) | 281 ms | 85 ms |
+| A place's visits page, an ordinary place | 13.3 ms | 6.1 ms |
+| Journey Detail point cards' visits (Home + ordinary) | ~520 ms (passportFacts + summaries) | 131 ms |
+| 30 earlier drives for the comparison | 1.7 ms | 0.3 ms |
+
+The iPhone is three to four times slower than the simulator in Debug, and the gains hold there:
+issue 13 is answered (no need to keep one result per revision). The phone then got the owner's
+29-drive journal and its own 3 drives restored (`-carodo.debugRestoreBackup` with the container's
+absolute path, found by a unit test printing `NSHomeDirectory()`).
 
 **Order for a new session (as written before the work):** 11 → 12 (largest and most frequent) → measure 13 on the iPhone over
 USB (`xctrace`, the method above) → 14. Each with a before/after row in `PlaceVisitsPerformanceTests`
