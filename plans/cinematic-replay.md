@@ -351,7 +351,7 @@ either. The clips are in `carodo-studio/results/`.
 **Owner, 2026-11-13: agreed.** W4 renders with the MapKit view; ImmersiveMap is looked at again
 only if a Terrain Reveal wants real relief.
 
-### W4 plan (draft, waiting for the owner's approval)
+### W4 plan (approved by the owner, 2026-11-13)
 
 **Reference (owner, 2026-11-13): another drive app's export screen.** What it does: a 9:16 preview
 card (map above; distance, a speed dial and the clock below; the drive's name, date and the app's
@@ -385,7 +385,7 @@ place names around it (P5, P9).
 | **W4d** Recap edit | The length is spent unevenly: the opening, the Reveals, the arrival and the highlights near Replay's rate, the long straight parts compressed harder; a pure `RecapScript` made before rendering | Tests on both sides of each rule; the owner prefers it to the one-rate clip of the same drive |
 | **W4e** A part of the drive | The reference's range bar: two handles on the speed profile choose the part exported | After W4c, if the owner wants it |
 
-**Decisions the owner must make before W4a.**
+**Decisions (owner, 2026-11-13: all six agreed as proposed; the CARODO mark is added in W4b, drawn over the map's frame).**
 
 1. **One rate first, the edit after (W4d)?** `replay.md` says the recap is an edit, not a faster
    rate. Proposed: ship the fitted single rate first (the reference does only this, and stops are
@@ -400,6 +400,37 @@ place names around it (P5, P9).
    behind the DEBUG argument (W4a, W4b) and the Developer screen (W4c); nothing in a release build.
 6. **Contracts (P6), approved 2026-11-13, restated:** `AVFoundation` in the app;
    `NSPhotoLibraryAddUsageDescription` in `project.yml` with W4c. No schema, API or package change.
+
+### W4a result (2026-11-13, carodo-ios 00fe310)
+
+Built: `ReplayVideoStage` (Replay's own `ReplayMapCoordinator` and map at 360 × 640 points, no
+second dressing), `ReplayVideoRenderer` (first pass for tiles, then one frame per `1 / fps` of the
+video's clock through `ReplayPlayer.renderFrame`), `ReplayMovieWriter`, and
+`ReplayTimeline.rate(forPlaybackS:)`. Reached by `-carodo.debugReplayExport 30` only; the report
+and the clip land in the app's `Documents/replay-export/`.
+
+iPhone 17 Pro Max, iOS 27.2, a real town drive, 30 s asked (31 s, 930 frames, rate 37.6 ×):
+
+| Wait before each frame | Per frame (mean / p95 / max) | Whole export | First pass | Memory | Frames drawn while MapKit loaded | Seen |
+|---|---|---|---|---|---|---|
+| 16 ms (default) | 63 / 83 / 87 ms | 61.6 s | 3.0 s, no stop timed out | 487 MB | 6 | Complete: 3D buildings, street names, the driven line whole, the wheel, logo and Legal |
+| 4 ms | 51 / 67 / 72 ms | 49.9 s | 2.8 s | 497 MB | 14 | not inspected |
+| 0 ms | 41 / 63 / 70 ms | 40.9 s | 2.8 s | 493 MB | 0 | Wrong: the driven line broken behind the wheel, street names missing |
+
+So the wait is kept: without it MapKit has not laid out the labels or redrawn the line when the
+frame is taken. Heat: `nominal` to `fair` in the first clip.
+
+Open:
+
+- **Slower than the spike.** 63 ms a frame on the fastest iPhone, where Carodo Studio took 37 ms
+  on the iPhone 12 Pro Max. Not yet explained; candidates: Replay's screen and its own map alive
+  under the stage, the stage's window over the whole screen, the SwiftUI wheel, the casing and
+  way-ahead overlays. A 30 s clip takes 62 s here, twice the "under a minute for 60 s" target.
+- **The iPhone 12 Pro Max** has not run it: time per frame, memory and heat there, a 60 s clip.
+- **Very high rates.** On the simulator the 312 km drive asked for in 10 s (about 3,000 ×) drew
+  an empty grid: tiles cannot follow. 60 s of it is about 250 to 300 ×, not yet tried.
+- A test that waits on real time (`AtlasMapViewTests.testATapReleasesTheHoldAfterTheGrace`)
+  failed once in three full runs; it is not part of this work.
 
 Not in W4: highlights chips (R.2C), a 1:1 size, music, a 3D car model, web replay, the share card
 image (its own slice in `share.md`; W4b's frame should be designed so the card can reuse it).
