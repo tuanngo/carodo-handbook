@@ -500,10 +500,21 @@ as a fourth figure; moved by the owner the same day: columns 1 and 3 of the pict
 read ([`replay-video-address.png`](../design/mockups/replay/replay-video-address.png)). The pages
 of carodo.app are not built yet: needed before export leaves the Developer screen.
 
+**On the iPhone (iPhone 17 Pro Max, iOS 27.2, a real town drive, 32 s clip, 960 frames; the
+agent's shell could run `task device` this time).**
+
+| Run | Per frame | Wait | Draw (overlay of it) | Export | Memory | Heat |
+|---|---|---|---|---|---|---|
+| Overlay drawn whole in every frame | 40.2 ms | 12.1 ms | 27.4 ms (5.5 ms) | 41.7 s | | nominal |
+| Its fixed part drawn once (carodo-ios, `perf(replay): a video's fixed overlay is drawn once`) | 41.5 ms | 12.9 ms | 28.0 ms (3.8 ms) | 44.1 s | 468 MB | nominal |
+
+The overlay costs about 4 ms of a frame; a clip renders in about 1.4 times its length (1.15
+without the overlay, W4a, on another drive: not the same map). The two runs differ by less than
+one run varies. One of four runs failed with a `ReplayMovieError` whose case the note did not
+say (the note names it now); not reproduced, the phone's state at that moment unknown.
+
 Open:
 
-- A run on the iPhone (what the overlay
-  adds to a frame's 35 ms is not measured; on the simulator the export time did not move).
 - **Private regions are not cut from a video** (TD-25): only the zone at the two ends.
 - The arrival is where the zone begins, so the last frame can show a speed above 0: the car was
   moving there. Left as the fact it is.
