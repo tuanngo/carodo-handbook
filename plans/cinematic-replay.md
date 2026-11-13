@@ -492,6 +492,12 @@ build). `task lint`, `task warnings`, 2,040 tests pass; seven new in `ReplayVide
 (no fix inside the zone in the timeline, the drawn line or any moment; both sides of "something
 is left"; a stop inside the zone goes, one outside stays whole).
 
+**The address (owner, 2026-11-13; carodo-ios, the commit after 3d2f925):** `carodo.app` as text, not a
+QR code (a person watching on the phone that plays the video cannot scan it), and only over the
+arrival's hold: it fades in under the figures in 0.3 s. The hold is two seconds now, so it can be
+read ([`replay-video-address.png`](../design/mockups/replay/replay-video-address.png)). The pages
+of carodo.app are not built yet: needed before export leaves the Developer screen.
+
 Open:
 
 - A run on the iPhone (what the overlay
