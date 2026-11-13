@@ -150,6 +150,10 @@ plates. Not the speed profile strip in speed colours (D6 applies to it too).
   Copper 6 pt on a 10 pt casing; `CarodoMapLook`: Apple's map not muted in Light), ends as plain
   discs whatever the zone; the other size's map is taken right after the first card, so 9:16 ↔ 1:1
   is one drawing with no card shown without its map, and each new card fades in over the last.
+- Owner's addition (2026-11-13): an **Aa** tool opens Show on Card, a small dark sheet of switches
+  (Vehicle, Time, Average speed; `ShareCard.Fields`), for this card only and not remembered; the
+  distance, the day and the brand always stay. The block closes up around what is off; no new map
+  is taken.
 - QA: `-carodo.debugOpenShareCard YES`, `-carodo.debugShareCard simple,square,dark,whole`.
 - Checks: lint, a clean build with no warning, the whole test suite (27 new tests).
 
