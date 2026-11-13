@@ -312,12 +312,41 @@ Simulator, 300 frames of 1080 × 1920 (iPhone 18 Pro simulator; not the iPhone):
 | MapKit snapshotter (10 fps) | 170 to 190 ms | about 55 s at 30 fps | as above, route over the buildings |
 | ImmersiveMap | 130 to 145 ms | 39 to 43 s | OpenStreetMap: fewer buildings in Vietnam; relief and hillshade in Zermatt; no credit in the frame (must be added); the spike's camera mapping (zoom, bearing) is still off |
 
-Open: the iPhone 12 Pro Max run (blocked until Xcode is signed in to the developer account: the
-new bundle id needs a profile); whether `drawHierarchy` returns the map on the iPhone; for
-ImmersiveMap, who hosts the planet archive in production (the default is the maintainer's), its
+The iPhone run is below. Open for
+ImmersiveMap: who hosts the planet archive in production (the default is the maintainer's), its
 detail outside Europe, a moving wheel in the export, the camera mapping, and the dependency itself
 (P6, ADR 0015 names MKMapView). Both engines cover the world: MapKit by Apple, ImmersiveMap by
 OpenStreetMap.
+
+### W3 result on the iPhone (2026-11-13, iPhone 12 Pro Max, iOS 27.2)
+
+Carodo Studio rendered the made-up 10 s drive (300 frames, 1080 × 1920) in the four places, one
+after another, about nine minutes in all. `drawHierarchy` returns the map on the iPhone: no flat
+frame in the 20 sampled per clip, in any place.
+
+| Route | Per frame | 10 s clip takes | Peak memory | Seen in the frames |
+|---|---|---|---|---|
+| MapKit view | 37 to 38 ms (p95 40 to 43, max 76) in every place | 17.6 to 17.7 s, of which 6.4 s is the silent first pass for tiles | 423 to 763 MB (San Francisco the highest) | Apple's map: 3D buildings, places, the line under the buildings, the wheel, logo and Legal in frame |
+| MapKit snapshotter | 172 to 212 ms; 452 ms in San Francisco | 52 to 64 s at 30 fps (measured at 10 fps); 136 s in San Francisco | 418 to 820 MB | as above, the line over the buildings |
+| ImmersiveMap | 40 to 148 ms (Da Lat the least, San Francisco the most) | 12 to 45 s | 519 to 1,066 MB | OpenStreetMap: few buildings and no places in Vietnam; relief and hillshade in Zermatt, where MapKit's ground is flat; no wheel, no credit; the spike's camera still looks from farther and another bearing |
+
+Heat: `nominal` at the start, `fair` after the first clip, `serious` after about two minutes of
+rendering without a pause, and it stayed there. The MapKit view's time per frame did not change
+at `serious`.
+
+**Answer to W3: the MapKit view drawn per frame** (route (c)). It is the fastest and the steadiest
+on the weakest iPhone, it is the view Replay already draws, and it adds no dependency. The
+snapshotter is dropped. ImmersiveMap stays a later option for terrain only (its relief is the one
+thing MapKit did not show), not the W4 renderer: its open points are those listed above.
+
+Open for W4: a 60 s clip (memory, heat, and the render time against "under a minute": at 37 ms a
+frame, 60 s at 30 fps is about 67 s plus the first pass, so the frame rate, the 16 ms settle or
+the first pass must give); memory near 500 MB on a 6 GB iPhone, 763 MB in a dense city; what the
+export does when the iPhone is already `serious`; TD-2 before a video leaves the device.
+
+`run-device.sh` must be run from Terminal: an agent's shell is a background session and cannot use
+the signing key (`errSecInternalComponent`). Launching the app and pulling the results work from
+either. The clips are in `carodo-studio/results/`.
 
 ### Brief for the next session
 
