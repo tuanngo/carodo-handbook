@@ -168,6 +168,21 @@ No screen's memory grew over its run.
   display rule; the speed share bars keep exact values), or draw the detail map on `MKMapView`
   with one `MKMultiPolyline` per band (4 overlays), reusing `AtlasOverlays`. The latter is an ADR
   0015 amendment (owner).
+- **Done 2026-11-13** (carodo-ios `6947f81`, branch `perf/speed-overlays`, not yet in `main`).
+  Counted on 31 real drives (`SpeedOverlayCountReplayTests`, opt-in): median 42 overlays, city
+  drives 7–77, a 98 km drive 115, the 337 km drive 259; 13 of 31 over 50. Now one
+  `MKMultiPolyline` per band plus one for the stop-and-go dots: 2–4 on every drive. iPhone 12 Pro
+  Max, 337 km drive in Speed, Activity Monitor median:
+
+  | | Carodo CPU | backboardd CPU |
+  |---|---|---|
+  | Still, before → after | 0.1 % → 0.1 % | 5.5 % → 5.7 % |
+  | Panned and pinched by hand 38 s, before → after | 41.1 % → 38.1 % | 31.4 % → 27.0 % |
+
+  A modest gain: on `MKMapView` 259 overlays cost far less than ADR 0015's 708 SwiftUI ones;
+  panning is mostly tiles. One hand run each, so within noise of the gesture. Same look (owner
+  checked on the device). Open: Replay's Speed still adds one `ReplayLine` per band run (its
+  driven line animates per piece); apply the same rule once the Replay session's work lands.
 
 ### 7. Low — the expanded recording panel rebuilds its whole scroll view every second
 
