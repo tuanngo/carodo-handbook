@@ -62,7 +62,8 @@ In points, 360 wide; written at 3x: 1080 × 1920 (9:16, default) and 1080 × 108
 - **No map** (offline with nothing cached, or the snapshot fails): the same card on the plain
   ground. A card can always be made.
 - **Never:** a clock time, the journey's title, a place name or symbol written by Carodo, a stop, a
-  top speed.
+  top speed. A caption the person types is theirs (owner, 2026-11-13); it starts empty and is
+  never filled from the title, which names the drive's ends.
 
 ## The editor
 
@@ -154,6 +155,10 @@ plates. Not the speed profile strip in speed colours (D6 applies to it too).
   (Vehicle, Time, Average speed; `ShareCard.Fields`), for this card only and not remembered; the
   distance, the day and the brand always stay. The block closes up around what is off; no new map
   is taken.
+- Owner's addition (2026-11-13): a **Caption** field at the top of Show on Card (`Fields.caption`,
+  40 characters, no explaining note); one line over the distance, the block's text moving down to
+  make room, the stamp and the map staying. Drawn 350 ms after the last key, so typing does not
+  draw a card per key.
 - QA: `-carodo.debugOpenShareCard YES`, `-carodo.debugShareCard simple,square,dark,whole`.
 - Checks: lint, a clean build with no warning, the whole test suite (27 new tests).
 
