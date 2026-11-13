@@ -531,9 +531,15 @@ W4b, and its rules (no clock and no title in a frame; the privacy zone drawn on 
 
 **Decided (owner, 2026-11-13).**
 
-- **Two steps.** The editor decides what the video shows; Make Video opens a sheet that says what
-  will be made and asks the length (15 s · 30 s · 60 s, each with its rate; 30 s chosen), then
-  starts. Play in the editor runs at the length last chosen.
+- ~~Two steps~~ **One editor (owner, the same evening).** A sheet asking the length after the
+  preview made a clip faster than what had been seen, so the pace moved into the editor: a pill
+  beside the tools, a length (15 · 30 · 60 s, with its rate) or one of Replay's rates (5× · 15× ·
+  30× · 60× · 120×, with the length it gives); a length under 5× and a rate over a 3 min clip are
+  dimmed; a drive too short for 30 s at 5× opens on 15×. The preview plays at the pace; Make Video
+  starts at once. The board's sheet panel is superseded.
+- **Replay's map is Standard only; Overview and Follow are one control that cycles; the video's
+  top block sits 14 pt higher** (owner, 2026-11-13, after W4c-1 on the simulator).
+- **Trim (W4e) before Aa (W4c-2)** (owner, 2026-11-13).
 - **Three slices**, one screen, one commit each (below).
 - **The CARODO lockup and carodo.app at the end cannot be turned off.**
 - **Replay's header** takes one more round control (Share) for now; the header is tidied in its
