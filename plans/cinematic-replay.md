@@ -576,6 +576,31 @@ Open after W4c-1: TD-25 (private regions) and the carodo.app pages before export
 Developer screen; the iPhone 12 Pro Max run; a long drive at a high rate (reachable from this
 screen now).
 
+### W4c result (2026-11-13, carodo-ios 2d79687; owner: "tạm ổn", to polish)
+
+Built together, iterated with the owner the same evening: the editor (W4c-1) and the Trim (W4e),
+before Aa (W4c-2). As it stands (carodo-ios `docs/specs/replay.md`, The Export screen):
+
+- Replay's header: Share (Developer only); Replay's map Standard only; Overview and Follow one
+  camera control that cycles.
+- The editor: the preview is the stage and its overlay, playing as the clip will; tools: Light or
+  Dark (the video's route is Signature only), **Hide** (a word and a hand; a menu of the start and
+  the end, each Off · 300 m · 500 m · 1 km), and **a length or a speed, one of the two**, both
+  worked out first and only offered between 15× and 300× and for a clip of 6 s to a minute;
+  over 120× a line suggests the Trim, a drive too long or too short says so.
+- The Trim is Trim Journey's bar (`TrimBar`, shared, with its haptics): a part at least a minute
+  long, stopped at the zone, cut from what the zone leaves.
+- A video's stops and gaps are its own (owner: "they care for the road, not the pauses"): a stop
+  0.6 s under "Stopped 45 min", all stops a tenth of the clip at most; a tunnel at the video's
+  rate; the clock counts time on the move. On drive-data: a 311 km drive's stops 9 of 30 s →
+  4.8 of 60 s, its clock 5 h 37 → 4 h 08.
+- Make Video → progress, Cancel → the share sheet; backgrounded → "not finished", no file; a
+  screen's leftover clips go when the next opens.
+
+Open: PV-20 (device checks, the 300× ceiling), TD-25 (private regions), TD-27 (the editor now
+committed: adopt `ActivitySheet` and `CarodoLockup`), the owner's polish pass, then Aa (W4c-2) and
+W4d.
+
 ### W4d plan (drafted 2026-11-13, not approved; after W4c)
 
 A pure `RecapScript` in `Core/Replay`, made once before rendering: the map from the video's
