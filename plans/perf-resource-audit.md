@@ -357,12 +357,13 @@ Owner decisions needed: none for the multipolyline (a rendering detail, same loo
 
 | Item | Where it stands | Next step |
 |---|---|---|
+| Issue 6, speed overlays | Done 2026-11-13 (`6947f81`, merged `e147432`) | Replay's Speed: same rule after the Replay session lands |
 | Issue 4, Detail map memory | Fixed in code (`isOffScreen`), memory not re-measured | Xcode memory graph after Detail → Map tab on an iPhone: count live `MKMapView` |
 | Issue 7, recording panel | Open: the 1 s `TimelineView` in `RecordingPanels.swift` (~l.447) wraps the panel body | Scope it to the time rows; measure with issue 1's method |
 | Issue 8, Place editor | Open: `onMapCameraChange(.continuous)` writes the model per frame | Careful: the same handler detects the camera leaving the fallback frame; split that from the model write |
 | Issue 10, UI scroll test | `CarodoUITests` target approved 2026-11-06, not started | Scroll/hitch metrics on Journeys and Feed with `-carodo.sampleJournal 2000` |
 | TD-23 | DEBUG-opened Passport page pushes links under itself | With TD-14 (debug arguments in one place) |
 | Lessons inbox | 8 of ~10 entries ([`lessons-inbox.md`](lessons-inbox.md)) | Build L5 (`docs/solutions/`) at ~10 or before TestFlight |
-| Branches | `refactor/repo-split`, `perf/passport-routes` merged into carodo-ios `main` | Owner: delete when wanted |
+| Branches | Deleted 2026-11-13 (`refactor/repo-split`, `perf/passport-routes`, `perf/speed-overlays`, all merged) | Done |
 | VanSam iPhone | Restored 32 drives; `Documents/restore.carodo`, `restore29.carodo` left in the app container | Leave, or delete with the app; never copy them elsewhere (P5) |
 | Other sessions, uncommitted in carodo-ios `main` | L2 hot-phone GPS (waits for its device drive), Replay W2, `LaunchMark` staged | Theirs: never stage them; work in a worktree |
