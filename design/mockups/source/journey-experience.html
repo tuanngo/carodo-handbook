@@ -1,0 +1,708 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Journey Experience — Explore, Day and the Route Glyph</title>
+<style>
+  :root { --charcoal:#242321; --copper:#BD8053; --ivory:#F3EEE5; --stone:#77736D; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:#1a1917; color:var(--ivory); font-family:-apple-system,"SF Pro Text",system-ui,sans-serif; padding:44px 40px 60px; width:2200px; }
+  h1 { font-size:30px; margin:0 0 6px; font-weight:700; }
+  h2 { font-size:22px; margin:56px 0 6px; font-weight:650; }
+  p.lead { margin:0 0 18px; color:#b9b3a8; font-size:15px; max-width:1500px; line-height:1.45; }
+  .row { display:flex; gap:34px; align-items:flex-start; }
+  figure { margin:0; flex:none; }
+  figcaption { font-size:13.5px; color:#b9b3a8; margin-top:10px; line-height:1.45; width:393px; }
+  figcaption b { color:var(--ivory); font-weight:650; }
+  .notes { font-size:14.5px; color:#cfc9be; line-height:1.55; max-width:1500px; margin:22px 0 0; padding-left:20px; }
+  .notes b { color:var(--ivory); }
+
+  /* A phone, 393 points wide, drawn 1:1; a tall one is a whole scroll laid out. */
+  .phone { position:relative; width:393px; overflow:hidden; border-radius:44px; border:1px solid #3a3835; padding-bottom:110px; }
+  .phone.light { --bg:243,238,229; --elev:250,247,241; --card:255,252,247; --stroke:222,214,201; --text:36,35,33; --text2:119,115,109; --accent:150,94,54; --line:189,128,83; --well:36,35,33; }
+  .phone.dark  { --bg:36,35,33; --elev:46,44,41; --card:55,52,48; --stroke:78,74,68; --text:243,238,229; --text2:164,158,149; --accent:208,146,100; --line:212,146,94; --well:243,238,229; }
+  .phone { background:rgb(var(--bg)); color:rgb(var(--text)); }
+  .status { height:54px; padding:18px 34px 0; font-weight:650; font-size:16px; display:flex; justify-content:space-between; }
+  .status i { font-style:normal; font-size:12px; letter-spacing:1px; padding-top:2px; }
+  .head { display:flex; align-items:center; justify-content:space-between; padding:2px 16px 10px; }
+  .round { width:44px; height:44px; border-radius:50%; background:rgb(var(--elev)); border:.5px solid rgba(var(--stroke),.7); display:flex; align-items:center; justify-content:center; flex:none; }
+  .round svg { width:20px; height:20px; stroke:rgb(var(--text)); fill:none; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }
+  .stamp { border:1.5px solid rgb(var(--accent)); }
+  .stamp svg { stroke:rgb(var(--accent)); }
+  .seg { height:36px; width:228px; padding:2px; border-radius:10px; background:rgba(var(--text),.07); display:flex; }
+  .seg div { flex:1; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:14px; font-weight:600; }
+  .seg div.on { background:rgb(var(--card)); box-shadow:0 1px 3px rgba(0,0,0,.12); }
+  .content { padding:0 16px; }
+
+  /* Bottom: the floating bar and the Start Drive button. */
+  .bar { position:absolute; left:16px; right:16px; bottom:28px; display:flex; gap:12px; align-items:center; }
+  .tabs { flex:1; height:58px; border-radius:29px; background:rgba(var(--elev),.94); border:.5px solid rgba(var(--stroke),.8); box-shadow:0 6px 18px rgba(0,0,0,.10); display:flex; justify-content:space-around; align-items:center; font-size:10.5px; font-weight:600; color:rgb(var(--text2)); }
+  .tabs div { text-align:center; } .tabs div.on { color:rgb(var(--accent)); }
+  .tabs svg { display:block; margin:0 auto 2px; width:22px; height:22px; stroke:currentColor; fill:none; stroke-width:1.7; stroke-linejoin:round; stroke-linecap:round; }
+  .start { width:58px; height:58px; border-radius:50%; background:var(--copper); display:flex; align-items:center; justify-content:center; box-shadow:0 6px 18px rgba(0,0,0,.18); }
+  .start svg { width:24px; height:24px; fill:var(--charcoal); }
+
+  /* Explore */
+  .hero { margin:4px 0 26px; }
+  .hero .map { height:180px; border-radius:20px; overflow:hidden; position:relative; }
+  .hero .kick { display:flex; justify-content:space-between; margin:14px 2px 4px; font-size:12px; font-weight:700; letter-spacing:.6px; color:rgb(var(--accent)); }
+  .hero .kick span:last-child { color:rgb(var(--text2)); letter-spacing:0; font-weight:500; font-size:13px; }
+  .hero h3 { margin:0 2px 4px; font-size:22px; font-weight:700; letter-spacing:-.3px; }
+  .hero .figs { margin:0 2px; font-size:15px; color:rgb(var(--text2)); font-variant-numeric:tabular-nums; }
+  .hero .figs b { color:rgb(var(--text)); font-weight:600; }
+  .hero .car { margin:6px 2px 0; font-size:13.5px; color:rgb(var(--text2)); display:flex; gap:6px; align-items:center; }
+  .month { display:flex; align-items:baseline; justify-content:space-between; margin:6px 2px 2px; }
+  .month h4 { margin:0; font-size:24px; font-weight:700; letter-spacing:-.3px; } .month h4 span { color:rgb(var(--accent)); }
+  .month .menu { font-size:13px; color:rgb(var(--text2)); font-weight:500; }
+  .monthsub { margin:0 2px 8px; font-size:13.5px; color:rgb(var(--text2)); font-variant-numeric:tabular-nums; }
+  .dayh { display:flex; justify-content:space-between; align-items:baseline; margin:18px 2px 2px; font-size:13px; color:rgb(var(--text2)); }
+  .dayh b { color:rgb(var(--text)); font-weight:650; font-size:14.5px; }
+  .jrow { display:flex; gap:14px; align-items:center; padding:11px 0; position:relative; }
+  .jrow + .jrow::before, .jrow + .disc + .jrow::before { content:""; position:absolute; top:0; left:58px; right:0; height:.5px; background:rgba(var(--stroke),1); }
+  .well { width:44px; height:44px; border-radius:11px; background:rgba(var(--well),.045); flex:none; display:flex; }
+  .jrow .txt { flex:1; min-width:0; }
+  .jrow .t { font-size:16px; font-weight:600; display:flex; gap:5px; align-items:center; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .jrow .m { font-size:13.5px; color:rgb(var(--text2)); margin-top:2px; font-variant-numeric:tabular-nums; display:flex; justify-content:space-between; }
+  .jrow .m span:last-child { display:flex; align-items:center; gap:4px; }
+  .chev { width:8px; height:13px; stroke:rgba(var(--text2),.7); fill:none; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; flex:none; }
+  .ico { width:15px; height:15px; stroke:rgb(var(--accent)); fill:none; stroke-width:1.9; stroke-linecap:round; stroke-linejoin:round; flex:none; }
+  .src { width:13px; height:13px; stroke:rgb(var(--text2)); fill:none; stroke-width:1.7; stroke-linecap:round; stroke-linejoin:round; }
+  .badge { font-size:11px; font-weight:650; color:rgb(var(--accent)); border:1px solid rgba(var(--accent),.5); border-radius:6px; padding:1px 5px; margin-top:4px; display:inline-block; }
+  /* A discovery: the row it belongs to, raised by one line under it, never a card of its own. */
+  .disc { margin:-4px 0 6px 58px; display:flex; gap:8px; align-items:center; font-size:13px; font-weight:600; color:rgb(var(--accent)); }
+  .disc svg { width:16px; height:16px; stroke:rgb(var(--accent)); fill:none; stroke-width:1.8; stroke-linejoin:round; stroke-linecap:round; }
+  .disc span { color:rgb(var(--text2)); font-weight:500; }
+
+  /* Day */
+  .calh { display:flex; justify-content:space-between; align-items:center; margin:4px 2px 10px; }
+  .calh b { font-size:20px; font-weight:700; } .calh b span { color:rgb(var(--accent)); }
+  .calh .today { font-size:15px; color:rgb(var(--accent)); font-weight:600; }
+  .strip { display:flex; justify-content:space-between; margin:0 0 18px; }
+  .strip div { width:46px; height:66px; border-radius:14px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px; font-variant-numeric:tabular-nums; }
+  .strip small { font-size:11.5px; color:rgb(var(--text2)); font-weight:600; }
+  .strip b { font-size:18px; font-weight:600; }
+  .strip i { width:6px; height:6px; border-radius:3px; background:transparent; }
+  .strip i.l1 { background:rgba(var(--line),.4); } .strip i.l2 { background:rgba(var(--line),.65); } .strip i.l3 { background:rgb(var(--line)); }
+  .strip div.sel { background:rgba(var(--line),.13); box-shadow:inset 0 0 0 1px rgba(var(--line),.75); }
+  .totals { display:flex; gap:22px; margin:0 2px 18px; font-variant-numeric:tabular-nums; }
+  .totals div { font-size:12.5px; color:rgb(var(--text2)); }
+  .totals b { display:block; font-size:22px; font-weight:650; color:rgb(var(--text)); letter-spacing:-.3px; }
+  .totals b small { font-size:14px; font-weight:600; color:rgb(var(--text2)); margin-left:2px; }
+  .tl { position:relative; }
+  .trow { display:grid; grid-template-columns:48px 18px 1fr; column-gap:8px; padding:0 0 22px; }
+  .trow .time { text-align:right; font-variant-numeric:tabular-nums; font-size:15px; font-weight:650; color:rgb(var(--accent)); padding-top:2px; line-height:1.25; }
+  .trow .time small { display:block; font-size:13px; font-weight:500; color:rgb(var(--text2)); }
+  .trow .rail { position:relative; }
+  .trow .rail::before { content:""; position:absolute; left:8px; top:9px; width:7px; height:7px; border-radius:4px; background:rgb(var(--line)); margin-left:-3px; }
+  .trow .rail::after { content:""; position:absolute; left:8px; top:22px; bottom:-18px; width:1px; background:rgba(var(--text2),.28); }
+  .trow:last-child .rail::after { display:none; }
+  .trow .body { display:flex; gap:12px; align-items:flex-start; }
+  .trow .t { font-size:16px; font-weight:600; display:flex; gap:5px; align-items:center; }
+  .trow .m { font-size:13.5px; color:rgb(var(--text2)); margin-top:3px; font-variant-numeric:tabular-nums; }
+  .empty { text-align:center; padding:48px 20px 40px; }
+  .empty .disc0 { width:64px; height:64px; border-radius:32px; background:rgba(var(--line),.14); margin:0 auto 14px; display:flex; align-items:center; justify-content:center; }
+  .empty .disc0 svg { width:28px; height:28px; stroke:rgb(var(--accent)); fill:none; stroke-width:1.8; stroke-linecap:round; }
+  .empty b { display:block; font-size:18px; font-weight:650; margin-bottom:4px; } .empty span { color:rgb(var(--text2)); font-size:14.5px; }
+
+  /* Explore V3: open editorial timeline */
+  .latest { display:flex; gap:14px; align-items:center; padding:6px 2px 18px; border-bottom:.5px solid rgba(var(--stroke),1); margin-bottom:18px; }
+  .latest .txt { flex:1; min-width:0; }
+  .latest .k { display:flex; gap:7px; align-items:center; font-size:14px; font-weight:650; color:rgb(var(--accent)); margin-bottom:4px; }
+  .latest .k svg { width:18px; height:18px; stroke:rgb(var(--accent)); fill:none; stroke-width:1.8; stroke-linejoin:round; stroke-linecap:round; }
+  .latest h3 { margin:0; font-size:21px; font-weight:700; letter-spacing:-.3px; }
+  .latest .m { margin-top:3px; font-size:15px; color:rgb(var(--text2)); font-variant-numeric:tabular-nums; }
+  .monthline { display:flex; align-items:baseline; gap:10px; margin:4px 2px 12px; }
+  .monthline h4 { margin:0; font-size:26px; font-weight:700; letter-spacing:-.4px; } .monthline h4 span { color:rgb(var(--accent)); }
+  .monthline .km { font-size:16px; color:rgb(var(--text2)); font-variant-numeric:tabular-nums; flex:1; }
+  .monthline .menu { font-size:13px; color:rgb(var(--text2)); font-weight:500; }
+  .grp { position:relative; margin:0 0 22px 2px; }
+  .grp .gh { display:flex; justify-content:space-between; align-items:baseline; font-size:13.5px; color:rgb(var(--text2)); margin-bottom:6px; }
+  .grp .gh b { color:rgb(var(--text)); font-weight:650; font-size:15px; }
+  .erow { display:flex; gap:14px; align-items:center; padding:7px 0; }
+  .erow .well { width:56px; height:56px; border-radius:14px; }
+  .erow.bleed { position:relative; } .erow.bleed .txt { position:relative; } .erow .bart { position:absolute; right:-16px; top:-6px; pointer-events:none; }
+  .erow .txt { flex:1; min-width:0; }
+  .erow .t { font-size:16.5px; font-weight:600; display:flex; gap:6px; align-items:center; }
+  .erow .m { font-size:14px; color:rgb(var(--text2)); margin-top:3px; font-variant-numeric:tabular-nums; display:flex; align-items:center; gap:5px; }
+  .story { position:relative; margin:4px 2px 26px; padding:4px 0 0; min-height:150px; }
+  .story .art { position:absolute; right:-6px; top:-4px; opacity:.9; }
+  .story .k { display:flex; gap:7px; align-items:center; font-size:14px; font-weight:650; color:rgb(var(--accent)); }
+  .story .k svg { width:18px; height:18px; stroke:rgb(var(--accent)); fill:none; stroke-width:1.8; stroke-linejoin:round; stroke-linecap:round; }
+  .story h3 { position:relative; margin:6px 0 4px; font-size:21px; font-weight:700; letter-spacing:-.3px; max-width:250px; line-height:1.2; }
+  .story .m { position:relative; font-size:14.5px; color:rgb(var(--text2)); max-width:230px; line-height:1.35; font-variant-numeric:tabular-nums; }
+  .story .go { position:relative; margin-top:10px; font-size:15.5px; font-weight:600; color:rgb(var(--accent)); }
+  .big .erow .t { font-size:23px; line-height:1.18; } .big .erow .m { font-size:20px; flex-wrap:wrap; }
+  .big .grp .gh { font-size:18px; } .big .grp .gh b { font-size:20px; } .big .monthline h4 { font-size:32px; } .big .monthline .km { font-size:20px; }
+  .big .latest h3 { font-size:28px; } .big .latest .m { font-size:20px; } .big .latest .k { font-size:19px; } .big .erow { align-items:flex-start; }
+
+  /* Day V3: a compact timeline (the dot and a hairline rail at the edge) */
+  .ctl .c { position:relative; padding:0 0 18px 24px; display:flex; align-items:flex-start; gap:12px; }
+  .ctl .c::before { content:""; position:absolute; left:2px; top:5px; width:9px; height:9px; border-radius:5px; background:rgb(var(--line)); }
+  .ctl .c::after { content:""; position:absolute; left:6px; top:20px; bottom:2px; width:1px; background:rgba(var(--text2),.28); }
+  .ctl .c:last-child::after { display:none; }
+  .ctl .txt { flex:1; }
+  .ctl .tr { font-size:15.5px; font-weight:600; color:rgb(var(--accent)); font-variant-numeric:tabular-nums; }
+  .ctl .t { font-size:17px; font-weight:650; margin-top:5px; display:flex; gap:6px; align-items:center; }
+  .ctl .m { font-size:14.5px; color:rgb(var(--text2)); margin-top:4px; font-variant-numeric:tabular-nums; }
+  .ctl .chev { margin-top:4px; }
+  .ctl .gl { align-self:center; }
+
+  /* A featured journey: Latest drive, a one-drive day, a journey worth remembering (one component) */
+  .feat { position:relative; min-height:178px; margin:2px 0 20px; padding:8px 2px 0; }
+  .feat .art { position:absolute; right:-16px; top:-6px; pointer-events:none; }
+  .feat .fmap { position:absolute; left:-16px; right:-16px; top:-10px; bottom:-6px; pointer-events:none; opacity:.5;
+    -webkit-mask-image:radial-gradient(ellipse 52% 72% at 80% 48%, #000 30%, transparent 100%); mask-image:radial-gradient(ellipse 52% 72% at 80% 48%, #000 30%, transparent 100%); }
+  .phone.dark .feat .fmap { opacity:.6; }
+  .feat .k { position:relative; display:flex; gap:7px; align-items:center; font-size:14px; font-weight:650; color:rgb(var(--accent)); }
+  .feat .k svg { width:18px; height:18px; stroke:rgb(var(--accent)); fill:none; stroke-width:1.8; stroke-linejoin:round; stroke-linecap:round; }
+  .feat .k span { color:rgb(var(--text2)); font-weight:500; }
+  .feat h3 { position:relative; margin:6px 0 4px; font-size:22px; font-weight:700; letter-spacing:-.3px; max-width:215px; line-height:1.2; }
+  .feat .m { position:relative; font-size:15px; color:rgb(var(--text2)); max-width:215px; line-height:1.4; font-variant-numeric:tabular-nums; }
+  .feat .m b { color:rgb(var(--text)); font-weight:600; }
+  .feat .go { position:relative; margin-top:10px; font-size:15.5px; font-weight:600; color:rgb(var(--accent)); }
+  .feat.rule { border-bottom:.5px solid rgba(var(--stroke),1); padding-bottom:16px; }
+  .ctl { position:relative; }
+  .ctl .dayart { position:absolute; right:-16px; top:-8px; pointer-events:none; }
+  .ctl .c { position:relative; }
+
+  /* Row variants */
+  .rv { width:393px; padding:18px 16px 8px; border-radius:24px; flex:none; }
+  .rv h5 { margin:0 0 2px; font-size:14px; color:#F3EEE5; font-weight:650; }
+  .rvlab { width:393px; } .rvlab > b { display:block; font-size:15px; color:#F3EEE5; margin-bottom:4px; } .rvlab > span { font-size:13px; color:#b9b3a8; line-height:1.45; display:block; margin-bottom:12px; }
+  .vr { display:flex; align-items:center; gap:12px; padding:9px 0; }
+  .vr .tm { width:44px; flex:none; font-size:15px; font-weight:600; font-variant-numeric:tabular-nums; color:rgb(var(--text)); align-self:flex-start; padding-top:2px; }
+  .vr .tm small { display:block; font-size:12px; font-weight:500; color:rgb(var(--text2)); }
+  .vr .txt { flex:1; min-width:0; }
+  .vr .t { font-size:16.5px; font-weight:600; display:flex; gap:6px; align-items:center; }
+  .vr .m { font-size:14px; color:rgb(var(--text2)); margin-top:3px; font-variant-numeric:tabular-nums; display:flex; gap:6px; align-items:center; }
+  .vr .km { text-align:right; font-variant-numeric:tabular-nums; flex:none; }
+  .vr .km b { display:block; font-size:19px; font-weight:650; letter-spacing:-.3px; } .vr .km small { font-size:12.5px; color:rgb(var(--text2)); }
+  .vr .medal { display:inline-flex; gap:3px; align-items:center; color:rgb(var(--accent)); font-weight:600; font-size:13px; }
+  .vr .medal svg { width:14px; height:14px; stroke:rgb(var(--accent)); fill:none; stroke-width:1.9; }
+  .vh { display:flex; justify-content:space-between; align-items:baseline; font-size:13.5px; color:rgb(var(--text2)); margin:12px 0 4px; }
+  .vh b { color:rgb(var(--text)); font-weight:650; font-size:15px; }
+  .vr.combo { padding:12px 0; gap:10px; }
+  .vr.combo .t { font-size:16px; } .vr.combo .km b { font-size:17px; } .vr.combo .km { width:42px; }
+  .vr.combo .tm { color:rgb(var(--text2)); font-weight:600; }
+  .big .vr.combo { flex-wrap:wrap; } .big .vr.combo .t { font-size:22px; } .big .vr.combo .m { font-size:19px; } .big .vr.combo .tm { font-size:19px; width:58px; }
+  .big .vr.combo .km b { font-size:22px; } .big .vh { font-size:18px; } .big .vh b { font-size:20px; }
+  .vr.combo { position:relative; } .vr.combo .free { position:absolute; right:48px; top:50%; margin-top:-36px; pointer-events:none; }
+  .vr.combo .txt { position:relative; } .vr.combo .km { position:relative; } .vr.free-row .txt { padding-right:64px; }
+  .vsep { height:.5px; background:rgba(var(--stroke),1); margin-left:56px; }
+
+  /* Large text (xxxLarge) */
+  .big .jrow .t { font-size:23px; white-space:normal; line-height:1.18; }
+  .big .jrow .m { font-size:20px; flex-direction:column; gap:1px; }
+  .big .dayh { font-size:18px; } .big .dayh b { font-size:20px; }
+  .big .month h4 { font-size:32px; } .big .monthsub { font-size:19px; }
+  .big .jrow { align-items:flex-start; } .big .jrow .chev { margin-top:8px; }
+
+  /* Glyph sheet */
+  .sheetgrid { display:grid; grid-template-columns:repeat(6, 1fr); gap:18px; max-width:1500px; }
+  .gcell { background:#242321; border:1px solid #3a3835; border-radius:16px; padding:16px; }
+  .gcell.l { background:#F3EEE5; color:#242321; border-color:#ded6c9; }
+  .gcell .pair { display:flex; gap:16px; align-items:flex-end; margin-bottom:12px; }
+  .gcell b { font-size:14px; font-weight:650; display:block; margin-bottom:3px; }
+  .gcell span { font-size:12.5px; color:#b9b3a8; line-height:1.4; display:block; }
+  .gcell.l span { color:#77736D; }
+  table.fam { border-collapse:collapse; width:1500px; font-size:14px; margin-top:18px; }
+  table.fam th, table.fam td { text-align:left; vertical-align:top; padding:12px 14px; border-bottom:1px solid #3a3835; line-height:1.45; }
+  table.fam th { color:#b9b3a8; font-weight:600; font-size:13px; }
+  table.fam td:first-child { width:220px; }
+  table.fam td b { font-weight:650; }
+  .famvis { display:flex; gap:18px; margin-top:18px; }
+  .famvis figure { background:#F3EEE5; border-radius:16px; padding:14px; width:360px; color:#242321; }
+  .famvis figcaption { color:#77736D; width:auto; }
+  .famvis figcaption b { color:#242321; }
+</style>
+</head>
+<body>
+<h1>Journey Experience — Explore, Day and the Route Glyph</h1>
+<p class="lead">Mockup for <b>plans/journey-experience.md</b> milestone 02 (owner decisions D12–D20, 2026-11-14). Every route here is synthetic, made by
+  the script at the bottom of this file; every glyph is drawn from that geometry by the rule the plan sets (north up, aspect kept with cos-latitude, a
+  minimum span, fixed padding, parts kept apart, ends marked). The map behind the Latest drive is a stand-in for the Apple Maps image the app already draws.</p>
+
+<h2>Explore — open editorial timeline (V5, owner comments 2026-11-14)</h2>
+<p class="lead">No card for a journey, none around a day, and no rule beside the day (owner: one thing too many): journeys sit on the Ivory page, ranked by
+  type, route and space. <b>Latest drive</b> (sentence case) is the featured block shared with a one-drive Day and "A journey worth remembering", now over a <b>faded map</b>
+  (owner, 2026-11-14): the muted Apple Maps snapshot the app already draws, at about half strength, fading out toward the text and the edges, the route on top.
+  The map here is a stand-in. Offline with no tiles, the block is the same without it. The row's
+  route is compared in three drawings, all on the real shape with a start ring and an end dot: <b>A</b> the crisp polyline in a well, <b>B</b> the Feed's
+  drawing (soft curve, faint ribbon, thin core) in the same well, <b>C</b> the Feed's layout too: no well, the route at the trailing edge fading toward the text.</p>
+<div class="row">
+  <figure><div class="phone light" id="exploreA"></div>
+    <figcaption><b>A — crisp polyline.</b> Exact corners; reads as a diagram.</figcaption></figure>
+  <figure><div class="phone light" id="exploreLight"></div>
+    <figcaption><b>B — Feed drawing in the well</b> (recommended). Softer and of one family with the featured block and Day, still a clear shape with its ends.</figcaption></figure>
+  <figure><div class="phone dark" id="exploreDark"></div>
+    <figcaption><b>B, Dark.</b></figcaption></figure>
+  <figure><div class="phone light" id="exploreC"></div>
+    <figcaption><b>C — Feed layout.</b> Most like the Feed; the shapes run behind the chevrons and compete with the featured blocks above and below.</figcaption></figure>
+  <figure><div class="phone light big" id="exploreBig"></div>
+    <figcaption><b>B at xxxLarge.</b> The route keeps 56 pt; titles and figures wrap.</figcaption></figure>
+</div>
+<ul class="notes">
+  <li><b>Left out of the owner's sketch on purpose:</b> the large "Explore — Where have I been?" title and subtitle (AGENTS.md UI: no large titles, no
+    decorative section titles; the picker already names the screen) and the mountain illustrations (content first: Carodo draws only what was recorded).
+    Either can come back by an owner decision; both would be a change to the design rules, not to this screen.</li>
+  <li><b>The journey block's words</b> come from data only (provinces, days, drives, distance), never a sentence a model invented
+    ("From the coast to the highlands" needs geographic evidence: concept rule 7).</li>
+</ul>
+
+<h2>Explore rows — four ways to make them less alike (V7)</h2>
+<p class="lead">The same two days in four row designs. What makes V5 read as a table: every row opens with the same tile, every route fills its tile whatever
+  its length, and the row ends in a chevron, so the eye sees a grid of identical boxes. Each variant changes one or two of those.</p>
+<div class="row" id="rowVariants"></div>
+<h2 style="margin-top:34px">2 + 3 combined (owner, 2026-11-14)</h2>
+<p class="lead">Time column on the left (secondary ink: the anchor, not the accent), title with its place symbol, driving time (and a milestone) under it, the
+  route sized by distance, and the distance as the trailing figure, always there. The day header adds the day's kilometres. Rows breathe more (12 pt), since a day
+  holds few drives. Every row reads left to right: <i>when · where · how long · what shape · how far</i>.</p>
+<div class="row" id="rowCombo"></div>
+<h2 style="margin-top:34px">2 + 3, unboxed route (V9, owner 2026-11-14)</h2>
+<p class="lead">No frame for any journey, not even an invisible square: each route is drawn in its own proportions (a tall road trip stays tall, a wide
+  commute wide), sized by distance, anchored just before the kilometres, free to spill above and below its row into the space between rows, and faded out toward
+  the title with the Feed's mask, so it never sits under a word at full strength.</p>
+<div class="row" id="rowFree"></div>
+<ul class="notes" id="rowNotes"></ul>
+
+<h2>Day — two cases (V4, owner 2026-11-14)</h2>
+<p class="lead"><b>Several drives:</b> the compact timeline (dot and hairline rail at the edge; time range in Copper, title, distance · driving time) over
+  one frame that draws <b>every route of the day together</b>, on their real geography (home, school and back meet where they really meet), behind the rows
+  from the first to the last. <b>One drive:</b> the same featured block as Latest drive and "A journey worth remembering": its time range, title, figures and its
+  route drawn large. Route art in both is drawn the Feed's way (a soft curve, a faint ribbon under a thin core, fading toward the text) but on the real shape,
+  north up, with its ends: the Feed's <i>style</i>, never the Feed's <i>shape</i> (D21). The real map stays in Journey Detail.</p>
+<div class="row">
+  <figure><div class="phone light" id="dayBusy"></div>
+    <figcaption><b>Several drives.</b> The day's three routes in one frame, fading out before the titles; nothing is drawn over a line of text.</figcaption></figure>
+  <figure><div class="phone light" id="dayOne"></div>
+    <figcaption><b>One drive</b> (Light): the featured block, the road trip's two parts around its GPS gap.</figcaption></figure>
+  <figure><div class="phone dark" id="dayGlyph"></div>
+    <figcaption><b>One drive</b> (Dark).</figcaption></figure>
+  <figure><div class="phone light" id="dayEmpty"></div>
+    <figcaption><b>No drives</b>: the whole calendar, then the existing light empty state.</figcaption></figure>
+  <figure><div class="phone dark" id="dayDark"></div>
+    <figcaption><b>Several drives</b> (Dark).</figcaption></figure>
+</div>
+
+<h2>The Route Glyph — rules and edge cases</h2>
+<p class="lead">Each cell is the glyph at 44 pt (rows) and 56 pt, on Light and Dark. Start: a hollow ring. End: a filled Copper dot. No place symbol in a list glyph
+  (owner, 2026-11-14: too small); the title carries the place. A loop's ends meet: one combined mark. A very short drive is drawn at a minimum span of 300 m, so a car-park shuffle
+  stays small in the middle. No route at all: a quiet dash, never a made-up line.</p>
+<div class="sheetgrid" id="glyphSheet"></div>
+
+<h2>One route family, three audiences — should Feed and share card share the concept?</h2>
+<p class="lead">Recommendation: <b>one visual family, three separate concepts</b>. They may share drawing code (stroke, caps, the end-mark vocabulary, one
+  projection and fitting step) but never their geometry rules, because each answers to a different audience and privacy rule.</p>
+<div class="famvis" id="family"></div>
+<table class="fam">
+  <tr><th>Rendering</th><th>Who sees it</th><th>Geometry</th><th>Marks</th><th>Proposal</th></tr>
+  <tr><td><b>Route Glyph</b><br>(Explore, Day; new)</td><td>the person only, on their own screens</td>
+    <td>real display route, north up, aspect kept, minimum span, parts apart</td><td>start ring, end dot</td>
+    <td>New, milestone 02. Never leaves the device: no Feed, no link, no notification, no widget shared with others.</td></tr>
+  <tr><td><b>Feed shape</b><br>(<code>DriveShape</code>, ADR 0007)</td><td>other people</td>
+    <td>ends cut (privacy zone, 300 m, Home/Work), turned on its own axis, mirrored and tilted by seed, 48–64 points: cannot be laid on a map</td><td>none, by rule</td>
+    <td><b>Keep apart.</b> Merging it with the glyph would put north and real ends back into what others see. Share only the stroke helpers (<code>RouteCurve</code>).
+      The glyph's start ring / end dot must never be added to it.</td></tr>
+  <tr><td><b>Share card</b><br>(map image)</td><td>whoever the person sends it to</td>
+    <td>real route, privacy-trimmed, on a muted Apple map</td><td>disc ends, no flag</td>
+    <td><b>Keep its map as the default.</b> Its plain-ground fallback (offline) should use the glyph's projection and fitting, so one rule decides how a route
+      fits a box. <b>Option (owner):</b> a third card style, <i>Line</i>, the trimmed route on paper with no map: it also sidesteps Apple's map terms for images used
+      outside the app (TD-2). Never a saved place's symbol or name on a card: "Home" is a place, and a card leaves the device.</td></tr>
+  <tr><td><b>Signature route</b><br>(maps)</td><td>the person</td><td>the route on a real map</td><td>RouteEndMarker</td>
+    <td>Unchanged: Latest drive (snapshot), Journey Detail, Replay, Trim.</td></tr>
+</table>
+<ul class="notes">
+  <li><b>Shared code, one rule each:</b> a single <i>route fitting</i> step (cos-latitude projection, minimum span, padding, parts) used by the glyph and the share
+    card's plain ground; <code>RouteCurve</code> stays the soft curve for Feed and card; the glyph is a polyline with round joins (honest at 44 pt, where a curve
+    would smooth away a real corner).</li>
+  <li><b>Same end vocabulary:</b> the glyph's ring and dot are the small sizes of <code>RouteEndMarker</code> (design-system "Map markers — one source"), not new marks.</li>
+  <li><b>Privacy line:</b> anything that leaves the device takes the trim (<code>PrivacyZone</code>, private regions) and loses place meaning; the glyph is exempt only
+    because it never leaves.</li>
+</ul>
+
+<script>
+// ---------- Synthetic routes (seeded; nothing here is a real drive) ----------
+function rng(seed){ let s = seed>>>0; return () => { s = (s*1664525 + 1013904223)>>>0; return s/4294967296; }; }
+const LAT0 = 10.78, LON0 = 106.70, M = 1/111320;
+function walk(seed, steps, stepM, turn, snap, start=[LAT0,LON0], heading0){
+  const r = rng(seed); let [lat,lon] = start; let h = heading0 ?? r()*Math.PI*2; const base = h; const pts=[[lat,lon]]; let since=0;
+  for (let i=0;i<steps;i++){
+    if (snap){ since++; if (since>3 && r()<turn){ const c=[-1,0,1,1,-1][Math.floor(r()*5)]; h = base + c*Math.PI/2*0.92; since=0; } h += (r()-.5)*0.05; }
+    else h += (r()-.5)*turn;
+    lat += Math.cos(h)*stepM*M; lon += Math.sin(h)*stepM*M/Math.cos(lat*Math.PI/180); pts.push([lat,lon]);
+  }
+  return pts;
+}
+function loop(seed, steps, stepM){ // out and back by another way: bend the walk round to the start
+  const out = walk(seed, steps, stepM, .25, true); const s = out[0], e = out[out.length-1]; const r = rng(seed+7); const back=[];
+  const n = Math.round(steps*.8); for (let i=1;i<=n;i++){ const t=i/n; const bulge=Math.sin(t*Math.PI)*0.004;
+    back.push([e[0]+(s[0]-e[0])*t + bulge + (r()-.5)*.0003, e[1]+(s[1]-e[1])*t - bulge*.6 + (r()-.5)*.0003]); }
+  return out.concat(back);
+}
+// Routes drawn by hand in metres (x east, y north), then densified, a road trip smoothed (Chaikin), a little GPS noise added.
+function road(wp, opts={}){
+  let q = wp.map(([x,y])=>[x,y]);
+  for (let k=0;k<(opts.smooth??0);k++){ const o=[q[0]]; for(let i=0;i<q.length-1;i++){ const [a,b]=[q[i],q[i+1]];
+    o.push([a[0]*.75+b[0]*.25,a[1]*.75+b[1]*.25],[a[0]*.25+b[0]*.75,a[1]*.25+b[1]*.75]); } o.push(q[q.length-1]); q=o; }
+  const r = rng(opts.seed??3), out=[]; const noise=opts.noise??6;
+  for (let i=0;i<q.length-1;i++){ const [a,b]=[q[i],q[i+1]]; const n=Math.max(2,Math.round(Math.hypot(b[0]-a[0],b[1]-a[1])/(opts.step??60)));
+    for (let j=0;j<n;j++){ const t=j/n; out.push([a[0]+(b[0]-a[0])*t+(r()-.5)*noise, a[1]+(b[1]-a[1])*t+(r()-.5)*noise]); } }
+  out.push(q[q.length-1]);
+  return out.map(([x,y])=>[LAT0+y*M, LON0+x*M/Math.cos(LAT0*Math.PI/180)]);
+}
+const R = {
+  commute: road([[0,0],[0,900],[1400,1100],[2500,2500],[4200,2900],[5500,4700],[7400,5100],[8000,6700],[9200,6900]]),
+  school: road([[0,0],[650,0],[750,900],[1700,1250],[2050,2300],[2900,2400]], {step:30, noise:3}),
+  schoolBack: road([[2900,2400],[2950,1500],[1950,1050],[1500,350],[600,-150],[0,0]], {step:30, noise:3}),
+  loop: road([[0,0],[2000,1200],[4800,1400],[6800,3600],[6100,6200],[3500,7000],[1200,5300],[-300,2600],[150,250]], {smooth:2, step:80}),
+  errand: road([[0,0],[0,650],[850,700],[900,1500],[1550,1550]], {step:30, noise:3}),
+  city2: road([[0,0],[-900,300],[-1200,1500],[-2500,1700],[-2600,900]], {step:40}),
+  tiny: road([[0,0],[20,15],[35,8],[42,30],[58,40]], {step:5, noise:1}),
+  roadtrip: road([[0,0],[20000,25000],[45000,38000],[70000,52000],[92000,90000],[110000,118000],[126000,150000],[118000,182000],[136000,205000]], {smooth:3, step:1500, noise:200}),
+  coast: road([[0,0],[-8000,15000],[-4000,30000],[-15000,46000],[-11000,62000],[-25000,80000],[-19000,100000]], {smooth:3, step:800, noise:80}),
+  straight: road([[0,0],[30000,25000]], {step:1500, noise:150}),
+};
+// A road trip with a GPS gap: two parts, the jump in the middle of nowhere (about 90 km without fixes).
+R.gappy = [R.roadtrip.slice(0, Math.round(R.roadtrip.length*.38)), R.roadtrip.slice(Math.round(R.roadtrip.length*.70))];
+const PARTS = r => Array.isArray(r[0][0]) ? r : [r];
+
+// ---------- The Route Glyph rule ----------
+function dp(p, eps){ if (p.length<3) return p; let i0=0, dmax=0; const [a,b]=[p[0],p[p.length-1]];
+  for (let i=1;i<p.length-1;i++){ const d=segd(p[i],a,b); if(d>dmax){dmax=d;i0=i;} }
+  return dmax>eps ? dp(p.slice(0,i0+1),eps).slice(0,-1).concat(dp(p.slice(i0),eps)) : [a,b]; }
+function segd(p,a,b){ const dx=b[0]-a[0], dy=b[1]-a[1]; const L=dx*dx+dy*dy; let t=L?((p[0]-a[0])*dx+(p[1]-a[1])*dy)/L:0; t=Math.max(0,Math.min(1,t));
+  return Math.hypot(p[0]-a[0]-t*dx, p[1]-a[1]-t*dy); }
+function glyph(route, size, opts={}){
+  const parts = route ? PARTS(route) : [];
+  const all = parts.flat();
+  if (all.length < 2) return {parts:[], none:true};
+  const latc = all.reduce((s,p)=>s+p[0],0)/all.length, k = Math.cos(latc*Math.PI/180);
+  const proj = p => [p[1]*k/M, -p[0]/M]; // metres, x east, y down
+  let xs = all.map(p=>proj(p)[0]), ys = all.map(p=>proj(p)[1]);
+  let minX=Math.min(...xs), maxX=Math.max(...xs), minY=Math.min(...ys), maxY=Math.max(...ys);
+  const MIN=300; const cx=(minX+maxX)/2, cy=(minY+maxY)/2;
+  const span=Math.max(maxX-minX, maxY-minY, MIN);
+  const pad = size*0.16, inner=size-2*pad, sc=inner/span;
+  const fit = p => { const q=proj(p); return [size/2+(q[0]-cx)*sc, size/2+(q[1]-cy)*sc]; };
+  const out = parts.map(pt => dp(pt.map(fit), size/90));
+  const s = out[0][0], last=out[out.length-1], e = last[last.length-1];
+  const loop = Math.hypot(s[0]-e[0], s[1]-e[1]) < size*0.09;
+  return {parts:out, start:s, end:e, loop};
+}
+const ICON = {
+  home:'<path d="M-3.2 0.2 0-2.6 3.2 0.2M-2.2-.6v3h4.4v-3"/>',
+  work:'<rect x="-3" y="-1.6" width="6" height="4.2" rx=".8"/><path d="M-1.2-1.6v-1h2.4v1"/>',
+  school:'<path d="M-3.4-.6 0-2.2 3.4-.6 0 1z"/><path d="M-1.9.2v1.4c1.2.9 2.6.9 3.8 0V.2"/>',
+  star:'<path d="M0-3 .9-.9 3.1-.9 1.4.5 2 2.7 0 1.4-2 2.7-1.4.5-3.1-.9-.9-.9z"/>',
+};
+function glyphSVG(route, size, place, dark){
+  const g = glyph(route, size); const line = dark ? '#D4925E' : '#BD8053'; const ring = dark ? '#242321' : '#FFFCF7';
+  let s = `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">`;
+  if (g.none) return s + `<line x1="${size*.38}" y1="${size/2}" x2="${size*.62}" y2="${size/2}" stroke="${dark?'#A49E95':'#77736D'}" stroke-opacity=".55" stroke-width="2" stroke-linecap="round"/></svg>`;
+  const w = size>=56 ? 2.4 : 2;
+  for (const p of g.parts) s += `<polyline points="${p.map(q=>q.map(v=>v.toFixed(1)).join(',')).join(' ')}" fill="none" stroke="${line}" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round"/>`;
+  const r = size>=56 ? 3.4 : 3;
+  if (place){
+    const pr = size>=56 ? 8 : 7; const [x,y] = g.end;
+    s += `<g transform="translate(${x.toFixed(1)},${y.toFixed(1)})"><circle r="${pr+1.2}" fill="${ring}"/><circle r="${pr}" fill="${line}"/>`+
+         `<g transform="scale(${pr/4.6})" fill="none" stroke="${ring}" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round">${ICON[place]}</g></g>`;
+    if (!g.loop) s += `<circle cx="${g.start[0]}" cy="${g.start[1]}" r="${r}" fill="${ring}" stroke="${line}" stroke-width="1.6"/>`;
+  } else if (g.loop){
+    s += `<circle cx="${g.end[0]}" cy="${g.end[1]}" r="${r+1.6}" fill="${ring}" stroke="${line}" stroke-width="1.6"/><circle cx="${g.end[0]}" cy="${g.end[1]}" r="${r-1}" fill="${line}"/>`;
+  } else {
+    s += `<circle cx="${g.start[0]}" cy="${g.start[1]}" r="${r}" fill="${ring}" stroke="${line}" stroke-width="1.6"/>`;
+    s += `<circle cx="${g.end[0]}" cy="${g.end[1]}" r="${r+.4}" fill="${line}" stroke="${ring}" stroke-width="1.2"/>`;
+  }
+  return s + '</svg>';
+}
+
+// ---------- Pieces of the screens ----------
+const SVGI = {
+  stamp:'<circle cx="12" cy="12" r="7"/><path d="M8.5 13.5 12 8l3.5 5.5"/>',
+  plus:'<path d="M12 6v12M6 12h12"/>',
+  map:'<path d="M3 6l6-2 6 2 6-2v14l-6 2-6-2-6 2z"/><path d="M9 4v14M15 6v14"/>',
+  journeys:'<path d="M5 19c3-1 3-6 6-7s4 3 7 1"/><circle cx="5" cy="19" r="1.6"/><circle cx="18" cy="13" r="1.6"/>',
+  feed:'<rect x="4" y="4" width="16" height="16" rx="3"/><path d="M8 9h8M8 13h5"/>',
+  auto:'<path d="M3 7a5 5 0 0 1 9-1M11 1v5H6"/><path d="M11 7a5 5 0 0 1-9 1"/>',
+  car:'<path d="M3 12l1.6-4.2A2 2 0 0 1 6.5 6.5h7a2 2 0 0 1 1.9 1.3L17 12v3H3z"/><circle cx="6.5" cy="15" r="1.4"/><circle cx="13.5" cy="15" r="1.4"/>',
+  medal:'<circle cx="12" cy="14" r="5"/><path d="M9 3l3 6 3-6"/>',
+  clock:'<circle cx="12" cy="12" r="8"/><path d="M12 8v4.5l3 2"/>',
+  pin:'<path d="M12 21s-6-5.5-6-10a6 6 0 0 1 12 0c0 4.5-6 10-6 10z"/><circle cx="12" cy="11" r="2"/>',
+  road:'<path d="M8 4 5 20M16 4l3 16M12 5v2M12 11v2M12 17v2"/>',
+};
+const ico = (k, cls='ico', vb='0 0 24 24') => `<svg class="${cls}" viewBox="${vb}">${SVGI[k]}</svg>`;
+const placeIco = k => `<svg class="ico" viewBox="-4.5 -4.5 9 9" style="stroke-width:1">${ICON[k]}</svg>`;
+const chev = '<svg class="chev" viewBox="0 0 8 13"><path d="M1.5 1.5 6.5 6.5 1.5 11.5"/></svg>';
+const status = '<div class="status"><span>9:41</span><i>●●● ◐ ▮</i></div>';
+const head = mode => `<div class="head"><div class="round stamp"><svg viewBox="0 0 24 24">${SVGI.stamp}</svg></div>
+  <div class="seg"><div class="${mode==='e'?'on':''}">Explore</div><div class="${mode==='d'?'on':''}">Day</div></div>
+  <div class="round"><svg viewBox="0 0 24 24">${SVGI.plus}</svg></div></div>`;
+const bar = `<div class="bar"><div class="tabs"><div>${'<svg viewBox="0 0 24 24">'+SVGI.map+'</svg>'}Map</div><div class="on"><svg viewBox="0 0 24 24">${SVGI.journeys}</svg>Journeys</div><div><svg viewBox="0 0 24 24">${SVGI.feed}</svg>Feed</div></div>
+  <div class="start"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div></div>`;
+
+function row(j, dark){
+  return `<div class="jrow"><div class="well">${glyphSVG(R[j.r], 44, j.place, dark)}</div>
+    <div class="txt"><div class="t">${j.from?placeIco(j.from):''}${j.title}</div>
+    <div class="m"><span>${j.figs}</span><span>${j.auto?ico('auto','src'):''}${j.time}</span></div>${j.badge?`<span class="badge">${j.badge}</span>`:''}</div>${chev}</div>`
+    + (j.disc ? `<div class="disc">${ico(j.disc.icon,'')}${j.disc.text}${j.disc.sub?` <span>· ${j.disc.sub}</span>`:''}</div>` : '');
+}
+function heroMap(dark){
+  const W=361,H=180; const r = rng(5); const bg = dark?'#2E2C29':'#ECE6DA', st = dark?'#3B3835':'#FBF8F2', wa = dark?'#26303A':'#D6E0E4';
+  let s = `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}"><rect width="${W}" height="${H}" fill="${bg}"/>`;
+  s += `<path d="M-10 150 C 60 120 120 175 200 150 S 320 120 380 140 L380 200 L-10 200z" fill="${wa}"/>`;
+  for (let i=0;i<16;i++){ const x=r()*W, y=r()*H; s+=`<path d="M${x-200} ${y+(r()-.5)*60} L${x+200} ${y+(r()-.5)*60}" stroke="${st}" stroke-width="${1+r()*3}"/>`; }
+  const g = glyph(R.coast, 260); const dx=(W-260)/2, dy=(H-260)/2;
+  const pts = g.parts[0].map(([x,y])=>`${(x+dx).toFixed(1)},${(y*0.62+dy+50).toFixed(1)}`).join(' ');
+  const line = dark?'#D4925E':'#BD8053', cas = dark?'#242321':'#FFFCF7';
+  s += `<polyline points="${pts}" fill="none" stroke="${cas}" stroke-width="7" stroke-linejoin="round" stroke-linecap="round"/><polyline points="${pts}" fill="none" stroke="${line}" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>`;
+  const p = pts.split(' '), a=p[0].split(','), b=p[p.length-1].split(',');
+  s += `<circle cx="${a[0]}" cy="${a[1]}" r="5" fill="${cas}" stroke="${line}" stroke-width="2.4"/><circle cx="${b[0]}" cy="${b[1]}" r="6" fill="${line}" stroke="${cas}" stroke-width="2"/>`;
+  return s + '</svg>';
+}
+const today = [
+  {r:'commute', from:'home', title:'Home → Work', figs:'12.8 km · 26 min', time:'08:12', auto:true},
+  {r:'errand', title:'Midday drive', figs:'4.1 km · 14 min', time:'12:30'},
+];
+const yesterday = [
+  {r:'school', from:'home', title:'Home → School', figs:'5.2 km · 17 min', time:'07:21', auto:true},
+  {r:'schoolBack', from:'school', title:'School → Home', figs:'5.4 km · 21 min', time:'07:48', auto:true},
+  {r:'loop', title:'P. Tân Phong Loop', figs:'30.1 km · 52 min', time:'20:14', disc:{icon:'medal', text:'Road Miles · 1,000 km', sub:'milestone'}},
+];
+const older = [
+  {day:'Tue · 11 Nov', sum:'1 drive · 0.3 km', rows:[{r:'tiny', title:'Night drive', figs:'0.3 km · 3 min', time:'22:40'}]},
+  {day:'Sat · 8 Nov', sum:'2 drives · 309 km', rows:[
+    {r:'gappy', from:'home', title:'Home → TP. Đà Lạt', figs:'302 km · 6 h 40 min', time:'05:30', disc:null},
+    {r:'city2', title:'Afternoon drive', figs:'7.2 km · 31 min', time:'15:05', badge:'Needs a look'}]},
+];
+function explore(dark){
+  let c = status + head('e') + '<div class="content">';
+  c += feature({routes:[R.coast], icon:'car', kick:'Latest drive', kick2:'Today', title:'TP. Vũng Tàu → Home', meta:'17:40 · <b>112 km</b> · 2 h 12 min', rule:true}, dark);
+  c += `<div class="monthline"><h4>November <span>2026</span></h4><span class="km">412 km</span><span class="menu">All ⌄</span></div>`;
+  c += group('Today · 14 Nov', '3 drives', today, dark);
+  c += group('Yesterday · 13 Nov', '3 drives', yesterday, dark);
+  const back = R.roadtrip.slice().reverse().map(([la,lo],i)=>[la-.02*Math.sin(i/9), lo+.25+.05*Math.sin(i/14)]);
+  c += feature({routes:[R.roadtrip, back], tones:[1,.6], icon:'pin', kick:'A journey worth remembering', title:'To Lâm Đồng and back', meta:'3 days · 4 drives · 642 km<br>First time in Lâm Đồng', go:'View the journey ›'}, dark);
+  for (const d of older) c += group(d.day, d.sum.split(' · ')[0], d.rows, dark);
+  return c + '</div>' + bar;
+}
+function exploreBig(){
+  let c = status + head('e') + '<div class="content">';
+  c += `<div class="latest"><div class="txt"><div class="k">${ico('car','')}Latest drive</div><h3>TP. Vũng Tàu → Home</h3>
+    <div class="m">Today · 17:40 · 112 km · 2 h 12 min</div></div></div>`;
+  c += `<div class="monthline"><h4>November <span>2026</span></h4><span class="km">412 km</span></div>`;
+  c += group('Yesterday · 13 Nov', '', yesterday, false);
+  return c + '</div>' + bar;
+}
+const STRIP = [['Sat',8,'l3'],['Sun',9,''],['Mon',10,'l1'],['Tue',11,'l1'],['Wed',12,''],['Thu',13,'l2'],['Fri',14,'l3']];
+function strip(sel){ return '<div class="strip">' + STRIP.map(([w,n,l])=>`<div class="${n===sel?'sel':''}"><small>${w}</small><b>${n}</b><i class="${l}"></i></div>`).join('') + '</div>'; }
+let ROWSTYLE = 'soft'; let ROWFREE_ = 0; var ROUTEFREE = false;
+function erow(j, dark){
+  const g = ROWSTYLE === 'crisp' ? `<div class="well">${glyphSVG(R[j.r], 56, null, dark)}</div>`
+    : ROWSTYLE === 'soft' ? `<div class="well">${softArt([R[j.r]], 56, 56, dark, {cls:'g', pad:10, ribbon:6, core:1.8, ends:true, fadeTo:0.001, small:true})}</div>`
+    : '';
+  const art = ROWSTYLE === 'bleed' ? softArt([R[j.r]], 150, 72, dark, {cls:'bart', pad:12, ribbon:8, core:1.8, ends:true, fadeTo:.6, anchorRight:true}) : '';
+  return `<div class="erow ${ROWSTYLE==='bleed'?'bleed':''}">${art}${g}
+    <div class="txt"><div class="t">${j.from?placeIco(j.from):''}${j.title}</div>
+    <div class="m">${j.auto?ico('auto','src'):''}${j.time} · ${j.figs}</div>${j.badge?`<span class="badge">${j.badge}</span>`:''}</div>${chev}</div>`
+    + (j.disc ? `<div class="disc" style="margin-left:70px">${ico(j.disc.icon,'')}${j.disc.text}${j.disc.sub?` <span>· ${j.disc.sub}</span>`:''}</div>` : '');
+}
+function group(day, sum, rows, dark){
+  const [d, date] = day.split(' · ');
+  return `<div class="grp"><div class="gh"><span><b>${d}</b> · ${date}</span><span>${sum}</span></div>${rows.map(j=>erow(j,dark)).join('')}</div>`;
+}
+function storyArt(dark){ // the trip's own drives in one frame: data, not an illustration
+  const back = R.roadtrip.slice().reverse().map(([la,lo],i)=>[la-.02*Math.sin(i/9), lo+.25+.05*Math.sin(i/14)]);
+  return glyphSVG([R.roadtrip, back], 150, null, dark).replace('<svg ', '<svg class="art" style="opacity:.6" ');
+}
+// The Feed's drawing (a curve through the points, a faint ribbon under a thin core, fading toward
+// the text) on the drive's REAL geometry, north up: the Feed's style, never the Feed's shape.
+let artId = 0;
+function softArt(routes, w, h, dark, o={}){
+  const all = routes.flatMap(r => PARTS(r)).flat();
+  const latc = all.reduce((a,p)=>a+p[0],0)/all.length, k = Math.cos(latc*Math.PI/180);
+  const proj = p => [p[1]*k/M, -p[0]/M];
+  const xs = all.map(p=>proj(p)[0]), ys = all.map(p=>proj(p)[1]);
+  const [x0,x1,y0,y1] = [Math.min(...xs),Math.max(...xs),Math.min(...ys),Math.max(...ys)];
+  const pad = o.pad ?? 22, sc = Math.min((w-2*pad)/Math.max(x1-x0,300), (h-2*pad)/Math.max(y1-y0,300));
+  const cx=(x0+x1)/2, cy=(y0+y1)/2, ox = o.anchorRight ? w-pad-(x1-x0)*sc/2 : w/2;
+  const fit = p => { const q=proj(p); return [ox+(q[0]-cx)*sc, h/2+(q[1]-cy)*sc]; };
+  const curve = pts => { let d=`M${pts[0][0].toFixed(1)} ${pts[0][1].toFixed(1)}`;
+    for (let i=0;i<pts.length-1;i++){ const p0=pts[Math.max(i-1,0)], p1=pts[i], p2=pts[i+1], p3=pts[Math.min(i+2,pts.length-1)];
+      d+=` C${(p1[0]+(p2[0]-p0[0])/6).toFixed(1)} ${(p1[1]+(p2[1]-p0[1])/6).toFixed(1)} ${(p2[0]-(p3[0]-p1[0])/6).toFixed(1)} ${(p2[1]-(p3[1]-p1[1])/6).toFixed(1)} ${p2[0].toFixed(1)} ${p2[1].toFixed(1)}`; }
+    return d; };
+  const line = dark ? '#D4925E' : '#BD8053', ground = dark ? '#242321' : '#F3EEE5', id = 'fade'+(artId++);
+  let svg = `<svg class="${o.cls||'art'}" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}"><defs><linearGradient id="${id}" x1="0" x2="1">
+    <stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset="${o.fadeTo ?? .45}" stop-color="#fff" stop-opacity="1"/><stop offset="1" stop-color="#fff" stop-opacity="1"/></linearGradient>
+    <mask id="m${id}"><rect width="${w}" height="${h}" fill="url(#${id})"/></mask></defs><g mask="url(#m${id})">`;
+  routes.forEach((r, i) => {
+    const op = o.tones ? o.tones[i] : 1;
+    for (const part of PARTS(r)) { const pts = dp(part.map(fit), Math.max(w,h)/220); const d = curve(pts);
+      svg += `<path d="${d}" fill="none" stroke="${line}" stroke-opacity="${.16*op}" stroke-width="${o.ribbon ?? 12}" stroke-linecap="round" stroke-linejoin="round"/>`;
+      svg += `<path d="${d}" fill="none" stroke="${ground}" stroke-opacity=".55" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>`;
+      svg += `<path d="${d}" fill="none" stroke="${line}" stroke-opacity="${.9*op}" stroke-width="${o.core ?? 2.2}" stroke-linecap="round" stroke-linejoin="round"/>`; }
+    if (o.ends) { const ps = PARTS(r); const a = fit(ps[0][0]), z = fit(ps[ps.length-1].slice(-1)[0]);
+      const r1 = o.small ? 2.6 : 3.6, r2 = o.small ? 3 : 4;
+      svg += `<circle cx="${a[0]}" cy="${a[1]}" r="${r1}" fill="${ground}" stroke="${line}" stroke-width="1.5" opacity="${op}"/><circle cx="${z[0]}" cy="${z[1]}" r="${r2}" fill="${line}" stroke="${ground}" stroke-width="1.2" opacity="${op}"/>`; }
+  });
+  return svg + '</g></svg>';
+}
+// A stand-in for the muted Apple Maps snapshot the app would draw under the route (JourneyMapSnapshotService, its muted style).
+let mapSeed = 100;
+function fadedMap(dark){
+  const W=393, H=212, r=rng(mapSeed++);
+  const land = dark?'#2F2D2A':'#E9E2D4', road = dark?'#45413C':'#FFFDF8', minor = dark?'#3A3733':'#F6F1E7', water = dark?'#29333B':'#D2DDE0', park = dark?'#2E352B':'#DCE2CC';
+  let g = `<svg class="fmap" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none"><rect width="${W}" height="${H}" fill="${land}"/>`;
+  g += `<path d="M${W*.55} ${H} C ${W*.62} ${H*.7} ${W*.9} ${H*.75} ${W} ${H*.55} L${W} ${H}z" fill="${water}"/>`;
+  for (let i=0;i<4;i++){ const x=W*(.35+r()*.55), y=H*r(); g+=`<rect x="${x}" y="${y}" width="${24+r()*40}" height="${16+r()*30}" rx="6" fill="${park}"/>`; }
+  for (let i=0;i<22;i++){ const x=W*(.25+r()*.75); g+=`<path d="M${x} 0 L${x+(r()-.5)*40} ${H}" stroke="${minor}" stroke-width="${1+r()*1.5}"/>`; }
+  for (let i=0;i<14;i++){ const y=H*r(); g+=`<path d="M${W*.2} ${y} L${W} ${y+(r()-.5)*30}" stroke="${minor}" stroke-width="${1+r()*1.5}"/>`; }
+  for (let i=0;i<3;i++){ const y=H*r(); g+=`<path d="M${W*.15} ${y} C ${W*.45} ${y+(r()-.5)*90} ${W*.7} ${y+(r()-.5)*90} ${W} ${y+(r()-.5)*60}" fill="none" stroke="${road}" stroke-width="${3.5+r()*2}"/>`; }
+  return g + '</svg>';
+}
+let FEATURE_MAP = true;
+function feature(f, dark){
+  return `<div class="feat ${f.rule?'rule':''}">${FEATURE_MAP?fadedMap(dark):''}${softArt(f.routes, 250, 196, dark, {ends:true, tones:f.tones})}
+    <div class="k">${ico(f.icon,'')}${f.kick}${f.kick2?` <span>· ${f.kick2}</span>`:''}</div><h3>${f.title}</h3><div class="m">${f.meta}</div>${f.go?`<div class="go">${f.go}</div>`:''}</div>`;
+}
+function ctl(t, dark, withGlyph){
+  return `<div class="c"><div class="txt"><div class="tr">${t.s} – ${t.e}</div><div class="t">${t.from?placeIco(t.from):''}${t.title}</div><div class="m">${t.figs}</div></div>`
+    + (withGlyph ? `<div class="gl">${glyphSVG(R[t.r], 40, null, dark)}</div>` : '') + chev + `</div>`;
+}
+function trow(t, dark){
+  return `<div class="trow"><div class="time">${t.s}<small>${t.e}</small></div><div class="rail"></div>
+    <div class="body"><div class="well">${glyphSVG(R[t.r],44,t.place,dark)}</div><div style="flex:1"><div class="t">${t.from?placeIco(t.from):''}${t.title}</div>
+    <div class="m">${t.figs}</div></div>${chev}</div></div>`;
+}
+R.school2 = road([[0,0],[0,1250],[1450,1350],[1650,2050],[2900,2400]], {step:30, noise:3, seed:9});
+const busy = [
+  {s:'07:21', e:'07:38', r:'school', from:'home', title:'Home → School', figs:'5.2 km · 15 min'},
+  {s:'15:39', e:'15:48', r:'school2', from:'home', title:'To school', figs:'3.8 km · 8 min'},
+  {s:'16:05', e:'16:16', r:'schoolBack', from:'school', title:'School → Home', figs:'4.4 km · 11 min'},
+];
+function day(sel, rows, dark, totals, showToday=true, withGlyph=false){
+  let c = status + head('d') + '<div class="content">';
+  c += `<div class="calh"><b>November <span>2026</span> ⌄</b>${showToday?'<span class="today">Today</span>':''}</div>` + strip(sel);
+  if (!rows.length) {
+    c += `<div class="empty"><div class="disc0"><svg viewBox="0 0 24 24">${SVGI.road}</svg></div><b>A quiet day on the road.</b><span>No drives recorded.</span></div>`;
+  } else {
+    c += `<div class="totals">${totals.map(([v,u,l])=>`<div><b>${v}<small>${u}</small></b>${l}</div>`).join('')}</div>`;
+    if (rows.length === 1) {
+      const t = rows[0];
+      c += feature({routes:[R[t.r]], icon:'clock', kick:`${t.s} – ${t.e}`, title:t.title, meta:t.figs, go:'Open the journey ›'}, dark);
+    } else {
+      const art = withGlyph ? softArt(rows.map(t=>R[t.r]), 210, rows.length*78+10, dark, {cls:'dayart', ends:true, fadeTo:.5, pad:18}) : '';
+      c += '<div class="ctl">' + art + rows.map(t=>ctl(t,dark,false)).join('') + '</div>';
+    }
+  }
+  return c + '</div>' + bar;
+}
+ROWSTYLE='crisp'; document.getElementById('exploreA').innerHTML = explore(false);
+ROWSTYLE='soft'; document.getElementById('exploreLight').innerHTML = explore(false);
+document.getElementById('exploreDark').innerHTML = explore(true);
+ROWSTYLE='bleed'; document.getElementById('exploreC').innerHTML = explore(false);
+ROWSTYLE='soft'; document.getElementById('exploreBig').innerHTML = exploreBig();
+const T4 = [['13.4',' km','GPS distance'],['3',' ','drives'],['34',' min','driving']];
+document.getElementById('dayBusy').innerHTML = day(13, busy, false, T4, true, true);
+document.getElementById('dayOne').innerHTML = day(8, [{s:'05:30', e:'13:02<span style="font-size:11px"> </span>', r:'gappy', from:'home', title:'Home → TP. Đà Lạt', figs:'302 km · 6 h 40 min'}], false,
+  [['302',' km','GPS distance'],['1',' ','drive'],['6 h 40',' min','driving']]);
+document.getElementById('dayGlyph').innerHTML = day(8, [{s:'05:30', e:'13:02', r:'gappy', from:'home', title:'Home → TP. Đà Lạt', figs:'302 km · 6 h 40 min'}], true,
+  [['302',' km','GPS distance'],['1',' ','drive'],['6 h 40',' min','driving']]);
+document.getElementById('dayEmpty').innerHTML = day(12, [], false, []);
+document.getElementById('dayDark').innerHTML = day(13, busy, true, T4, true, true);
+
+// ---------- Row variants ----------
+const KM = {commute:12.8, errand:4.1, school:5.2, schoolBack:5.4, loop:30.1, gappy:302, city2:7.2, tiny:0.3};
+// Route size by length: a gentle log scale (1 km ≈ 40 %, 100 km+ = 100 % of the box), so a short errand reads small.
+const sizeFor = km => Math.max(.4, Math.min(1, .4 + .6*Math.log10(Math.max(km,1))/2));
+function routeArt(r, size, dark, scaled){
+  const s = scaled ? sizeFor(KM[r]) : 1; const pad = 5 + (1-s)*(size/2-6);
+  return softArt([R[r]], size, size, dark, {cls:'g', pad, ribbon:6, core:1.8, ends:true, fadeTo:0.001, small:true});
+}
+// Unboxed: the route has no frame of its own. Its own aspect, sized by distance, hugging the distance figure, spilling
+// above and below its row into the space between rows, and fading out toward the text (the Feed's mask).
+function freeArt(r, dark){
+  const s = sizeFor(KM[r]); const pad = 5 + (1-s)*22;
+  return softArt([R[r]], 112, 72, dark, {cls:'free', pad, ribbon:8, core:1.8, ends:true, fadeTo:.55, anchorRight:true, small:true});
+}
+const medal = `<span class="medal"><svg viewBox="0 0 24 24">${SVGI.medal}</svg>1,000 km</span>`;
+function variant(kind, dark){
+  const days = kind==='combo' ? [['Today','14 Nov','3 drives · 128.9 km',today],['Yesterday','13 Nov','3 drives · 40.7 km',yesterday],['Sat','8 Nov','2 drives · 309 km',older[1].rows]]
+    : [['Today','14 Nov','3 drives',today],['Yesterday','13 Nov','3 drives',yesterday]];
+  let h = '';
+  for (const [d, date, n, rows] of days){
+    h += `<div class="vh"><span><b>${d}</b> · ${date}</span><span>${kind==='log'?'':n}</span></div>`;
+    rows.forEach((j, i) => {
+      const [km, dur] = j.figs.split(' · ');
+      const title = `<div class="t">${j.from?placeIco(j.from):''}${j.title}</div>`;
+      const ms = j.disc ? ' · ' + medal : '';
+      if (kind==='now') h += `<div class="vr"><div class="well" style="width:56px;height:56px;border-radius:14px">${routeArt(j.r,56,dark,false)}</div><div class="txt">${title}<div class="m">${j.time} · ${j.figs}${ms}</div></div>${chev}</div>`;
+      if (kind==='bare') h += `<div class="vr">${routeArt(j.r,44,dark,false)}<div class="txt">${title}<div class="m">${j.time} · ${j.figs}${ms}</div></div></div>`;
+      if (kind==='time') h += `<div class="vr"><div class="tm">${j.time}</div><div class="txt">${title}<div class="m">${j.figs}${ms}</div></div>${routeArt(j.r,46,dark,true)}</div>`;
+      if (kind==='log') h += `<div class="vr">${routeArt(j.r,44,dark,true)}<div class="txt">${title}<div class="m">${j.time} · ${dur}${ms}</div></div><div class="km"><b>${km.replace(' km','')}</b><small>km</small></div></div>`;
+      if (kind==='combo') h += `<div class="vr combo" style="${ROUTEFREE?'padding:14px 0':''}"><div class="tm">${j.time}</div><div class="txt">${title}<div class="m">${dur}${ms}</div>${j.badge?`<span class="badge">${j.badge}</span>`:''}</div>${ROUTEFREE ? freeArt(j.r,dark) : routeArt(j.r,44,dark,true)}<div class="km"><b>${km.replace(' km','')}</b><small>km</small></div></div>`;
+      if (i < rows.length-1 && kind!=='now' && !(kind==='combo' && ROUTEFREE)) h += `<div class="vsep" style="${kind==='time'?'margin-left:56px':''}"></div>`;
+    });
+  }
+  return h;
+}
+const VARIANTS = [
+  ['now','V5 — today', 'Tile, route filling it, chevron. Clean, but five identical tiles in a column read as a table.'],
+  ['bare','1 · Bare route', 'No tile and no chevron (the whole row is the tap target, as in Feed). The route alone, 44 pt. Lightest; the column of shapes still lines up.'],
+  ['time','2 · Journal time column (recommended)', 'The start time leads in its own column, like a diary; title and distance · duration; the route moves to the trailing edge, bare, and its size follows the distance (a 4 km errand small, a 30 km loop full). Explore stops looking like Day or a table: time anchors, shape decorates.'],
+  ['log','3 · Logbook', 'Route leads (scaled by distance), distance is the figure at the trailing edge. Strong for scanning kilometres; closer to a fitness log.'],
+];
+document.getElementById('rowVariants').innerHTML = VARIANTS.map(([k,t,d]) =>
+  `<div class="rvlab"><b>${t}</b><span>${d}</span><div class="phone light rv">${variant(k,false)}</div></div>`).join('');
+ROUTEFREE = true;
+document.getElementById('rowFree').innerHTML =
+  `<div class="rvlab"><b>Unboxed — Light</b><span>The same rows; each route keeps its own proportions and size, spills into the space between rows and fades toward the title.</span><div class="phone light rv">${variant('combo',false)}</div></div>` +
+  `<div class="rvlab"><b>Unboxed — Dark</b><span>&nbsp;</span><div class="phone dark rv">${variant('combo',true)}</div></div>`;
+ROUTEFREE = false;
+document.getElementById('rowCombo').innerHTML =
+  `<div class="rvlab"><b>2 + 3 — Light</b><span>Three days, including a 302 km road trip and a pending drive.</span><div class="phone light rv">${variant('combo',false)}</div></div>` +
+  `<div class="rvlab"><b>2 + 3 — Dark</b><span>&nbsp;</span><div class="phone dark rv">${variant('combo',true)}</div></div>` +
+  `<div class="rvlab"><b>2 + 3 — xxxLarge</b><span>The row wraps: time, then title and figures; route and km stay on the trailing edge of the first line.</span><div class="phone light rv big">${variant('combo',false)}</div></div>`;
+document.getElementById('rowNotes').innerHTML = `
+  <li><b>Route size by distance</b> (2, 3): a gentle log scale, 1 km at 40 % of the box and 100 km or more at full size, so length shows before it is read;
+    the shape is still the real one.</li>
+  <li><b>The milestone</b> joins the figures line ("· medal 1,000 km") instead of a line of its own: still the only Copper on the row.</li>
+  <li><b>The recording-source symbol</b> leaves the row (it stays on the detail): one less mark that few people read.</li>
+  <li><b>No chevron</b> in 1–3: the row is tappable as a whole (Feed works this way); VoiceOver keeps the button trait and "Opens the journey" hint.</li>`;
+
+// ---------- Glyph sheet ----------
+const CASES = [
+  ['commute', null, 'City commute', 'A 13 km city drive, simplified for its size: a few dozen points.'],
+  ['errand', null, 'Errand', 'A short city drive with right-angle turns.'],
+  ['roadtrip', null, 'Long road trip', '250 km; aspect kept, the long side fills the box less the padding.'],
+  ['straight', null, 'Nearly straight', 'A highway: a short diagonal with its ends; never stretched to a square.'],
+  ['loop', null, 'Loop', 'Ends within 9 % of the box: one combined mark.'],
+  ['city2', null, 'Across town', 'Back-and-forth streets stay readable at 44 pt.'],
+  ['gappy', null, 'GPS gap / jump', 'Two parts, two strokes; never a straight line across the gap.'],
+  ['tiny', null, 'Very short (60 m)', 'Drawn at the 300 m minimum span: a small mark in the middle.'],
+  ['school', null, 'Home → School', 'Short city drive.'],
+  ['schoolBack', null, 'School → Home', 'Nearly mirrored: the title (with its place symbol) tells them apart.'],
+  ['coast', null, 'Winding road', 'Curves kept: polyline with round joins.'],
+  [null, null, 'No route', 'Under 2 points or 50 m: a quiet dash, never a made-up line.'],
+];
+document.getElementById('glyphSheet').innerHTML = CASES.map(([r,p,t,d],i)=>{
+  const light = i%2===0; const route = r ? R[r] : null;
+  return `<div class="gcell ${light?'l':''}"><div class="pair">${glyphSVG(route,44,p,!light)}${glyphSVG(route,56,p,!light)}</div><b>${t}</b><span>${d}</span></div>`;
+}).join('');
+
+// ---------- Family ----------
+function feedShape(){ // the Feed's idea: no north, ends cut, turned and smoothed; drawn faint behind text
+  const g = glyph(R.coast.slice(6,-6), 300); const p = g.parts[0];
+  const ang = 0.35; const c=150; const rot = p.map(([x,y])=>[c+(x-c)*Math.cos(ang)-(y-c)*Math.sin(ang), c+(x-c)*Math.sin(ang)+(y-c)*Math.cos(ang)]);
+  const d = 'M'+rot.map(q=>q.map(v=>v.toFixed(1)).join(' ')).join(' L');
+  return `<svg width="330" height="150" viewBox="0 40 330 220"><defs><linearGradient id="fade" x1="0" x2="1"><stop offset="0" stop-color="#77736D" stop-opacity="0"/><stop offset=".4" stop-color="#77736D" stop-opacity=".45"/><stop offset="1" stop-color="#77736D" stop-opacity=".95"/></linearGradient></defs>
+    <path d="${d}" fill="none" stroke="url(#fade)" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" opacity=".35"/><path d="${d}" fill="none" stroke="url(#fade)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+}
+document.getElementById('family').innerHTML =
+  `<figure><div style="display:flex;gap:14px;align-items:center">${glyphSVG(R.commute,56,null,false)}<div><b style="font-size:15px">Home → Work</b><div style="font-size:13px;color:#77736D">12.8 km · 26 min</div></div></div>
+    <figcaption><b>Route Glyph</b> (own screens): real shape, north up, real ends, place symbol.</figcaption></figure>
+   <figure>${feedShape()}<figcaption><b>Feed shape</b> (others): the same drive with its ends cut, turned and tilted, no marks; it cannot be laid on a map.</figcaption></figure>
+   <figure><div style="height:150px;border-radius:12px;background:#F8F4EC;box-shadow:inset 0 0 0 1px #ded6c9;display:flex;align-items:center;justify-content:center">${glyphSVG(R.commute.slice(10,-10),130,null,false)}</div>
+    <figcaption><b>Share card, Line style</b> (option): the trimmed route on paper, no map, no place symbol.</figcaption></figure>`;
+</script>
+</body>
+</html>

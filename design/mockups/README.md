@@ -29,6 +29,7 @@ These boards are retained as explorations; their presence does not establish app
 - [Garage showcase concept](garage/garage-showcase.png)
 - [Vehicle editor concept](garage/vehicle-editor.png)
 - [Journey experience concept](journeys/journey-experience.png)
+- [Journey Experience V2: Explore, Day, Route Glyph](journeys/journey-experience-v2.png) (2026-11-14, `plans/journey-experience.md`; source `source/journey-experience.html`)
 - [Journeys overview](journeys/journeys-overview.png)
 - [Along the Way route variations](journeys/along-the-way-route-variations.png)
 - [Four-province exploration concept](journeys/regions-explored-four-provinces.png)
