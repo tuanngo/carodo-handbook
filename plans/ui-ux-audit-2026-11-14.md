@@ -290,6 +290,39 @@ Checked and by design: "Auto Mode", "Auto finish" and "Driving Passport" stay En
   own dimming) and the floating bar's translucency over the satellite map. Lint, warnings (none),
   2,195 tests pass.
 
+### Next session: steps 13–15 (brief)
+
+Owner, 2026-11-14: a new session takes the rest of the second pass. Read Findings A8–A9, Order of
+work (second pass) and Done (second pass) first; the code is carodo-ios `1313cf1` or later.
+
+```text
+Step 13 (A8 flow faults), one at a time, each checked on a simulator of the session's own:
+  - "Share to Feed?" card: the whole card takes the tap, not only its text; start/end place rows
+    get a 44 pt target.
+  - Edit vehicle: Save reachable above the keyboard (or in the bar); Cancel after a change asks
+    to discard.
+  - Archive a car: one dialog, one wording, from Edit and from the card's ⋯ (OWNER picks the
+    wording and whether it is a sheet or a confirmation).
+  - The ⋯ menu says "Add reading" when the car has none (as the card does).
+  - An archived car with no drives: no "0,0 km" (unknown is not zero).
+  - Place editor without a location: a camera on the journal's drives instead of an endless
+    "Determining Location".
+  - Export: a line saying the ends are hidden when the length differs from the drive (OWNER
+    approves the copy, English and Vietnamese).
+  - Passport: a backdrop under the status bar and its floating buttons when scrolled.
+  - Backup: the Settings surface, not system grey. Auto Mode sheet: the car icon not system blue.
+Step 14: hand A9 (Feed identity) and the Feed VoiceOver items (reactions as bare emoji, the
+  avatar's "Feed identity", Join's ".,") to the Feed session.
+Step 15: the car-log sheets (fuel, odometer, expense, "Log for your car") out of MainTabView into
+  one modifier of their own.
+Method notes: the device-interaction hierarchy lists children of combined elements and hidden
+  ones: trust only an element's own label; confirm exposure in the source. Set text size with
+  `xcrun simctl ui <sim> content_size extra-extra-extra-large` (the launch argument is capped
+  away). Colour or visual taste: before/after images opened locally in Preview. Commit by path
+  (`git commit -- <paths>`): other sessions share the tree.
+Simulators kept for this: "Carodo A11y QA" C24D62C2…, "Carodo A11y QA 2" 2F921BB6… (iOS 27.2).
+```
+
 ## Considered and not planned
 
 So nobody audits them again:
