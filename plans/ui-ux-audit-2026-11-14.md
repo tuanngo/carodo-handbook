@@ -132,6 +132,57 @@ What is sound and needs nothing: no deprecated SwiftUI API (`foregroundColor`, `
   `UIGraphicsImageRenderer` (compositing on map snapshots) and one `UISelectionFeedbackGenerator`
   (inside an `MKMapView` delegate) are UIKit on purpose, not leftovers.
 
+## Next session: flows, VoiceOver, contrast (brief)
+
+Owner, 2026-11-14: a new session takes this, then the small leftovers. Read this file's Findings
+and Done first; the code is carodo-ios `e99f1f4` or later.
+
+```text
+Outcome: an audit of what this one did not cover (How it was audited, "Not covered"), findings
+  recorded here as a second pass, then fixed one step at a time like the first pass.
+User story: someone using VoiceOver, larger text or a low-contrast setting can do everything the
+  app offers; every flow ends where it should.
+Existing behaviour (files read): steps 1-8 above; launch arguments in carodo-ios
+  docs/operations/setup.md#qa-launch-arguments-debug open most states.
+Owner decisions needed: (1) the two failure titles ending with a full stop ("Couldn't load your
+  places.", "This drive can't be replayed right now.") while the others do not: drop the stop?
+  (2) status colours (CarodoSurface.warning/success/error are system orange/green/red): tune to
+  the palette or keep? Ask before changing either.
+Spec (Ready?) and mockups: the owner is making Journeys mockups in parallel: do not restyle Journeys.
+Acceptance criteria:
+  - Flows walked on a simulator with taps (xcode-integration device-interaction, or the Xcode
+    MCP), screenshots of each step: onboarding (3 pages, permission gate), Start Drive panel ->
+    recording -> Hold to Finish -> summary sheet, Journey Detail -> Replay -> Export video,
+    Trim, Share card (Aa, styles), Merge, Your trip editor, Garage add/edit vehicle, fuel/odometer/
+    expense sheets, Feed join and profile sheets, Settings, Backup.
+  - VoiceOver: every control has a short plain label (owner rule: memory voiceover-copy), order
+    makes sense, nothing decorative is read; checked with the accessibility inspector or
+    `xcrun simctl` + accessibility audit (XCUIApplication.performAccessibilityAudit in a UI test
+    if a UI test target is approved; a new target is a P6 decision, ask first).
+  - Contrast: copper text on ivory and on charcoal, secondary text, warning orange on dark,
+    chips and the Feed shape behind text: measured (WCAG 2.1 AA 4.5:1 body, 3:1 large text/
+    controls), numbers recorded.
+  - Text at xxxLarge stays the rule (AGENTS.md, UI); never an accessibility-size branch.
+Non-goals: new features, Journeys redesign, the ~450 spacing literals (Known gap: migrate only in
+  files touched).
+Relevant files/docs: this plan; carodo-ios AGENTS.md (UI, Copy, Resource safety);
+  docs/design-system.md; docs/copy-and-localization.md (VoiceOver lines in both languages).
+Constraints: a simulator of the session's own, addressed by UDID; sample data only in
+  screenshots; strings in the String Catalogs with English and Vietnamese.
+Validation commands/device checks: task lint, task warnings, task test; screenshots Light/Dark,
+  xxxLarge, Vietnamese for every screen changed.
+Allowed scope: carodo-ios views, catalogs, docs; this handbook plan and technical-debt.md.
+Do not: commit with the harness's Co-Authored-By (P8); stage another session's files; run
+  `task format` without checking it touched only your files.
+```
+
+Small leftovers from this pass, for the same session:
+
+- The car-log sheets (fuel, odometer, expense, "Log for your car") from `MainTabView` into one
+  modifier of their own (step 5, not needed for its target; makes the shell smaller still).
+- Spacing: no mass rewrite; files the session touches move to `CarodoSpacing`.
+- PV-21 (the drive flow on an iPhone) stays with the owner.
+
 ## Considered and not planned
 
 So nobody audits them again:
