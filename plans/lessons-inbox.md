@@ -175,3 +175,11 @@ Lessons already paid for that L5 gathers, beside the entries below:
   draws two `MapPolyline`s (fine).
 - Rule now in: `carodo-ios/docs/design-system.md`, Map rules ("Overlays, not points, are the
   limit").
+
+### budgeted-simplify-floor
+- applies_when: simplifying a route to a point budget (`RouteSimplifier.keptIndices(unitBox:budget:)`), choosing a budget's lower bound, drawing a route without a map
+- area: Core/Domain/RouteSimplifier, Core/Journal/RouteGlyphMaker · found: 2026-11-14, carodo-ios `9f21129` · severity: medium
+- Context: the budgeted search halves the tolerance and stops at the first one that keeps at least the budget's floor. The Feed's floor (48) made that "detailed enough"; the route glyph reused it with a floor of 2, so it stopped at a quarter of the frame and drew every long drive as a straight line. It passed tests and a gallery of real drives (only the city drives looked right) and was seen by the owner on screen. Raising the floor then made a dense jittery track quadratic: 107 s for 10,000 points.
+- Guidance: the floor is the detail you want, not "at least a line"; test a long winding route's bends, not only the point count. Before a search that may keep most points, thin the input once to what the drawing can show.
+- Why it matters: the drawing still looks plausible, so a review of a few screenshots does not catch it.
+- Rule now in: `RouteGlyphMaker.Configuration.points` comment, `RouteGlyphMakerTests.testALongWindingDriveKeepsItsBends`.
