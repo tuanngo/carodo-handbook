@@ -120,6 +120,47 @@ whether `PassportStamp`'s arc lettering can take any two strings as it stands.
 **S2:** Save to Photos if approved (Q3), private regions cut along the route (the card's part of
 TD-25).
 
+**S1.1: the editor reworked (owner, 2026-11-14; approved and built the same evening; committed carodo-ios `24aedc1`).** The owner's look on
+the iPhone, against a reference editor: the sheet jumps when the size changes, Save weighs as much
+as Share, Aa's second sheet hides half the card, the map outweighs the route. Decided the same day
+(all as recommended):
+
+| # | Decision |
+|---|---|
+| E1 | The sheet keeps one height (`.large`) for every size. The preview is a box of fixed height; the card fits inside it (9:16 fills it, 4:5 and 1:1 smaller and centred), and only the card eases when the size changes. |
+| E2 | Share is the one wide Copper button; Save is a round icon button at its left (`↓`, a Copper `✓` once saved; VoiceOver "Save to Photos"). |
+| E3 | Aa is a panel inside the editor, not a second sheet: the card shrinks (about 55%) and moves up, still whole; the panel (caption, the chips, Done) rises from the foot over the tools and buttons, and follows the keyboard. Each chip redraws the card above at once. |
+| E4 | The map fades: whole around the route (its box and a margin), then dissolving into the card's ground; the map's colours muted about half; the route fitted tighter (80–85% of its area's shorter side; the 600 m floor stays). In the renderer, so the saved image is the one seen. No blur (blurred labels read as a broken image). |
+| E5 | One style: the Stamp. Simple and its tool are removed (`ShareCard.Style`, the Simple layouts and block, `CarodoLockup` if nothing else uses it). |
+| E6 | Three sizes: 9:16 Story, 4:5 Post (1080 × 1350), 1:1 Square. |
+| E7 | The Replay Export editor keeps its Aa sheet for now; it takes the same panel and Save button once this one is accepted (TD-27). |
+
+Steps, one commit once the owner accepts it on screen:
+1. `ShareCard`: `Size.post` and its layout; `Style` removed; the fit's fill ratio; tests for the 4:5
+   table and the tighter fit (tall, wide, very short routes).
+2. `ShareCardRenderer`: the fade mask around the route's box and the muted map (Core Graphics on
+   the snapshot, off the main actor); the Simple block gone; a test that the mask keeps the route's
+   box whole.
+3. `ShareCardView`: fixed detent and preview box (E1), the round Save (E2), the Aa panel (E3) with
+   `ShareFieldsPanel` beside the existing sheet; the style tool removed. Strings: one new
+   accessibility label at most; unused `shareCard.*` keys removed.
+4. Docs: `docs/specs/share.md` (Share card), `docs/operations/setup.md` (`-carodo.debugShareCard`:
+   `simple` gone, `post` and `text` added).
+5. Evidence: simulator screenshots of the three sizes, the Aa panel with the keyboard, Light and
+   Dark map, xxxLarge, Vietnamese; then the owner's look on the iPhone (PV-19).
+
+As built: `ShareFieldsPanel` (the Aa content, with its Done) and `ShareSaveButton` are the pieces
+the Replay Export editor takes next; until then its `ShareFieldsSheet` only hosts the panel.
+`CarodoLockup` went with Simple (nothing else drew it). The map cache holds six grounds (three
+sizes, Light and Dark, about 38 MB while the editor is open), so switching look and size back
+takes no new snapshot. Veil (owner's second look, 2026-11-14: wider, softer, a short drive must still
+show its place): an 80 pt band along the line and a 100 pt disc round the route's centre, a 72 pt
+fade, the ground at 78% beyond, the map at half its colour; in Dark the clear shape still reads
+more than in Light.
+
+**Later (owner, 2026-11-14):** the stamp and Simple to be looked at again: perhaps the stamp
+pressed lightly in a corner, as a seal on a document, rather than beside the figures.
+
 **S3 (backlog):** a badge earned on the drive pressed as its visa stamp, photo background, hidden
 plates. Not the speed profile strip in speed colours (D6 applies to it too).
 
