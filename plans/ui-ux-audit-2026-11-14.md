@@ -1,6 +1,6 @@
 # carodo-ios UI/UX and view organisation audit, 2026-11-14: findings and the order to fix them
 
-Status: **recorded 2026-11-14**. Steps 1 (`7f1cc4b`) and 2 (2a `055e6b3`, 2b `5ee58ee`; TD-16 closed) done; step 3 done (`e4a0dbf`); step 4 done (`75a9977`); step 5 done (`f813f76`, TD-13 closed, PV-21 open); step 6 done (`195fda6`, `b3d486e`); step 7 done (`62a623a`); 8 open (owner picks the layers symbol). Audit at carodo-ios `34c519f` (`main`). Each step
+Status: **all eight steps done 2026-11-14**, carodo-ios `7f1cc4b`..`e99f1f4`, unpushed. TD-10, TD-13 and TD-16 closed; PV-21 (the drive flow on an iPhone) open. Audit at carodo-ios `34c519f` (`main`). Each step
 below gets its own short plan, approved by the owner, before any code (AGENT_WORKFLOW.md); steps
 are taken one at a time, in order, and each is one commit.
 
@@ -120,6 +120,13 @@ What is sound and needs nothing: no deprecated SwiftUI API (`foregroundColor`, `
   its init, simulator, sample data), each from the simplified route only; the other models built
   there only store references. No factory or cache: it would prevent no measurable cost. The seven
   `@State var model` are `private`, set from an explicit init.
+- **Step 8** (carodo-ios `e99f1f4`): the Map's layers button is `square.3.layers.3d` whatever the
+  layer (owner's pick, 2026-11-14). One home per kind of token: brand colours `CarodoColor`,
+  colours by role and status `CarodoSurface` (warning, success, error joined it, unchanged),
+  spacing `CarodoSpacing` (the 4 pt scale, from `Theme.Spacing`), motion `CarodoMotion`, text
+  styles, a card's radius `.carodoCard()`. `Theme` removed (its typography and radius scale had no
+  user). The ~450 spacing numbers written in place are not rewritten; new and touched code uses
+  the scale (design-system Known gaps).
 - Checked 2026-11-14 at the owner's question: with iOS 18 the minimum, no availability check for
   an older system is left; every `#available` is iOS 26 (Liquid Glass, Apple Intelligence). The 11
   `UIGraphicsImageRenderer` (compositing on map snapshots) and one `UISelectionFeedbackGenerator`
