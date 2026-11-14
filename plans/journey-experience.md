@@ -2,8 +2,8 @@
 
 Status: **Design contract approved** (owner, 2026-11-14): D12–D31 decided, mockup V9
 (`design/mockups/journeys/journey-experience-v2.png`, source `design/mockups/source/journey-experience.html`,
-synthetic routes only); D22 (a share card "Line" style) left for the share-card plan. No code changed. Next: the
-02a plan. Concept:
+synthetic routes only); D22 (a share card "Line" style) left for the share-card plan. No code changed. Next:
+[`journey-experience-02a-route-glyph.md`](journey-experience-02a-route-glyph.md), waiting for the owner. Concept:
 [`../drafts/journey-experience.md`](../drafts/journey-experience.md). Milestone 01 of four
 (Audit & design contract); 02–04 are planned below and start only after approval.
 
