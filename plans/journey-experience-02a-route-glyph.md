@@ -1,6 +1,6 @@
 # Journey Experience 02a — the Route Glyph (geometry and drawing)
 
-Status: **Plan, waiting for the owner** (2026-11-14): **Approved** (owner, 2026-11-14): D32 and D33; 02a·0 first. Parent: [`journey-experience.md`](journey-experience.md)
+Status: **Approved** (owner, 2026-11-14: D32, D33). **02a·0 done** (carodo-ios `b98d636`; PV-22, TD-30); next: 02a. Parent: [`journey-experience.md`](journey-experience.md)
 (design contract D12–D31, mockup V9). No code before approval.
 
 ## Outcome
