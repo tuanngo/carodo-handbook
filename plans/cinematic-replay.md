@@ -601,6 +601,23 @@ Open: PV-20 (device checks, the 300× ceiling), TD-25 (private regions), TD-27 (
 committed: adopt `ActivitySheet` and `CarodoLockup`), the owner's polish pass, then Aa (W4c-2) and
 W4d.
 
+### Polish pass and Aa result (2026-11-14, carodo-ios ab29b2c, 77ac507, 5ae181e)
+
+Owner's polish asks, each decided in a question with options (2026-11-14):
+
+- **No web address** (ab29b2c): `carodo.app` is gone from the share card and from the video's
+  arrival hold; the CARODO lockup is the brand. The card's Simple figures move up into the room.
+- **Replay's header** (77ac507): back, the title and **Video** (`film`, was Share; Developer only
+  until TD-2). The route style and the camera move to one column under it at the right, the Map
+  tab's control (`MapControlButton` and `MapControlHint`, now in the design system). The route
+  style switches Signature and Speed on a tap and names the new one for 1.4 s.
+- **Aa, W4c-2** (5ae181e): as the share card's ("same as the card", owner): the card's sheet is now
+  shared (`ShareFieldsSheet`); a caption over the distance, then Vehicle, Time and Speed, each on
+  or off for this video; the distance, the day and the mark always show.
+
+Open: the overview's fit ignores the new column at the right (a route edge may sit under it: look
+on the iPhone); the round tool button and the font helper of TD-27 are still two.
+
 ### W4d plan (drafted 2026-11-13, not approved; after W4c)
 
 A pure `RecapScript` in `Core/Replay`, made once before rendering: the map from the video's
