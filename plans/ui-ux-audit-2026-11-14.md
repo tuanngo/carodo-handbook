@@ -185,7 +185,7 @@ Small leftovers from this pass, for the same session:
 
 ## Second pass: flows, VoiceOver, contrast (audit 2026-11-14, carodo-ios `e99f1f4`)
 
-Status: **order approved by the owner 2026-11-14; steps 9–10 done (carodo-ios `73adbac`, `463807c`), step 11 next.** Owner decisions the same day:
+Status: **order approved by the owner 2026-11-14; steps 9–11 done (carodo-ios `73adbac`, `463807c`, `8ff6cd6`), step 12 next.** Owner decisions the same day:
 (1) the two failure titles drop their full stop (done with step 11's copy); (2) status colours are
 tuned to the palette in Light to pass AA, every direct use through the token (step 12).
 
@@ -263,6 +263,20 @@ Checked and by design: "Auto Mode", "Auto finish" and "Driving Passport" stay En
   drive card's line, Day headers, the stat strip's order. A real VoiceOver pass with speech, or
   `performAccessibilityAudit` (a UI test target: P6), is still the only proof of A3/A4.
   Lint, warnings (none), 2,192 tests pass.
+- **Step 11** (carodo-ios `8ff6cd6`, copy approved by the owner): "Avg speed" is spoken "Average
+  speed" (Journey Detail, live panels; `StatColumn.spokenLabel`), a dash for a figure not
+  measured yet "Not yet" / "Chưa có" (`DisplayFormat.spokenFigure`, tested; the live figures, the
+  speed dial, the context row), Change "Change vehicle", Auto Mode's "Off" said once, the live
+  panel's Finish takes the floating button's existing hint "Hold to finish the drive" (the
+  approved "Double-tap and hold…" was dropped: `copy-and-localization.md` keeps "Double tap" out of
+  hints, and one gesture keeps one line). The two failure titles lose their full stop (owner
+  decision 1). Not real in the source, so unchanged: the text fields (labelled by their
+  `TextField` title), Export's menus (labelled with values), the Stamp toggle (on/off with a
+  selected trait). Left to the Feed session with A9: reactions as bare emoji, the avatar's "Feed
+  identity", Join's ".,". The rule went into `docs/copy-and-localization.md` (VoiceOver lines).
+  Lint, warnings (none); 2,180 tests pass with `RouteGlyphMakerTests` skipped (another session's
+  uncommitted change was failing it at the time); `AtlasMapViewTests` failed once by timing, then
+  passed.
 
 ## Considered and not planned
 
