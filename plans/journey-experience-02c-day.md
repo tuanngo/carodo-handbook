@@ -1,6 +1,6 @@
 # Journey Experience 02c — Day in two cases
 
-Status: **Built, waiting for the owner's review** (2026-11-14; uncommitted in carodo-ios). Parent:
+Status: **Done** (carodo-ios `e7dec1b`, `0dda072`; route bends fix `9f21129`). Next: light polish (owner), then the weather slice once D-weather is decided. Parent:
 [`journey-experience.md`](journey-experience.md) (D12, D18, D25, D27, D28), on 02b (carodo-ios `7d91aeb`).
 
 ## Changes

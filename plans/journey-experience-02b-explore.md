@@ -1,6 +1,6 @@
 # Journey Experience 02b — Explore as an open editorial timeline
 
-Status: **Built, waiting for the owner's review** (2026-11-14; uncommitted in carodo-ios). Approved to build (owner: "viết plan và làm luôn"); a screen change, so the
+Status: **Done** (carodo-ios `7d91aeb`, polish in `e7dec1b`, `9f21129`). Approved to build (owner: "viết plan và làm luôn"); a screen change, so the
 owner reviews screenshots before the commit. Parent: [`journey-experience.md`](journey-experience.md)
 (D17, D23, D24, D28, D29, D30, D31), on 02a's route glyph (carodo-ios `bfaa4a4`).
 
