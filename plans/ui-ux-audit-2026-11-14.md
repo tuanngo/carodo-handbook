@@ -185,7 +185,7 @@ Small leftovers from this pass, for the same session:
 
 ## Second pass: flows, VoiceOver, contrast (audit 2026-11-14, carodo-ios `e99f1f4`)
 
-Status: **order approved by the owner 2026-11-14; steps 9–12 done (carodo-ios `73adbac`, `463807c`, `8ff6cd6`, `1313cf1`), step 13 next.** Owner decisions the same day:
+Status: **order approved by the owner 2026-11-14; second pass done: steps 9–13 and 15 in carodo-ios (`73adbac`, `463807c`, `8ff6cd6`, `1313cf1`, `e8ead48`), step 14 handed to the Feed session.** Owner decisions the same day:
 (1) the two failure titles drop their full stop (done with step 11's copy); (2) status colours are
 tuned to the palette in Light to pass AA, every direct use through the token (step 12).
 
@@ -290,7 +290,33 @@ Checked and by design: "Auto Mode", "Auto finish" and "Driving Passport" stay En
   own dimming) and the floating bar's translucency over the satellite map. Lint, warnings (none),
   2,195 tests pass.
 
-### Next session: steps 13–15 (brief)
+- **Steps 13 and 15** (carodo-ios `e8ead48`, owner decisions 2026-11-14: one archive sheet,
+  "ends hidden"): "Share to Feed?" is one 44 pt button across the card; a journey point's whole
+  timeline row opens it (content shape 2 pt into the gap, so a one-line row is 44 pt). Edit vehicle:
+  Save in the bar (the bottom button went; the title says Add vehicle when adding), Cancel after a
+  change asks "Discard Changes" / "Bỏ thay đổi", a swipe down is blocked while edited. Archive: the
+  form opens `ArchiveVehicleSheet` like the card's ⋯ and the vehicle page, with the vehicle's
+  totals (the editor now takes a `JourneySummary`; from the Garage's Edit it had said "no drives"
+  for any car); the dialog's four strings removed. The ⋯ menu and Log for your car's tile say "Add
+  reading" before the first. An archived car never driven: "No drives" / "Không có chuyến nào".
+  Place editor: with location not allowed a new place starts at the latest drive's end (else the
+  first place), no location button; allowed, it still follows the person, with the same fallback
+  instead of 0, 0. Export: "· ends hidden" / "· đã ẩn hai đầu" after the figures while either end is
+  hidden (a part says Part). Passport: the system bar and a soft scroll edge (was a hidden bar).
+  Backup on the Settings surface; the empty car-audio symbol in the secondary colour (found cars keep
+  their blue/green icon tiles). Step 15: `CarLogSheets` (App/) owns Log for your car and its three
+  sheets; `MainTabView` keeps a flag and the action. Screenshots English Light, Vietnamese xxxLarge
+  Dark (edit form, place editor without location, Passport scrolled, Backup, Auto Mode). Not seen on
+  screen: the discard dialog, the archive sheet from Edit, the ⋯ menu wording, the past-vehicle
+  line and the Export line (taps or an archived sample car needed; the Export line is unit-tested).
+  Lint, warnings (none), 2,198 tests pass.
+- **Step 14** handed to the Feed session (not fixed here): A9 (the Join card staying after Join and
+  Start sharing, Edit profile and Settings disagreeing on sharing, a guest's letter avatar, "T"
+  after a relaunch while Settings offers Create your profile: check the real store before the
+  mock), and the Feed VoiceOver items (reactions read as bare emoji, the avatar's "Feed identity",
+  Join's title read "Claim your name., Make it yours.").
+
+### Next session: steps 13–15 (brief, done)
 
 Owner, 2026-11-14: a new session takes the rest of the second pass. Read Findings A8–A9, Order of
 work (second pass) and Done (second pass) first; the code is carodo-ios `1313cf1` or later.
