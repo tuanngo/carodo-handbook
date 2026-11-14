@@ -6,7 +6,13 @@ with every recommendation below; the workspace `AGENTS.md` edit allowed. Built d
 plan: the artwork is a still `Canvas` (drawn when its lines, size or appearance change) rather than
 an image rendered off the main actor; only the geometry is computed off it. Before the first drive
 the header shows the title alone (decision 5's line would repeat the first-drive note below it).
-Open: device checks below; the artwork's framing on the owner's real history.
+Then, on the owner's review the same evening: the title and the gear in one row (`64cf23b`), then
+the title moved into the system bar, which stays put while the page scrolls: the round stamp and
+"Passport" (title 2 bold) at the leading edge, the gear trailing (`a528517`). So the "large title
+in the page" and decision 4 (no inline title) below are superseded; the header now starts at
+"Every road since …". The Feed copies the bar (`plans/feed-header.md`).
+Open: device checks below; the artwork's framing on the owner's real history; the Vietnamese label
+under the distance ("Tổng quãng đường") does not say GPS (the mockup's "all-time GPS"), to decide.
 Mockup: [`design/mockups/passport/passport-feed-headers.png`](../design/mockups/passport/passport-feed-headers.png)
 (source `design/mockups/source/passport-feed-headers.html`), Round 3, first frame (P2).
 
