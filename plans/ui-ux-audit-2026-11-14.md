@@ -185,7 +185,7 @@ Small leftovers from this pass, for the same session:
 
 ## Second pass: flows, VoiceOver, contrast (audit 2026-11-14, carodo-ios `e99f1f4`)
 
-Status: **order approved by the owner 2026-11-14; step 9 done (carodo-ios `73adbac`), step 10 next.** Owner decisions the same day:
+Status: **order approved by the owner 2026-11-14; steps 9–10 done (carodo-ios `73adbac`, `463807c`), step 11 next.** Owner decisions the same day:
 (1) the two failure titles drop their full stop (done with step 11's copy); (2) status colours are
 tuned to the palette in Light to pass AA, every direct use through the token (step 12).
 
@@ -247,6 +247,22 @@ Checked and by design: "Auto Mode", "Auto finish" and "Driving Passport" stay En
   before the unit); the Private chip keeps one line. Screenshots Vietnamese xxxLarge Light and
   Dark, English xxxLarge and default: English and default sizes unchanged. The same wrap of a
   figure from its unit elsewhere is TD-29. Lint, warnings (none), 2,149 tests pass.
+- **Step 10** (carodo-ios `463807c`). **Correction to A3–A5 first:** the device-interaction
+  hierarchy the audit read lists the children of a combined element, and elements marked
+  `accessibilityHidden`, as if they were their own stops. Checked in the source, most of A3 and A4
+  were not real: the stat tiles, onboarding rows, Settings icons, the Garage chart (one spoken line,
+  `cardWeeksSpoken`) and Feed rows are already combined or hidden. What is reliable in that tree is
+  an element's own label and position. Fixed where the source confirmed it: `HoldToConfirm` is one
+  element (Finish read once, not icon and caption apart); a journey point's row reads "Start,
+  Phú Nhuận, 7:40" in one button, its marker hidden; a stop's map marker reads its line's title,
+  Replay's moving wheel is hidden (no "Map pin"); the Garage odometer reads "Odometer 41,250 km"
+  and its button "Update odometer" (also on the vehicle page); a count reads number first ("45
+  drives"); Log for your car's tiles share their top (titles line up, read in order); the
+  onboarding map is hidden. Checked through the tree's labels after the change. Left to the
+  Journeys session's redesign (Explore and Day were being rebuilt meanwhile, `7d91aeb`): the latest
+  drive card's line, Day headers, the stat strip's order. A real VoiceOver pass with speech, or
+  `performAccessibilityAudit` (a UI test target: P6), is still the only proof of A3/A4.
+  Lint, warnings (none), 2,192 tests pass.
 
 ## Considered and not planned
 
