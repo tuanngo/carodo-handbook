@@ -8,7 +8,25 @@ needs two vehicles in the garage, archived ones included, not two active ones; `
 from the share card's panel to the design system for the sheet and the tokens. Found on the way:
 Explore hid every other journey when the journal held one driven drive and passenger trips (the
 history waited for two *driving* drives); it now follows the listed journeys (`showsHistory`,
-tested). Open: device checks, PV-23 in [technical-debt.md](technical-debt.md).
+tested). After the owner's review (2026-11-15) carodo-ios `a5587ee`: the chips and tokens take the
+share editor's Aa chip size, the Show button sits on its own ground, and the sheet measures itself
+to open exactly as tall as its chips need.
+
+### Open, for the owner's review
+
+1. **Device checks (PV-23):** the sheet and tokens at xxxLarge on an iPhone SE-class width; the
+   self-sizing sheet on a real device (the first open, rotating text size while it is up); a
+   rare-vehicle filter timed on the real history (no index on vehicle or distance); VoiceOver on
+   the chips, tokens and the button's "2 on".
+2. **Copy to approve:** "Filter / Lọc chuyến", "GPS distance / Quãng đường GPS", "Any / Mọi
+   quãng", "Period / Thời gian", "All time / Mọi lúc" (was "All / Tất cả"), "This year / Năm nay",
+   "Show 4 drives / Xem 4 chuyến", "No drives match / Không có chuyến nào khớp", "No drives match
+   these filters. / Không có chuyến nào khớp với bộ lọc.", "Clear filters / Bỏ lọc", VoiceOver
+   "Remove filter: … / Bỏ lọc: …", "2 on / Đang lọc theo 2 mục".
+3. **Taste:** the filter button is primary ink at rest while **+** beside it is Copper (the app
+   tint); the mockup draws both dark. Keep, or make both the same ink.
+4. **Not built, by plan:** Places / Regions groups; tags (Night, Long) as chips; a chip for drives
+   with no car; Search.
 Mockup: [`design/mockups/passport/passport-feed-headers.png`](../design/mockups/passport/passport-feed-headers.png),
 Round 3, frames J1 (at rest), J2 (the filter sheet), J3 (filtered, with tokens).
 Follows [`passport-tab-and-header.md`](passport-tab-and-header.md), which freed the bar's leading slot.

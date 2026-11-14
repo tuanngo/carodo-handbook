@@ -183,3 +183,12 @@ Lessons already paid for that L5 gathers, beside the entries below:
 - Guidance: the floor is the detail you want, not "at least a line"; test a long winding route's bends, not only the point count. Before a search that may keep most points, thin the input once to what the drawing can show.
 - Why it matters: the drawing still looks plausible, so a review of a few screenshots does not catch it.
 - Rule now in: `RouteGlyphMaker.Configuration.points` comment, `RouteGlyphMakerTests.testALongWindingDriveKeepsItsBends`.
+
+### git-add-commits-what-a-peer-already-staged
+- applies_when: committing with `git add <my paths> && git commit` in carodo-ios while another session works in the same tree
+- area: Git (every repo) · found: 2026-11-15, carodo-ios `b08d723` → amended to `a5587ee` · severity: medium
+- Context: `git add` of three own files, then `git commit`, also committed two paths another session had staged earlier (a deleted `ShareFieldsSheet.swift`, `LaunchMark/Contents.json`). `git diff --cached --stat` was printed in the same command as the commit, so nobody read it first. Fixed by amending the unpushed commit from a temporary index that put back the parent's two blobs; the peer's paths stayed staged in the real index.
+- Guidance: when `git status` shows any staged path (first column) that is not yours, never commit from the real index: build the commit in a temporary index (`GIT_INDEX_FILE=… git read-tree HEAD`, `update-index --cacheinfo` your blobs). Otherwise run `git diff --cached --stat` and read it before a separate `git commit` call.
+- Why it matters: a peer's half-finished change lands in a commit under the wrong message, and the peer's own commit later shows it missing.
+- Rule now in: carodo-ios `AGENTS.md` Git ("`git diff --cached --stat` lists exactly the files this work touched" — the check must come before the commit, not in the same call)
+
