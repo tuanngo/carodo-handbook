@@ -185,7 +185,7 @@ Small leftovers from this pass, for the same session:
 
 ## Second pass: flows, VoiceOver, contrast (audit 2026-11-14, carodo-ios `e99f1f4`)
 
-Status: **order approved by the owner 2026-11-14; second pass done: steps 9–13 and 15 in carodo-ios (`73adbac`, `463807c`, `8ff6cd6`, `1313cf1`, `e8ead48`), step 14 handed to the Feed session.** Owner decisions the same day:
+Status: **order approved by the owner 2026-11-14; second pass done: steps 9–13 and 15 in carodo-ios (`73adbac`, `463807c`, `8ff6cd6`, `1313cf1`, `e8ead48`), step 14 done in the same session (`23b0e43`).** Owner decisions the same day:
 (1) the two failure titles drop their full stop (done with step 11's copy); (2) status colours are
 tuned to the palette in Light to pass AA, every direct use through the token (step 12).
 
@@ -310,11 +310,18 @@ Checked and by design: "Auto Mode", "Auto finish" and "Driving Passport" stay En
   screen: the discard dialog, the archive sheet from Edit, the ⋯ menu wording, the past-vehicle
   line and the Export line (taps or an archived sample car needed; the Export line is unit-tested).
   Lint, warnings (none), 2,198 tests pass.
-- **Step 14** handed to the Feed session (not fixed here): A9 (the Join card staying after Join and
-  Start sharing, Edit profile and Settings disagreeing on sharing, a guest's letter avatar, "T"
-  after a relaunch while Settings offers Create your profile: check the real store before the
-  mock), and the Feed VoiceOver items (reactions read as bare emoji, the avatar's "Feed identity",
-  Join's title read "Claim your name., Make it yours.").
+- **Step 14** (carodo-ios `23b0e43`, owner asked to do it here, 2026-11-14). A9 checked on the real
+  local store first (claim, Start sharing, Edit profile): sharing reads On and no Join card stays,
+  so those three were the sample mock's (no-op actions, sharing always Off); the mock now keeps the
+  choices for the session (`FeedSharingActions.sample`). The letter avatar was real: a guest's
+  avatar took the initial of "Driver"/"Tài xế" (D, T); `OwnAvatar` shows a person symbol until a
+  username exists (shared with Settings). VoiceOver: the avatar says what it opens (Join the Feed /
+  Edit profile), Join's title reads as two sentences, reactions by name and count (Fire, Coffee,
+  Applause, Road, Party / Lửa, Cà phê, Vỗ tay, Đường xa, Ăn mừng; owner approved). Also the owner's
+  report of a jump on entering the Feed: recorded at 10 fps on the simulator, the first visit per
+  launch showed the skeleton, a crossfade with one narrower layout (rows rewrapped), then the shapes
+  drawing in and the warm-up line filling; all three removed with the draw-in code, the page's width
+  fixed from the first frame (owner checked on an iPhone: no jump). 2,199 tests, lint, no warnings.
 
 ### Next session: steps 13–15 (brief, done)
 
