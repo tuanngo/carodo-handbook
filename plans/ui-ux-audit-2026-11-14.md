@@ -1,6 +1,6 @@
 # carodo-ios UI/UX and view organisation audit, 2026-11-14: findings and the order to fix them
 
-Status: **recorded 2026-11-14**. Steps 1 (`7f1cc4b`) and 2 (2a `055e6b3`, 2b `5ee58ee`; TD-16 closed) done; step 3 done (`e4a0dbf`); step 4 done (`75a9977`); 5–8 open. Audit at carodo-ios `34c519f` (`main`). Each step
+Status: **recorded 2026-11-14**. Steps 1 (`7f1cc4b`) and 2 (2a `055e6b3`, 2b `5ee58ee`; TD-16 closed) done; step 3 done (`e4a0dbf`); step 4 done (`75a9977`); step 5 done (`f813f76`, TD-13 closed, PV-21 open); 6–8 open. Audit at carodo-ios `34c519f` (`main`). Each step
 below gets its own short plan, approved by the owner, before any code (AGENT_WORKFLOW.md); steps
 are taken one at a time, in order, and each is one commit.
 
@@ -103,6 +103,11 @@ What is sound and needs nothing: no deprecated SwiftUI API (`foregroundColor`, `
   sheet to close. 28 `@State` to 17. Each presentation checked through its debug argument; Trim
   and Merge open only on a journal in a trip store (`-carodo.sampleJournal N`), not on
   `-carodo.sampleData`, as before.
+- **Step 5** (carodo-ios `f813f76`, owner approved the coordinator): `DriveFlow` (`@Observable`,
+  owned by the shell) holds the garage the panels offer, starts (tap, Shortcut, car connection,
+  Undo), finishes and their banners, the foreground catch-up and the diagnostics lines; 5 tests.
+  `MainTabView` 1,127 → 898 lines (TD-13 closed). Not done, not needed for the target: the car-log
+  sheets (fuel, odometer, expense) as a modifier of their own. A drive on an iPhone is PV-21.
 - Checked 2026-11-14 at the owner's question: with iOS 18 the minimum, no availability check for
   an older system is left; every `#available` is iOS 26 (Liquid Glass, Apple Intelligence). The 11
   `UIGraphicsImageRenderer` (compositing on map snapshots) and one `UISelectionFeedbackGenerator`
