@@ -1,6 +1,6 @@
 # Journey Experience 02a — the Route Glyph (geometry and drawing)
 
-Status: **Approved** (owner, 2026-11-14: D32, D33). **02a·0 done** (carodo-ios `b98d636`; PV-22, TD-30); next: 02a. Parent: [`journey-experience.md`](journey-experience.md)
+Status: **Approved** (owner, 2026-11-14: D32, D33). **02a·0 done** (carodo-ios `b98d636`; PV-22, TD-30). **02a done** (carodo-ios `bfaa4a4`): gallery checked on the 34 pulled drives (scratchpad only); the opt-in perf measure moves to 02b, where a page of rows makes glyphs. Next: 02b. Parent: [`journey-experience.md`](journey-experience.md)
 (design contract D12–D31, mockup V9). No code before approval.
 
 ## Outcome
