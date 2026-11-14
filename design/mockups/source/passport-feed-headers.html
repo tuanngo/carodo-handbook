@@ -1,0 +1,294 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Passport and Feed — editorial headers</title>
+<style>
+  * { box-sizing:border-box; }
+  body { margin:0; background:#1a1917; color:#F3EEE5; font-family:-apple-system,"SF Pro Text",system-ui,sans-serif; padding:44px 40px 60px; width:1800px; }
+  h1 { font-size:30px; margin:0 0 6px; font-weight:700; }
+  h2 { font-size:21px; margin:48px 0 6px; font-weight:650; }
+  p.lead { margin:0 0 20px; color:#b9b3a8; font-size:15px; max-width:1560px; line-height:1.45; }
+  p.lead b, ul b { color:#F3EEE5; }
+  .row { display:flex; gap:40px; align-items:flex-start; flex-wrap:wrap; }
+  figure { margin:0; } figcaption { font-size:13.5px; color:#b9b3a8; margin-top:11px; line-height:1.45; width:390px; }
+  figcaption b { color:#F3EEE5; }
+  ul { color:#cfc9be; font-size:14.5px; line-height:1.55; max-width:1560px; padding-left:20px; }
+
+  /* A phone: 390 pt wide, the top of the screen. Tokens from CarodoSurface. */
+  .ph { width:390px; height:720px; border-radius:44px; overflow:hidden; position:relative;
+        --bg:#F3EEE5; --el:#FAF7F1; --card:#FFFCF7; --stroke:#DED6C9; --tx:#242321; --tx2:#77736D; --ac:#965E36; --land:#ECE6DA; --road:#FFFDF8; --water:#D2DDE0;
+        background:var(--bg); color:var(--tx); }
+  .ph.dark { --bg:#242321; --el:#2E2C29; --card:#373430; --stroke:#4E4A44; --tx:#F3EEE5; --tx2:#A49E95; --ac:#D09264; --land:#2F2D2A; --road:#46423D; --water:#29333B; }
+  .status { height:54px; padding:18px 34px 0; display:flex; justify-content:space-between; font-weight:600; font-size:16px; position:relative; z-index:3; }
+  .status i { font-style:normal; letter-spacing:2px; font-size:12px; padding-top:3px; }
+  .nav { height:48px; padding:0 16px; display:flex; justify-content:space-between; align-items:center; position:relative; z-index:3; }
+  .btn { width:44px; height:44px; border-radius:22px; background:var(--el); border:.5px solid var(--stroke); box-shadow:0 2px 10px rgba(0,0,0,.08);
+         display:flex; align-items:center; justify-content:center; color:var(--tx); }
+  .btn svg { width:20px; height:20px; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+  .navtitle { font-weight:600; font-size:17px; }
+  .hero { position:relative; padding:14px 20px 26px; }
+  .hero > * { position:relative; z-index:2; }
+  .art { position:absolute !important; z-index:1 !important; inset:0; pointer-events:none; }
+  .eyebrow { font-size:12px; font-weight:600; letter-spacing:1.6px; text-transform:uppercase; color:var(--tx2); display:flex; gap:6px; align-items:center; }
+  .eyebrow svg { width:11px; height:11px; fill:var(--ac); }
+  .eyebrow em { font-style:normal; color:var(--ac); }
+  .title { font-family:"SF Pro Display",-apple-system,sans-serif; font-size:38px; line-height:1.08; font-weight:700; letter-spacing:-.4px; margin:8px 0 6px; }
+  .sub { font-size:17px; color:var(--tx2); line-height:1.3; }
+  .num { font-family:"SF Pro Rounded","SF Pro Display",-apple-system,sans-serif; font-weight:700; font-variant-numeric:tabular-nums; letter-spacing:-.5px; }
+  .unit { font-weight:600; color:var(--tx2); }
+  .lab { font-size:13px; color:var(--tx2); margin-top:2px; }
+  .card { margin:0 16px; background:var(--el); border:.5px solid var(--stroke); border-radius:18px; overflow:hidden; }
+  .chead { display:flex; align-items:center; gap:12px; padding:14px 16px 12px; font-weight:600; font-size:17px; }
+  .tile { width:34px; height:34px; border-radius:10px; background:color-mix(in srgb, var(--ac) 14%, transparent); display:flex; align-items:center; justify-content:center; }
+  .tile svg { width:18px; height:18px; fill:none; stroke:var(--ac); stroke-width:2; stroke-linejoin:round; }
+  .seg { margin:0 16px 12px; background:color-mix(in srgb, var(--tx) 7%, transparent); border-radius:9px; padding:2px; display:flex; font-size:13px; font-weight:500; }
+  .seg span { flex:1; text-align:center; padding:6px 0; border-radius:7px; }
+  .seg span.on { background:var(--card); box-shadow:0 1px 3px rgba(0,0,0,.12); font-weight:600; }
+  .pill { display:inline-block; font-size:12px; font-weight:700; color:var(--ac); background:color-mix(in srgb, var(--ac) 14%, transparent); padding:3px 9px; border-radius:99px; }
+  .avatar { width:44px; height:44px; border-radius:22px; background:color-mix(in srgb, var(--ac) 18%, var(--el)); color:var(--ac); font-weight:700; font-size:17px;
+            display:flex; align-items:center; justify-content:center; border:.5px solid var(--stroke); font-family:"SF Pro Rounded",-apple-system,sans-serif; }
+  .join { height:36px; padding:0 16px; border-radius:18px; background:var(--el); border:.5px solid var(--stroke); font-weight:600; font-size:15px; color:var(--ac); display:flex; align-items:center; box-shadow:0 2px 10px rgba(0,0,0,.08); }
+  .frow { margin:0 16px 12px; background:var(--el); border:.5px solid var(--stroke); border-radius:18px; padding:14px 16px; display:flex; gap:12px; }
+  .frow .avatar { width:38px; height:38px; font-size:15px; flex:none; }
+  .frow b { font-size:15px; } .frow small { color:var(--tx2); font-size:13px; }
+  .frow .hl { font-size:17px; font-weight:600; margin:6px 0 2px; }
+  .bar { position:absolute; left:50%; transform:translateX(-50%); bottom:22px; width:270px; height:58px; border-radius:29px; background:var(--el); border:.5px solid var(--stroke); box-shadow:0 6px 22px rgba(0,0,0,.14);
+         display:flex; align-items:center; justify-content:space-around; font-size:11px; font-weight:600; color:var(--tx2); z-index:4; }
+  .bar .on { color:var(--ac); }
+</style>
+</head>
+<body>
+<h1>Passport and Feed — editorial headers</h1>
+<p class="lead">Owner's brief (2026-11-14): both screens get a <b>large editorial header</b> from the Carodo design system, not the same layout. Passport is the
+  private driving identity: Back + Settings, "Your Passport", a subtitle, the all-time figures set <b>directly on Ivory</b> (no card, no three columns with rules),
+  with the person's <b>own routes</b> as faint artwork behind the hero only, never running into Your Footprint. Feed becomes a light Community space: a large
+  left title, an identity entry on the right. All routes on this board are synthetic.</p>
+
+<h2>Round 2 · after the owner's review (2026-11-14, evening)</h2>
+<p class="lead">Decided: direction <b>A</b>'s open typography with a one-time drawing; the header is the page's own (the system bar draws no title); no @username and no Private line on the
+  Passport (it is the private side by nature); the Feed stays <b>Feed</b>. Considered here: the <b>Passport as a tab</b>, so it needs no Back; and on Journeys the Passport stamp gives its
+  place to <b>Filter / Refine</b> (<code>slider.horizontal.3</code>).</p>
+<div class="row" id="r0"></div>
+<div class="row" id="r0b" style="margin-top:36px"></div>
+
+<h2>Round 3 · chosen header, and Journeys' Filter (2026-11-14)</h2>
+<p class="lead">Chosen: <b>P2</b> ("since" is the subtitle) and the tab order <b>Map · Journeys · Passport · Feed</b>. Filter / Refine starts with <b>Vehicle</b> and <b>Distance</b>;
+  Places / Regions may follow. Proposal drawn here: the period joins them in the same sheet, so one control filters the history.</p>
+<div class="row" id="r00"></div>
+
+<h2 style="margin-top:70px">Round 1 · Passport — three directions</h2>
+<div class="row" id="r1"></div>
+
+<h2>2 · Direction A in its other states</h2>
+<div class="row" id="r2"></div>
+
+<h2>3 · Feed — Community</h2>
+<div class="row" id="r3"></div>
+
+<h2>Notes and open decisions</h2>
+<ul>
+  <li><b>This changes two written rules</b>, so it needs the owner's decision recorded: design-system "Screen layout" says <i>no large titles</i> and <i>no other screen gets a
+    heading or a drawn background without a decision</i>; the Passport spec says <i>no visible title</i> (2026-11-05) and that the Passport <i>reads no route</i>.</li>
+  <li><b>Where the identity goes.</b> Today's card carries the stamp, @username, "Driving since" and the Private chip. A and B keep them as one quiet eyebrow line
+    (lock · Private · since March 2026); C keeps the stamp's role in the signature. The username is left to the Feed's identity, since the Passport is the private side: to confirm.</li>
+  <li><b>The artwork is a drawing, not a map view.</b> The person's routes as thin Copper lines (the Footprint's prepared geometry, simplified), drawn once into an image, masked to
+    fade before the hero ends. No tiles, no labels, no live MapKit view: nothing renders while the page rests. With too little GPS the hero is plain Ivory (state 2b).</li>
+  <li><b>Distance stays "GPS"</b> (P2): the label says all-time GPS, never just "distance".</li>
+  <li><b>Scroll:</b> the title, subtitle and figures scroll with the content; Back and Settings stay in the system bar, and the inline title "Passport" appears in the bar once the large one has gone.</li>
+  <li><b>Feed:</b> "Community" as the visible title is a copy and navigation decision (the tab is "Feed" today). The community pulse (72h pill, drivers) becomes one line under the
+    subtitle instead of a second large title; guests see Join where members see their avatar.</li>
+</ul>
+
+<script>
+function rng(seed){ let s = seed>>>0; return () => { s = (s*1664525 + 1013904223)>>>0; return s/4294967296; }; }
+const I = {
+  back:'<svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>',
+  gear:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.2"/><path d="M12 2.8v2.6M12 18.6v2.6M2.8 12h2.6M18.6 12h2.6M5.5 5.5l1.8 1.8M16.7 16.7l1.8 1.8M18.5 5.5l-1.8 1.8M7.3 16.7l-1.8 1.8"/></svg>',
+  lock:'<svg viewBox="0 0 12 12"><rect x="2" y="5.2" width="8" height="5.8" rx="1.4"/><path d="M3.9 5.4V3.9a2.1 2.1 0 014.2 0v1.5" fill="none" stroke="currentColor" stroke-width="1.3" style="stroke:var(--ac)"/></svg>',
+  layers:'<svg viewBox="0 0 24 24"><path d="M12 3l9 5-9 5-9-5 9-5zM3 13l9 5 9-5"/></svg>',
+};
+// A synthetic footprint: a hub with short tangled trips and a few long arms.
+function footprint(w,h,seed,hub){ const r=rng(seed); const [cx,cy]=hub; let out=[];
+  const walk=(x,y,a,n,step,wob)=>{ let d=`M${x.toFixed(1)} ${y.toFixed(1)}`; for(let i=0;i<n;i++){ a+=(r()-.5)*wob; x+=Math.cos(a)*step; y+=Math.sin(a)*step; d+=` L${x.toFixed(1)} ${y.toFixed(1)}`; if(r()<.04) out.push(walkStr(x,y,a+(r()<.5?1:-1)*(.9+r()*.6),8+Math.floor(r()*14),step,wob)); } return d; };
+  const walkStr=(x,y,a,n,step,wob)=>{ let d=`M${x.toFixed(1)} ${y.toFixed(1)}`; for(let i=0;i<n;i++){ a+=(r()-.5)*wob; x+=Math.cos(a)*step; y+=Math.sin(a)*step; d+=` L${x.toFixed(1)} ${y.toFixed(1)}`; } return d; };
+  for(let i=0;i<9;i++) out.push(walk(cx,cy,r()*6.28,10+Math.floor(r()*12),5,.9));
+  [[-2.7,62],[-1.9,40],[2.5,48],[.4,30],[-.6,26]].forEach(([a,n])=>out.push(walk(cx,cy,a+(r()-.5)*.3,n,6,.42)));
+  return out; }
+function artRoutes({w=390,h=330,seed=7,hub=[318,128],sw=1.4,op=.5,map=false,mask='radial-gradient(75% 80% at 88% 36%, #000 30%, transparent 78%)'}){
+  let s=''; if(map){ const r=rng(seed+9); s+=`<path d="M250 ${h} C 290 ${h-70} 350 ${h-60} ${w} ${h-120} L${w} ${h}z" fill="var(--water)" opacity=".7"/>`;
+    for(let i=0;i<14;i++){const x=r()*w; s+=`<path d="M${x} 0 L${x+(r()-.5)*70} ${h}" stroke="var(--road)" stroke-width="${1+r()*2.5}"/>`;}
+    for(let i=0;i<11;i++){const y=r()*h; s+=`<path d="M0 ${y} L${w} ${y+(r()-.5)*60}" stroke="var(--road)" stroke-width="${1+r()*2.5}"/>`;} }
+  s+=`<g fill="none" stroke="var(--ac)" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round" opacity="${op}">`+footprint(w,h,seed,hub).map(d=>`<path d="${d}"/>`).join('')+'</g>';
+  return `<svg class="art" viewBox="0 0 ${w} ${h}" preserveAspectRatio="xMaxYMin slice" style="-webkit-mask-image:${mask};mask-image:${mask};${map?'background:var(--land);':''}">${s}</svg>`; }
+function curve(pts){ let d=`M${pts[0][0]} ${pts[0][1]}`; for (let i=0;i<pts.length-1;i++){ const p0=pts[Math.max(i-1,0)],p1=pts[i],p2=pts[i+1],p3=pts[Math.min(i+2,pts.length-1)];
+  d+=` C${p1[0]+(p2[0]-p0[0])/6} ${p1[1]+(p2[1]-p0[1])/6} ${p2[0]-(p3[0]-p1[0])/6} ${p2[1]-(p3[1]-p1[1])/6} ${p2[0]} ${p2[1]}`; } return d; }
+function signature(){ const pts=[[232,250],[250,222],[244,196],[270,176],[262,150],[290,140],[312,112],[300,86],[330,70],[352,44]]; const d=curve(pts);
+  return `<svg class="art" viewBox="0 0 390 330" preserveAspectRatio="xMaxYMin slice"><path d="${d}" fill="none" stroke="var(--ac)" stroke-width="3" stroke-linecap="round" opacity=".85"/>`+
+    `<circle cx="232" cy="250" r="5" fill="var(--bg)" stroke="var(--ac)" stroke-width="2.4"/><circle cx="352" cy="44" r="5.5" fill="var(--ac)"/></svg>`; }
+
+const status = `<div class="status"><span>9:41</span><i>●●● ▂▄▆</i></div>`;
+const nav = (title='') => `<div class="nav"><div class="btn">${I.back}</div><div class="navtitle">${title}</div><div class="btn">${I.gear}</div></div>`;
+const eyebrow = (t='Private · since March 2026') => `<div class="eyebrow">${I.lock}<span>${t}</span></div>`;
+function mapStub(seed=4){ const r=rng(seed); let s=`<rect width="358" height="260" fill="var(--land)"/><path d="M0 200 C 100 180 220 250 358 205 L358 260 L0 260z" fill="var(--water)"/>`;
+  for(let i=0;i<12;i++){const x=r()*358; s+=`<path d="M${x} 0 L${x+(r()-.5)*50} 260" stroke="var(--road)" stroke-width="${1+r()*2}"/>`;}
+  for(let i=0;i<9;i++){const y=r()*260; s+=`<path d="M0 ${y} L358 ${y+(r()-.5)*40}" stroke="var(--road)" stroke-width="${1+r()*2}"/>`;}
+  s+=`<g fill="none" stroke="var(--ac)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">`+footprint(358,260,7,[190,110]).map(d=>`<path d="${d}"/>`).join('')+'</g>';
+  return `<svg width="358" height="260" viewBox="0 0 358 260" style="display:block">${s}</svg>`; }
+const footprintCard = (t='Your Footprint', seg=['All time','This year','This month']) => `<div class="card"><div class="chead"><div class="tile">${I.layers}</div>${t}</div>
+  <div class="seg"><span class="on">${seg[0]}</span><span>${seg[1]}</span><span>${seg[2]}</span></div>${mapStub()}</div>`;
+const phone = (inner, cls='') => `<div class="ph ${cls}">${status}${inner}</div>`;
+const fig = (inner, cap) => `<figure>${inner}<figcaption>${cap}</figcaption></figure>`;
+
+// Today (approximation of PassportIdentityHeader)
+const today = phone(nav() + `<div class="card" style="margin-top:8px">
+  <div style="padding:16px;display:flex;gap:14px;background:linear-gradient(225deg, rgba(189,128,83,.16), transparent 70%)">
+    <div style="width:76px;height:76px;border-radius:38px;border:2px solid var(--ac);display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;letter-spacing:1px;color:var(--ac);text-align:center;line-height:1.3">DRIVING<br>PASSPORT</div>
+    <div style="flex:1"><div style="font-size:22px;font-weight:600">@tuan</div><div class="sub" style="font-size:15px">Driving since March 2026</div></div>
+    <div><span class="pill">Private</span></div></div>
+  <div style="display:flex;border-top:.5px solid var(--stroke);padding:14px 0;text-align:center">
+    ${[['830','km','All-time GPS'],['30','drives','All time'],['15h 38m','','Driving time']].map(([v,u,l],i)=>`<div style="flex:1;${i?'border-left:.5px solid var(--stroke)':''}"><span class="num" style="font-size:20px">${v}</span> <span class="unit" style="font-size:13px">${u}</span><div class="lab">${l}</div></div>`).join('')}
+  </div></div><div style="height:14px"></div>` + footprintCard());
+
+// A — one hero figure, the rest in a sentence
+const heroA = (o={}) => `<div class="hero" style="${o.pad||''}">${o.art===false?'':artRoutes({seed:7, op:o.op||.42})}
+  ${eyebrow(o.eyebrow)}
+  <div class="title" style="${o.titleStyle||''}">${o.title||'Your Passport'}</div>
+  <div class="sub" style="${o.subStyle||''}">${o.sub||'Every road tells a story.'}</div>
+  ${o.stats===false ? (o.empty||'') : `<div style="margin-top:${o.gap||34}px"><span class="num" style="font-size:${o.big||68}px;line-height:1">${o.km||'830'}</span> <span class="unit" style="font-size:${o.unitSize||24}px">km</span></div>
+  <div class="lab" style="font-size:${o.labSize||15}px">${o.gps||'all-time GPS'}</div>
+  <div style="margin-top:14px;font-size:${o.lineSize||20}px;font-weight:600;line-height:1.3">${o.line||'30 <span class="unit">drives</span> &nbsp;·&nbsp; 15h 38m <span class="unit">driving</span>'}</div>`}
+</div>`;
+const A = phone(nav() + heroA() + footprintCard());
+
+// B — three open figures over a faint map
+const B = phone(nav() + `<div class="hero">${artRoutes({seed:7, map:true, op:.55, mask:'linear-gradient(180deg, rgba(0,0,0,.0) 0%, rgba(0,0,0,.55) 30%, rgba(0,0,0,.55) 55%, transparent 96%)'})}
+  ${eyebrow()}
+  <div class="title">Your Passport</div><div class="sub">Your driving story</div>
+  <div style="display:flex;gap:26px;margin-top:92px;align-items:flex-end">
+    ${[['830','km','All-time GPS',34],['30','','Drives',34],['15h 38m','','Driving time',34]].map(([v,u,l,s])=>`<div><span class="num" style="font-size:${s}px">${v}</span>${u?` <span class="unit" style="font-size:17px">${u}</span>`:''}<div class="lab">${l}</div></div>`).join('')}
+  </div></div>` + footprintCard());
+
+// C — the Route Signature, figures as a column
+const C = phone(nav() + `<div class="hero">${signature()}
+  <div class="eyebrow"><span>Carodo Passport · <em>Private</em></span></div>
+  <div class="title">Your<br>Passport</div><div class="sub" style="max-width:190px">Every road tells a story.</div>
+  <div style="margin-top:26px;display:grid;gap:10px">
+    ${[['830 <span class="unit" style="font-size:17px">km</span>','all-time GPS'],['30','drives'],['15h 38m','driving']].map(([v,l])=>`<div style="display:flex;align-items:baseline;gap:10px"><span class="num" style="font-size:30px">${v}</span><span class="lab" style="font-size:15px">${l}</span></div>`).join('')}
+  </div></div>` + footprintCard());
+
+document.getElementById('r1').innerHTML =
+  fig(today, '<b>Today.</b> An Identity card: the stamp, the username, Private, then three columns with icons and rules. The page opens on a card, like every card below it.') +
+  fig(A, '<b>A · One figure leads</b> (recommended). The distance is the hero at display size; drives and time follow as one line. The person\'s routes are thin Copper lines behind it, fading before the hero ends. No rule, no icon, no card.') +
+  fig(B, '<b>B · Three open figures.</b> The brief taken literally: the same three figures, left-aligned, no rules or icons, over a faint map of the person\'s area with their routes. Calmer hierarchy; the map band costs height and sits close to the Footprint map below.') +
+  fig(C, '<b>C · Route Signature.</b> One line, start ring to end dot, as the page\'s signature (the longest drive, or the Feed\'s shape maker on the whole history). The most "passport", the least literal; the figures read as a column.');
+
+const Adark = phone(nav() + heroA({op:.5}) + footprintCard(), 'dark');
+const Aempty = phone(nav() + heroA({art:false, stats:false, eyebrow:'Private · on this iPhone',
+  empty:`<div style="margin-top:34px;font-size:20px;font-weight:600;line-height:1.3">Your first drive starts the story.</div>
+  <div style="margin-top:16px;display:inline-flex;height:48px;padding:0 22px;border-radius:24px;background:#BD8053;color:#242321;font-weight:700;font-size:17px;align-items:center">Start a drive</div>`}));
+const Avi = phone(nav() + heroA({eyebrow:'Riêng tư · từ tháng 3, 2026', title:'Hộ chiếu của bạn', titleStyle:'font-size:44px', sub:'Mỗi cung đường là một câu chuyện.', subStyle:'font-size:21px',
+  big:76, unitSize:28, labSize:18, gps:'tổng quãng đường GPS', lineSize:24, gap:28,
+  line:'30 <span class="unit">chuyến</span><br>15 giờ 38 phút <span class="unit">cầm lái</span>'}) + footprintCard('Những cung đường đã qua', ['Tất cả','Năm nay','Tháng này']));
+const Ascroll = phone(nav('Passport') + `<div style="height:618px;overflow:hidden"><div style="margin-top:-128px">${heroA({op:.42})}${footprintCard()}</div></div>`);
+document.getElementById('r2').innerHTML =
+  fig(Adark, '<b>2a · Dark.</b> Charcoal, the lighter Copper for the lines; the artwork drops no brighter than the secondary text.') +
+  fig(Aempty, '<b>2b · No drives yet</b> (or too little GPS for a drawing). Plain Ivory, no artwork, no zeros: the title, one line and the one invitation.') +
+  fig(Avi, '<b>2c · xxxLarge, Vietnamese.</b> The title and the figures scale; the second line breaks between its two facts, never mid-figure.') +
+  fig(Ascroll, '<b>2d · Scrolled.</b> The header leaves with the content; Back and Settings stay, and the bar takes the inline title.');
+
+// Feed
+const bar = `<div class="bar"><span>Map</span><span>Journeys</span><span class="on">Feed</span></div>`;
+const shape = (seed) => { const r=rng(seed); let pts=[[8,30]]; for(let i=1;i<8;i++) pts.push([8+i*14, 30+(r()-.5)*34]); return `<svg width="76" height="40" viewBox="0 0 116 60" style="flex:none;margin-top:4px"><path d="${curve(pts)}" fill="none" stroke="var(--ac)" stroke-width="3" stroke-linecap="round"/></svg>`; };
+const frow = (n,i,hl,meta,seed) => `<div class="frow"><div class="avatar">${i}</div><div style="flex:1"><b>@${n}</b> <small>· this evening</small><div class="hl">${hl}</div><small>${meta}</small></div>${shape(seed)}</div>`;
+const rows = frow('minhchau','M','An easy evening run','Mazda CX-5 · 42 km · 1h 05m',3) + frow('duc.ng','D','Out before the rain','Honda Civic · 18 km · 34m',11) + frow('lananh','L','A long one north','VinFast VF 8 · 126 km · 2h 20m',5);
+const feedToday = phone(`<div class="nav"><div style="width:44px"></div><div class="navtitle">Feed</div><div class="avatar">T</div></div>
+  <div style="padding:10px 20px 18px"><div style="font-size:20px;font-weight:700">Welcome to the Feed</div><div class="sub" style="font-size:15px;margin-top:4px">No drives shared in the last 72 hours.</div>
+  <div style="height:5px;margin-top:12px;background:repeating-linear-gradient(90deg,var(--stroke) 0 22px,transparent 22px 34px)"></div></div>` + rows + bar);
+const feedHead = (right, pulse) => `<div class="nav" style="justify-content:flex-end">${right}</div>
+  <div class="hero" style="padding:0 20px 20px;margin-top:-6px"><div class="title">Community</div><div class="sub">The journeys we share.</div>
+  <div style="margin-top:14px;font-size:14px;color:var(--tx2)">${pulse}</div></div>`;
+const feedMember = phone(feedHead(`<div class="avatar">T</div>`, `<span class="pill">72h</span> &nbsp;<b style="color:var(--tx)">142 drivers</b> · 3,120 km · 96 h`) + rows + bar);
+const feedGuest = phone(feedHead(`<div class="join">Join</div>`, `<span class="pill">72h</span> &nbsp;<b style="color:var(--tx)">142 drivers</b> · 3,120 km · 96 h`) + rows + bar);
+const feedQuiet = phone(feedHead(`<div class="avatar">T</div>`, `Quiet for now. Drives people share appear here.`) +
+  `<div style="padding:60px 40px;text-align:center;color:var(--tx2);font-size:15px;line-height:1.4">Share a drive from its page<br>and it shows up here for others.</div>` + bar);
+document.getElementById('r3').innerHTML =
+  fig(feedToday, '<b>Today.</b> A small centred title, a greeting and a status line: it reads as a system state, not a place.') +
+  fig(feedMember, '<b>Member.</b> "Community" large and left, the subtitle, the pulse as one quiet line; the avatar on the right opens the Community identity. Plain Ivory, no hero.') +
+  fig(feedGuest, '<b>Guest.</b> The same header; Join stands where the avatar will be.') +
+  fig(feedQuiet, '<b>Quiet.</b> Nothing shared lately: the header holds the page, and the status is one line, not the headline.');
+
+// ---------- Round 2 ----------
+const T = {
+  map:'<path d="M9 4L3 6.5v13.5l6-2.5 6 2.5 6-2.5V4l-6 2.5L9 4zM9 4v13.5M15 6.5V20"/>',
+  journeys:'<path d="M5 19c0-5 4-4 7-7s2-7 7-7"/><circle cx="5" cy="19" r="1.6"/><circle cx="19" cy="5" r="1.6" fill="currentColor"/>',
+  passport:'<circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="5" stroke-dasharray="2 2.2"/>',
+  feed:'<circle cx="9" cy="9" r="3"/><path d="M3.5 19c.6-3.2 2.7-5 5.5-5s4.9 1.8 5.5 5M16 6.2a3 3 0 010 5.6M17.5 14.3c1.7.6 2.7 2.2 3 4.7"/>',
+  sliders:'<svg viewBox="0 0 24 24"><path d="M4 7h8M17 7h3M4 12h3M12 12h8M4 17h10M19 17h1"/><circle cx="14.5" cy="7" r="2.2"/><circle cx="9.5" cy="12" r="2.2"/><circle cx="16.5" cy="17" r="2.2"/></svg>',
+  plus:'<svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>',
+};
+const tab = (k,label,on) => `<span style="display:flex;flex-direction:column;align-items:center;gap:3px;${on?'color:var(--ac)':''}"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${T[k]}</svg>${label}</span>`;
+const bar4 = (on) => `<div style="position:absolute;left:16px;right:16px;bottom:22px;display:flex;gap:10px;align-items:center;z-index:4">
+  <div style="flex:1;height:62px;border-radius:31px;background:var(--el);border:.5px solid var(--stroke);box-shadow:0 6px 22px rgba(0,0,0,.14);display:flex;align-items:center;justify-content:space-around;font-size:10.5px;font-weight:600;color:var(--tx2);padding:0 6px">
+    ${tab('map','Map',on==='map')}${tab('journeys','Journeys',on==='journeys')}${tab('passport','Passport',on==='passport')}${tab('feed','Feed',on==='feed')}</div>
+  <div style="width:62px;height:62px;border-radius:31px;background:#BD8053;box-shadow:0 6px 22px rgba(0,0,0,.18);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;letter-spacing:.5px;color:#242321;text-align:center;line-height:1.1">START<br>DRIVE</div></div>`;
+const navR = (right, left='') => `<div class="nav">${left||'<div style="width:44px"></div>'}<div></div>${right}</div>`;
+const gearBtn = `<div class="btn">${I.gear}</div>`;
+const heroP = (o={}) => `<div class="hero" style="padding-top:2px">${o.art===false?'':artRoutes({seed:7, op:o.op||.42, hub:[318,104], mask:'radial-gradient(75% 80% at 88% 32%, #000 30%, transparent 78%)'})}
+  <div class="title" style="margin-top:0">Your Passport</div>
+  <div class="sub">${o.sub||'Every road tells a story.'}</div>
+  <div style="margin-top:34px"><span class="num" style="font-size:68px;line-height:1">830</span> <span class="unit" style="font-size:24px">km</span></div>
+  <div class="lab" style="font-size:15px">${o.gps||'all-time GPS'}</div>
+  <div style="margin-top:14px;font-size:20px;font-weight:600;line-height:1.3">30 <span class="unit">drives</span> &nbsp;·&nbsp; 15h 38m <span class="unit">driving</span></div>
+  ${o.after||''}</div>`;
+const P1 = phone(navR(gearBtn) + heroP({gps:'all-time GPS · since March 2026'}) + footprintCard() + bar4('passport'));
+const P2 = phone(navR(gearBtn) + heroP({sub:'Every road since March 2026.'}) + footprintCard() + bar4('passport'));
+const P3 = phone(navR(gearBtn) + heroP({gps:'all-time GPS · since March 2026', op:.5}) + footprintCard() + bar4('passport'), 'dark');
+const P4 = phone(`<div class="nav"><div class="btn">${I.back}</div><div></div>${gearBtn}</div>` + heroP({gps:'all-time GPS · since March 2026'}) + footprintCard());
+document.getElementById('r0').innerHTML =
+  fig(P1, '<b>P1 · Passport as a tab</b> (recommended). No Back: only Settings, top right. No eyebrow, no Private, no username. "Since" qualifies the total it belongs to: <i>all-time GPS · since March 2026</i>.') +
+  fig(P2, '<b>P2 · "Since" as the subtitle.</b> The subtitle carries the fact instead of a slogan: <i>Every road since March 2026.</i> One line fewer, and every line is data.') +
+  fig(P3, '<b>P3 · Dark</b>, as P1.') +
+  fig(P4, '<b>P4 · If the Passport stays pushed.</b> The same header with Back; the floating bar steps aside as today. For comparing against the tab.');
+
+const feedHead2 = (right, pulse) => navR(right) + `<div class="hero" style="padding:2px 20px 20px"><div class="title" style="margin-top:0">Feed</div><div class="sub">The journeys we share.</div>
+  <div style="margin-top:14px;font-size:14px;color:var(--tx2)">${pulse}</div></div>`;
+const F1 = phone(feedHead2(`<div class="avatar">T</div>`, `<span class="pill">72h</span> &nbsp;<b style="color:var(--tx)">142 drivers</b> · 3,120 km · 96 h`) + rows + bar4('feed'));
+const F2 = phone(feedHead2(`<div class="join">Join</div>`, `Quiet for now. Drives people share appear here.`) +
+  `<div style="padding:60px 40px;text-align:center;color:var(--tx2);font-size:15px;line-height:1.4">Share a drive from its page<br>and it shows up here for others.</div>` + bar4('feed'));
+const segTop = `<div style="width:190px;background:color-mix(in srgb, var(--tx) 7%, transparent);border-radius:20px;padding:3px;display:flex;font-size:14px;font-weight:600"><span style="flex:1;text-align:center;padding:8px 0;border-radius:17px;background:var(--card);box-shadow:0 1px 3px rgba(0,0,0,.12)">Explore</span><span style="flex:1;text-align:center;padding:8px 0;color:var(--tx2)">Day</span></div>`;
+const jrow = (t,m,seed) => `<div class="frow" style="align-items:center">${shape(seed)}<div style="flex:1"><div class="hl" style="margin:0 0 2px">${t}</div><small>${m}</small></div></div>`;
+const J1 = phone(`<div class="nav"><div class="btn">${T.sliders}</div>${segTop}<div class="btn">${T.plus}</div></div>
+  <div style="padding:6px 20px 12px;font-size:20px;font-weight:700">Where have I been?</div>
+  <div class="card" style="margin-bottom:12px">${mapStub(4)}<div style="padding:12px 16px"><div style="font-size:17px;font-weight:600">Saturday evening</div><small style="color:var(--tx2);font-size:13px">42 km · 1h 05m · Mazda CX-5</small></div></div>` +
+  jrow('Friday morning','18 km · 34m',11) + jrow('Thursday evening','126 km · 2h 20m',5) + bar4('journeys'));
+document.getElementById('r0b').innerHTML =
+  fig(F1, '<b>F1 · Feed, member.</b> The same header grammar as the Passport, on plain Ivory: title "Feed", the subtitle, the pulse as one line. The avatar moves to the right, where the Passport has Settings.') +
+  fig(F2, '<b>F2 · Feed, guest and quiet.</b> Join stands where the avatar will be; the status is one line, never the headline.') +
+  fig(J1, '<b>J1 · Journeys.</b> The Passport stamp is gone from the left (the Passport has its tab); <code>slider.horizontal.3</code> opens Filter / Refine. The picker and the question stay as built.');
+
+// ---------- Round 3 ----------
+const chip = (t,on) => `<span style="display:inline-flex;align-items:center;height:36px;padding:0 14px;border-radius:18px;font-size:15px;font-weight:${on?600:500};margin:0 8px 8px 0;${on?'background:color-mix(in srgb, var(--ac) 16%, transparent);color:var(--ac);border:1px solid var(--ac)':'background:var(--card);border:.5px solid var(--stroke)'}">${t}</span>`;
+const grp = (t,chips) => `<div style="font-size:13px;font-weight:600;color:var(--tx2);margin:16px 0 8px">${t}</div><div>${chips}</div>`;
+const jBody = (extra='', dot=false) => `<div class="nav"><div class="btn" style="position:relative;${dot?'color:var(--ac)':''}">${T.sliders}${dot?'<i style="position:absolute;top:1px;right:1px;width:10px;height:10px;border-radius:5px;background:var(--ac);border:2px solid var(--bg)"></i>':''}</div>${segTop}<div class="btn">${T.plus}</div></div>
+  <div style="padding:6px 20px 12px;font-size:20px;font-weight:700">Where have I been?</div>${extra}`;
+const list = `<div class="card" style="margin-bottom:12px">${mapStub(4)}<div style="padding:12px 16px"><div style="font-size:17px;font-weight:600">Saturday evening</div><small style="color:var(--tx2);font-size:13px">42 km · 1h 05m · Mazda CX-5</small></div></div>` + jrow('Friday morning','18 km · 34m',11) + jrow('Thursday evening','126 km · 2h 20m',5);
+const sheet = `<div style="position:absolute;inset:0;background:rgba(0,0,0,.28);z-index:5"></div>
+  <div style="position:absolute;left:0;right:0;bottom:0;height:500px;background:var(--bg);border-radius:28px 28px 0 0;z-index:6;padding:8px 20px 0">
+  <div style="width:36px;height:5px;border-radius:3px;background:var(--stroke);margin:0 auto 10px"></div>
+  <div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:20px;font-weight:700">Filter</span><span style="font-size:15px;font-weight:600;color:var(--ac)">Reset</span></div>
+  ${grp('Vehicle', chip('All',false)+chip('Mazda CX-5',true)+chip('Honda Wave',false))}
+  ${grp('Distance', chip('Any',false)+chip('Under 10 km',false)+chip('10–50 km',false)+chip('Over 50 km',true))}
+  ${grp('Period', chip('All time',true)+chip('This month',false)+chip('This year',false)+chip('2025',false))}
+  <div style="position:absolute;left:20px;right:20px;bottom:34px;height:52px;border-radius:26px;background:#BD8053;color:#242321;font-weight:700;font-size:17px;display:flex;align-items:center;justify-content:center">Show 4 drives</div></div>`;
+const tokens = `<div style="padding:0 20px 6px;margin-top:-4px">${chip('Mazda CX-5 ✕',true)}${chip('Over 50 km ✕',true)}</div>
+  <div style="padding:0 20px 10px;font-size:14px;color:var(--tx2)">4 drives · 412 km</div>` +
+  jrow('Thursday evening','126 km · 2h 20m · Mazda CX-5',5) + jrow('2 Nov, morning','98 km · 1h 50m · Mazda CX-5',9) + jrow('25 Oct, afternoon','104 km · 2h 05m · Mazda CX-5',13) + jrow('11 Oct, morning','84 km · 1h 32m · Mazda CX-5',17);
+document.getElementById('r00').innerHTML =
+  fig(P2, '<b>Passport, chosen (P2).</b> A tab; Settings top right; "Every road since March 2026."; the distance leads, drives and time follow; the person\'s routes drawn once behind the hero.') +
+  fig(phone(jBody(list) + bar4('journeys')), '<b>J1 · Journeys at rest.</b> <code>slider.horizontal.3</code> where the Passport stamp was.') +
+  fig(phone(jBody(list) + sheet), '<b>J2 · Filter.</b> A sheet at the medium height: Vehicle and Distance as chips, one choice per group; the period sits with them (today it is a menu on the first month). The button says how many drives match before it closes.') +
+  fig(phone(jBody(tokens, true) + bar4('journeys')), '<b>J3 · Filtered.</b> The button turns Copper with a dot; each active filter is a token that one tap removes; the totals line is the filter\'s. The latest-drive feature steps aside while a filter narrows the list.');
+</script>
+</body>
+</html>

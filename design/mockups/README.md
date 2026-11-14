@@ -34,6 +34,7 @@ These boards are retained as explorations; their presence does not establish app
 - [Journeys overview](journeys/journeys-overview.png)
 - [Along the Way route variations](journeys/along-the-way-route-variations.png)
 - [Four-province exploration concept](journeys/regions-explored-four-provinces.png)
+- [Passport and Feed editorial headers](passport/passport-feed-headers.png) (2026-11-14, `plans/passport-tab-and-header.md`; source `source/passport-feed-headers.html`): three Passport directions, the Passport as a tab, the Feed, Journeys' Filter; P2 chosen and built
 - [Milestones dashboard](passport/milestones-dashboard.png)
 - [Passport milestones](passport/passport-milestones.png)
 - [Warm Copper visual direction](concepts/warm-copper-ui-collage.png)

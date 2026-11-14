@@ -20,4 +20,5 @@ shot replay-export.html 1900 2150 replay/replay-export.png
 shot share-card.html 2260 3840 share/share-card.png
 shot journey-experience.html 2280 6900 journeys/journey-experience-v2.png
 shot route-ends.html 1800 1800 journeys/route-ends.png
+shot passport-feed-headers.html 1880 5960 passport/passport-feed-headers.png
 echo done
