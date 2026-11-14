@@ -653,6 +653,19 @@ the owner compares the edit with the one-rate clip of the same drive. 30 fps sta
 renderer step through its table; the camera reads its rate. W4d-3 the editor's pace line says the
 edit; owner's comparison on the iPhone.
 
+### W4d-1 result (2026-11-14, carodo-ios f27cd1e)
+
+`RecapScript` built as planned, pure, not yet played; 10 tests. On the 33 drives of the newest pull
+of each iPhone (opt-in `RecapScriptReplayTests`, figures only): 26 of 66 clips (30 s and 60 s) get
+an edit, the rest are too short and keep one rate. A 99 km drive in 30 s: fast 221×, slow 37× (one
+rate 171×); in 60 s: 93× and 15×. City drives drop their winding stretches (the slow parts would
+take over half the clip). The camera's rate doubles in exactly 0.5 s at the steepest; the wheel's
+the same away from stops. Made in up to ~360 ms (Debug, simulator) for a city drive's 60 s clip,
+where the winding try fails first: to measure on the iPhone in W4d-2, off the main actor.
+
+Next, W4d-2: `ReplayPlayer` and the renderer step through the table (story per frame), the camera
+reads its rate; the preview the same; then W4d-3 (the pace line, the owner's comparison).
+
 ### Brief for the next session
 
 ```text
