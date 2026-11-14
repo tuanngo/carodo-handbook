@@ -185,7 +185,9 @@ Small leftovers from this pass, for the same session:
 
 ## Second pass: flows, VoiceOver, contrast (audit 2026-11-14, carodo-ios `e99f1f4`)
 
-Status: **audited, waiting for the owner's approval of the order below.** No code yet.
+Status: **order approved by the owner 2026-11-14; step 9 done (carodo-ios `73adbac`), step 10 next.** Owner decisions the same day:
+(1) the two failure titles drop their full stop (done with step 11's copy); (2) status colours are
+tuned to the palette in Light to pass AA, every direct use through the token (step 12).
 
 ### How it was audited
 
@@ -234,6 +236,17 @@ Checked and by design: "Auto Mode", "Auto finish" and "Driving Passport" stay En
 | 13 | Flow faults in A8, one by one | A8 | agent; the archive dialog and the Export trim line need the owner | none |
 | 14 | A9 handed to the Feed session (check whether the real store has it before fixing the mock) | A9 | Feed session | none |
 | 15 | Leftover of the first pass: the car-log sheets out of `MainTabView` into one modifier | — | agent | none |
+
+### Done (second pass)
+
+- **Step 9** (carodo-ios `73adbac`): Replay's distance and speed take a row of their own when the
+  one row does not fit (`ViewThatFits`), so the overlay and its header stay on screen; the
+  Explore/Day pill is flexible down to the room between the bar's buttons; the first-drive tile
+  falls back to a numeric date ("23-12") rather than "23 thg…"; the fuel sheet's station line takes
+  two lines; a speed range is one unbreakable token (word joiner after the dash, no-break space
+  before the unit); the Private chip keeps one line. Screenshots Vietnamese xxxLarge Light and
+  Dark, English xxxLarge and default: English and default sizes unchanged. The same wrap of a
+  figure from its unit elsewhere is TD-29. Lint, warnings (none), 2,149 tests pass.
 
 ## Considered and not planned
 
