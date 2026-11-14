@@ -1,6 +1,6 @@
 # carodo-ios UI/UX and view organisation audit, 2026-11-14: findings and the order to fix them
 
-Status: **recorded 2026-11-14**. Step 1 done (carodo-ios `7f1cc4b`); step 2a built, waiting for the owner's review (uncommitted); 2b and 3–8 open. Audit at carodo-ios `34c519f` (`main`). Each step
+Status: **recorded 2026-11-14**. Steps 1 (`7f1cc4b`) and 2 (2a `055e6b3`, 2b `5ee58ee`; TD-16 closed) done; step 3 built, waiting for the owner's review (uncommitted); 4–8 open. Audit at carodo-ios `34c519f` (`main`). Each step
 below gets its own short plan, approved by the owner, before any code (AGENT_WORKFLOW.md); steps
 are taken one at a time, in order, and each is one commit.
 
@@ -74,7 +74,7 @@ What is sound and needs nothing: no deprecated SwiftUI API (`foregroundColor`, `
   stop, the others do not (copy, for the owner); a vehicle's page and Replay cannot be put in their
   failed state with sample data (unit tests cover them).
 
-- **Step 2a** (built 2026-11-14, waiting for the owner's review): `carodoTextSizeCap()` at the
+- **Step 2a** (carodo-ios `055e6b3`, 2026-11-14, accepted by the owner): `carodoTextSizeCap()` at the
   root of `CarodoApp` caps text at xxxLarge in two halves: SwiftUI's `dynamicTypeSize` for the
   root's tree, and the window's `traitOverrides.preferredContentSizeCategory` (the person's setting,
   no larger than xxxLarge, following a change in Settings) for what iOS presents beside it. The
@@ -88,9 +88,21 @@ What is sound and needs nothing: no deprecated SwiftUI API (`foregroundColor`, `
   agent's memory, while `AGENTS.md` asked for screenshots at "a large Dynamic Type size" and the
   recipe in `docs/operations/setup.md` used `accessibility-extra-large`. The rule is now in
   `AGENTS.md` (UI convention, evidence lines) and `docs/design-system.md#typography`, and the
-  recipe uses xxxLarge. **2b** (open): remove the ~60 `isAccessibilitySize` branches left in ~30
-  files, in its own commit when the files other sessions edit (Replay, Share, recording panels)
-  are quiet; TD-16 closes with it.
+  recipe uses xxxLarge.
+- **Step 2b** (carodo-ios `5ee58ee`): the 46 `isAccessibilitySize` branches in 24 files removed with
+  what only they used (Day's one-day stepper and its two strings, the CarPlay badge's dot-only
+  form, the elevation chart's and share card's own caps) and the spec lines describing them.
+  Screenshots at xxxLarge before and after differ only in the status bar's clock. TD-16 closed.
+- **Step 3** (built 2026-11-14, waiting for the owner's review): `feedShape(...)` clears a Feed
+  row's and the invite's shape around every laid-out line of text (`Text.LayoutKey`, soft edge),
+  so no stroke crosses a word; the shape shows beside short lines and between them. Replaces the
+  2026-11-11 rule "under text only a thin core with a halo", whose core read as a strike-through.
+  The invite's shape is now a short stub beside its last line; the owner judges whether that is
+  enough of a shape.
+- Checked 2026-11-14 at the owner's question: with iOS 18 the minimum, no availability check for
+  an older system is left; every `#available` is iOS 26 (Liquid Glass, Apple Intelligence). The 11
+  `UIGraphicsImageRenderer` (compositing on map snapshots) and one `UISelectionFeedbackGenerator`
+  (inside an `MKMapView` delegate) are UIKit on purpose, not leftovers.
 
 ## Considered and not planned
 
