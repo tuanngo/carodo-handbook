@@ -185,7 +185,7 @@ Small leftovers from this pass, for the same session:
 
 ## Second pass: flows, VoiceOver, contrast (audit 2026-11-14, carodo-ios `e99f1f4`)
 
-Status: **order approved by the owner 2026-11-14; steps 9–11 done (carodo-ios `73adbac`, `463807c`, `8ff6cd6`), step 12 next.** Owner decisions the same day:
+Status: **order approved by the owner 2026-11-14; steps 9–12 done (carodo-ios `73adbac`, `463807c`, `8ff6cd6`, `1313cf1`), step 13 next.** Owner decisions the same day:
 (1) the two failure titles drop their full stop (done with step 11's copy); (2) status colours are
 tuned to the palette in Light to pass AA, every direct use through the token (step 12).
 
@@ -277,6 +277,18 @@ Checked and by design: "Auto Mode", "Auto finish" and "Driving Passport" stay En
   Lint, warnings (none); 2,180 tests pass with `RouteGlyphMakerTests` skipped (another session's
   uncommitted change was failing it at the time); `AtlasMapViewTests` failed once by timing, then
   passed.
+- **Step 12** (carodo-ios `1313cf1`, colours chosen by the owner from before/after images and
+  swatches, 2026-11-14): Light `textSecondary` 106·102·96 (4.9:1 on Ivory, was 4.1); `warning` a
+  vivid red-orange 232·84·30 for icons, dots and borders only, its words in the text colour (the
+  owner found a burnt orange that passed as text too dark and dull; no vivid orange reaches 4.5:1
+  on Ivory); `success` teal 0·122·110 (4.5:1, also as text; the owner wanted it away from system
+  green); `error` brick 186·44·36 (5.2:1), Dark 255·118·110; the live panel is the Dark card in
+  both appearances (secondary and Copper 4.7:1 on it, were 3.9). 33 direct system orange, green
+  and red go through the tokens (icon tiles' own colours stay). Increase Contrast now gives text,
+  Copper, lines and status a stronger value (6–7.5:1, lines 3.5:1). `docs/design-system.md`
+  gained a Contrast section with the measured table. Not in this step: disabled buttons (iOS's
+  own dimming) and the floating bar's translucency over the satellite map. Lint, warnings (none),
+  2,195 tests pass.
 
 ## Considered and not planned
 
