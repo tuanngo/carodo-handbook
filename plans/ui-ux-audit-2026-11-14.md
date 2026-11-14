@@ -1,6 +1,6 @@
 # carodo-ios UI/UX and view organisation audit, 2026-11-14: findings and the order to fix them
 
-Status: **recorded 2026-11-14**. Steps 1 (`7f1cc4b`) and 2 (2a `055e6b3`, 2b `5ee58ee`; TD-16 closed) done; step 3 built, waiting for the owner's review (uncommitted); 4–8 open. Audit at carodo-ios `34c519f` (`main`). Each step
+Status: **recorded 2026-11-14**. Steps 1 (`7f1cc4b`) and 2 (2a `055e6b3`, 2b `5ee58ee`; TD-16 closed) done; step 3 done (`e4a0dbf`); 4–8 open. Audit at carodo-ios `34c519f` (`main`). Each step
 below gets its own short plan, approved by the owner, before any code (AGENT_WORKFLOW.md); steps
 are taken one at a time, in order, and each is one commit.
 
@@ -93,12 +93,11 @@ What is sound and needs nothing: no deprecated SwiftUI API (`foregroundColor`, `
   what only they used (Day's one-day stepper and its two strings, the CarPlay badge's dot-only
   form, the elevation chart's and share card's own caps) and the spec lines describing them.
   Screenshots at xxxLarge before and after differ only in the status bar's clock. TD-16 closed.
-- **Step 3** (built 2026-11-14, waiting for the owner's review): `feedShape(...)` clears a Feed
+- **Step 3** (carodo-ios `e4a0dbf`, 2026-11-14, accepted by the owner): `feedShape(...)` clears a Feed
   row's and the invite's shape around every laid-out line of text (`Text.LayoutKey`, soft edge),
   so no stroke crosses a word; the shape shows beside short lines and between them. Replaces the
   2026-11-11 rule "under text only a thin core with a halo", whose core read as a strike-through.
-  The invite's shape is now a short stub beside its last line; the owner judges whether that is
-  enough of a shape.
+  The invite's shape is now a short stub beside its last line (owner: fine).
 - Checked 2026-11-14 at the owner's question: with iOS 18 the minimum, no availability check for
   an older system is left; every `#available` is iOS 26 (Liquid Glass, Apple Intelligence). The 11
   `UIGraphicsImageRenderer` (compositing on map snapshots) and one `UISelectionFeedbackGenerator`
