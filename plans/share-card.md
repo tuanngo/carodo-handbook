@@ -158,6 +158,20 @@ show its place): an 80 pt band along the line and a 100 pt disc round the route'
 fade, the ground at 78% beyond, the map at half its colour; in Dark the clear shape still reads
 more than in Light.
 
+**S1.2 (owner's looks on the iPhone, 2026-11-14; committed carodo-ios `cc7f900`):** Aa gains
+**Map** (Route first, the default · Whole map, the S1 look) and **Line** (Solid · Glow: a Copper halo,
+amber at the start deepening to Copper at the end; never by speed, D6 kept) as `ShareSegments`
+rows in `ShareFieldsPanel`; the stamp a fifth smaller (72/66/58 pt); the line 3.5 pt on a 5.5 pt Ivory
+edge, end marks 9 pt (second look: 4.75 still read as a band); Glow's halo is the line itself
+widened and blurred (Core Image), so the whole length glows in its own colours; chips and rows in
+Aa smaller (footnote, 34 pt face, 44 pt touch); the "always show" footer gone, on the video's Aa too; third look: Glow quieter (halo 2x the line, sigma 3.5, half
+seen; amber to Copper closer together), units in Copper and figures in the ink, and Start & end
+falls back to Provinces Crossed for an end never looked up (the pulled databases showed most drives
+end at Home, a private place never sent to Apple, so the chip was never offered); the route spans 85% of its area; figures 18 pt over 12 pt units; a
+**Start & end** chip, off by default: each end by its ward, an end at the person's own place or in a
+private region by its province only (owner's choice of the three offered). D2 changed by the owner
+for this one opt-in line.
+
 **Later (owner, 2026-11-14):** the stamp and Simple to be looked at again: perhaps the stamp
 pressed lightly in a corner, as a seal on a document, rather than beside the figures.
 
