@@ -677,6 +677,11 @@ reads its rate; the preview the same; then W4d-3 (the pace line, the owner's com
 - W4d-3 (be3efa5): the pace pill reads the edit's two rates ("60 s · 141–282×"); the Trim's hint reads the
   fast one; at xxxLarge the pill shows the length alone.
 
+Private regions (owner, 2026-11-14; carodo-ios 156ca13): only the ends are cut, never the middle.
+An end in a private region loses that region whatever the zone (the larger of the two); a region
+crossed on the way plays; a stop made in one plays as driving (no pause, no "Stopped", its wait not
+counted). Places that cannot be read give no video. TD-25 resolved; TD-26 keeps only TD-2.
+
 Open: the owner's comparison on the iPhone (the edit against a one-rate clip of the same drive:
 pick 15× … 120× in the menu for the latter); the edit's making time on the iPhone (up to ~360 ms in
 Debug on the simulator for a city drive's minute); PV-20 as before.
