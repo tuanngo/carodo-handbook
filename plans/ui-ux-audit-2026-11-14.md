@@ -1,6 +1,6 @@
 # carodo-ios UI/UX and view organisation audit, 2026-11-14: findings and the order to fix them
 
-Status: **recorded 2026-11-14**. Steps 1 (`7f1cc4b`) and 2 (2a `055e6b3`, 2b `5ee58ee`; TD-16 closed) done; step 3 done (`e4a0dbf`); 4–8 open. Audit at carodo-ios `34c519f` (`main`). Each step
+Status: **recorded 2026-11-14**. Steps 1 (`7f1cc4b`) and 2 (2a `055e6b3`, 2b `5ee58ee`; TD-16 closed) done; step 3 done (`e4a0dbf`); step 4 done (`75a9977`); 5–8 open. Audit at carodo-ios `34c519f` (`main`). Each step
 below gets its own short plan, approved by the owner, before any code (AGENT_WORKFLOW.md); steps
 are taken one at a time, in order, and each is one commit.
 
@@ -98,6 +98,11 @@ What is sound and needs nothing: no deprecated SwiftUI API (`foregroundColor`, `
   so no stroke crosses a word; the shape shows beside short lines and between them. Replaces the
   2026-11-11 rule "under text only a thin core with a halo", whose core read as a strike-through.
   The invite's shape is now a short stub beside its last line (owner: fine).
+- **Step 4** (carodo-ios `75a9977`): Journey Detail's fifteen presentations are four enums (sheet,
+  cover, confirmation, failure); `notMineAfterEditor` became a confirmation that waits for the
+  sheet to close. 28 `@State` to 17. Each presentation checked through its debug argument; Trim
+  and Merge open only on a journal in a trip store (`-carodo.sampleJournal N`), not on
+  `-carodo.sampleData`, as before.
 - Checked 2026-11-14 at the owner's question: with iOS 18 the minimum, no availability check for
   an older system is left; every `#available` is iOS 26 (Liquid Glass, Apple Intelligence). The 11
   `UIGraphicsImageRenderer` (compositing on map snapshots) and one `UISelectionFeedbackGenerator`
