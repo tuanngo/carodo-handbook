@@ -1,6 +1,6 @@
 # carodo-ios UI/UX and view organisation audit, 2026-11-14: findings and the order to fix them
 
-Status: **all eight steps done 2026-11-14**, carodo-ios `7f1cc4b`..`e99f1f4`, unpushed. TD-10, TD-13 and TD-16 closed; PV-21 (the drive flow on an iPhone) open. Audit at carodo-ios `34c519f` (`main`). Each step
+Status: **first pass, all eight steps done 2026-11-14**, carodo-ios `7f1cc4b`..`e99f1f4`, unpushed. TD-10, TD-13 and TD-16 closed; PV-21 (the drive flow on an iPhone) open. **Second pass (flows, VoiceOver, contrast) audited 2026-11-14**, findings A1–A9 and steps 9–15 below, waiting for the owner. Audit at carodo-ios `34c519f` (`main`). Each step
 below gets its own short plan, approved by the owner, before any code (AGENT_WORKFLOW.md); steps
 are taken one at a time, in order, and each is one commit.
 
@@ -182,6 +182,58 @@ Small leftovers from this pass, for the same session:
   modifier of their own (step 5, not needed for its target; makes the shell smaller still).
 - Spacing: no mass rewrite; files the session touches move to `CarodoSpacing`.
 - PV-21 (the drive flow on an iPhone) stays with the owner.
+
+## Second pass: flows, VoiceOver, contrast (audit 2026-11-14, carodo-ios `e99f1f4`)
+
+Status: **audited, waiting for the owner's approval of the order below.** No code yet.
+
+### How it was audited
+
+- Flows tapped through on two simulators of the session's own (iPhone 18 Pro, iOS 27.2,
+  `-carodo.sampleData YES`) with the Xcode device-interaction tools, about 125 screenshots (session
+  scratch, not kept): onboarding, Start Drive → recording → Hold to Finish, Journeys → Journey
+  Detail → Replay → Export, Share card and Aa, Your trip, Map controls, Passport, Garage (add, edit,
+  archive, odometer, fuel, expense, histories), Feed (guest, Join, profile, reactions), every
+  Settings row. English Light first, then Vietnamese at xxxLarge, then Dark.
+- VoiceOver read from the accessibility tree of each screen (labels, traits, grouping, order),
+  plus a source scan for icon-only buttons without a label (none left: all 23 candidates are
+  labelled).
+- Contrast measured from the tokens in `CarodoSurface`/`CarodoColor` (WCAG 2.1 relative luminance;
+  system colours at their iOS values), and the places each pair is used counted in the source.
+
+Not covered: Trim and Merge (the ⋯ menu offered neither on sample data or `-carodo.sampleJournal 30`
+in this walk; not checked further), the summary after a finished drive (simulated GPS stayed on
+Finding GPS, so the drive was discarded as short: a simulator limit), a real VoiceOver run with
+speech, and an automated audit (`performAccessibilityAudit` needs a UI test target: a P6 decision).
+
+### Findings
+
+| ID | Finding | Evidence |
+|---|---|---|
+| A1 | **Replay is wider than the screen in Vietnamese at xxxLarge**: the header's right buttons (Make a video, Route style, Follow) and the panel's speed gauge are cut off at the right edge. English at xxxLarge fits | `ReplayView` header and control panel |
+| A2 | **Other cuts at xxxLarge, Vietnamese**: Journeys' Explore/Day pill runs under the Passport and + buttons; Milestones' first-drive date "23 thg…"; the fuel sheet's station line "Station No. 12 · 35…"; Driving Pace breaks "30–60 / km/h" between figure and unit; the Passport's "Riêng tư" chip breaks in two | Journeys bar, `MilestoneDetailView`, `FuelEntrySheet`, Journey Detail pace card, Passport |
+| A3 | **Decoration is read by VoiceOver under symbol names**: stat-tile icons ("Road With Lane Markings", "Open Gauge At 67 Percent…"), each car avatar twice ("Car Side View, Filled", "Car Side View"), onboarding rows ("Wi-Fi Off", "Lock"), Settings row icons beside their pickers ("Paper Banknote, Filled"), About's icon ("AboutIcon"), the Replay car and route ends ("Map pin") | Journeys, Journey Detail, Start panel, Settings, About, Replay, Export |
+| A4 | **Things off screen or behind stay in the accessibility tree**: the onboarding map on pages 1 and 3, Garage cards off the carousel, the collapsed recording pill under the expanded panel, Journey Detail's hidden title (then read again in the content) | onboarding, `GarageView`, recording panels, `JourneyDetailView` |
+| A5 | **Composite elements read badly**: the latest-drive card ("13,0, km, 24 min, +5 m, Daily, Long Thành": unit split, "+5 m" unexplained, place twice); Feed rows read twice (texts, then a combined line); Garage odometer "41.250" and "km" apart, "drives 45"; Journey Detail start/end rows do not say start or end; the Garage card's 12-week chart is 12 bars "0 to 1, 132.095"; day headers read "Yesterday, · 13 Nov"; missing live values read "–" | `JourneyHeroCard`, `FeedRow`, Garage card, Journey Detail, recording panel |
+| A6 | **Controls with a wrong or missing name**: Finish exposed twice (icon and caption) and neither says it needs a hold; the collapsed recording pill opens the panel but has no button trait; Menus expose a second unlabelled button at the same frame (Summary period, Export's Hide and Length); text fields named only by their placeholder (vehicle name/make/model, place name, Claim, caption); the share-card style toggle always says "Stamp"; the card preview has no label; reactions are bare emoji; Auto Mode reads "Off" twice; "Update" and "Change" say no object; the Feed avatar is "Feed identity"; Join's title reads "Claim your name., Make it yours."; "Tốc độ TB" spoken as written; tiles in a grid read in order of height (Driving time before Distance; Update odometer before Log fuel) | recording panels, Journeys, Export, Garage forms, Places editor, Share, Feed, Settings |
+| A7 | **Contrast, measured** (AA: 4.5:1 body, 3:1 large text and icons): Light secondary text on the page background **4.08** (on a card 4.60, passes); system orange and green on Light **1.9–2.2** and red **3.1–3.5**, used as text or status icons in **29 places** that bypass `CarodoSurface.warning/success/error` (Settings, iCloud, Diagnostics, Backup, Places, Feed sheets, Garage, recording requirements); Dark red on a card 3.63; on the live surface in Dark (`liveRaisedDark`) secondary text **3.87** and Copper **3.91**; secondary at 70 % opacity as caption text 2.5–3.6 (`JourneyCards`, `VehicleDetailView`, `VehicleEditorView`); disabled Save/Claim hard to read. Passes: primary text 10.7–15.3, Copper accent 4.6–6.0, Charcoal on the Copper fill 4.77. **Increase Contrast is not honoured**: the adaptive colours read only light/dark | `CarodoSurface`, grep counts |
+| A8 | **Flow faults**: the "Share to Feed?" card looks like one button but only its 137×20 pt text responds (the start/end place rows are 20 pt tall too); Edit vehicle: the keyboard covers Save (no Save in the bar) and Cancel drops edits without asking; archiving a car is two dialogs with different words (a popover without Cancel from Edit, a sheet with Cancel from ⋯); the ⋯ menu says "Update odometer" where the card says "Add reading"; an archived car with no drives shows "0,0 km" (unknown is not zero); the place editor without a location spins on "Determining Location" forever, with no camera fallback; Export says "Whole drive · 12,3 km" for a 13,0 km drive with no word about the privacy trim; Passport scrolls under the status bar and its floating buttons with no backdrop; Backup's background is system grey, not the Settings surface; the Auto Mode sheet's car icon is system blue | Journey Detail, `VehicleEditorView`, Garage, Places, Export, Passport, Backup, `AutoModeSheet` |
+| A9 | **Feed identity looks inconsistent (sample mock; for the Feed session)**: after Join and Start sharing, the Join card stays and Edit profile shows sharing Off; turning it on there leaves Settings at "Not sharing"; a guest's avatar shows a letter; after a relaunch the Feed avatar shows "T" while Settings offers "Create your profile" | Feed, Settings |
+
+Checked and by design: "Auto Mode", "Auto finish" and "Driving Passport" stay English in Vietnamese
+(glossary); the Feed shape beside short lines (step 3, accepted).
+
+### Order of work (second pass)
+
+| Step | What | Findings | Commit by | Depends on |
+|---|---|---|---|---|
+| 9 | Replay and the five other cuts fit at xxxLarge in Vietnamese (wrap or `ViewThatFits`, never an accessibility-size branch) | A1, A2 | agent, with screenshots | none |
+| 10 | VoiceOver structure: decoration hidden, off-screen and covered views hidden, composite elements combined with one authored line, grid reading order by sort priority | A3, A4, A5 | agent | none |
+| 11 | VoiceOver names: the controls in A6, new labels in the catalogs (English and Vietnamese, short) | A6 | **owner review** (copy) | 10 |
+| 12 | Contrast: Light secondary text to ≥ 4.5:1 on the page; status colours as tokens, every direct `.orange/.green/.red` through them, tuned for 3:1 (icons) and 4.5:1 (text); live surface in Dark; no faded text below 4.5:1; colours for Increase Contrast | A7 | **owner review** (owner decision 2) | none |
+| 13 | Flow faults in A8, one by one | A8 | agent; the archive dialog and the Export trim line need the owner | none |
+| 14 | A9 handed to the Feed session (check whether the real store has it before fixing the mock) | A9 | Feed session | none |
+| 15 | Leftover of the first pass: the car-log sheets out of `MainTabView` into one modifier | — | agent | none |
 
 ## Considered and not planned
 
