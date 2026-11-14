@@ -1,6 +1,6 @@
 # carodo-ios UI/UX and view organisation audit, 2026-11-14: findings and the order to fix them
 
-Status: **recorded 2026-11-14**. Step 1 done (carodo-ios `7f1cc4b`); steps 2–8 open. Audit at carodo-ios `34c519f` (`main`). Each step
+Status: **recorded 2026-11-14**. Step 1 done (carodo-ios `7f1cc4b`); step 2a built, waiting for the owner's review (uncommitted); 2b and 3–8 open. Audit at carodo-ios `34c519f` (`main`). Each step
 below gets its own short plan, approved by the owner, before any code (AGENT_WORKFLOW.md); steps
 are taken one at a time, in order, and each is one commit.
 
@@ -73,6 +73,24 @@ What is sound and needs nothing: no deprecated SwiftUI API (`foregroundColor`, `
   Journeys, Day, Garage, Places. Left open: the failure titles of Places and Replay end with a full
   stop, the others do not (copy, for the owner); a vehicle's page and Replay cannot be put in their
   failed state with sample data (unit tests cover them).
+
+- **Step 2a** (built 2026-11-14, waiting for the owner's review): `carodoTextSizeCap()` at the
+  root of `CarodoApp` caps text at xxxLarge in two halves: SwiftUI's `dynamicTypeSize` for the
+  root's tree, and the window's `traitOverrides.preferredContentSizeCategory` (the person's setting,
+  no larger than xxxLarge, following a change in Settings) for what iOS presents beside it. The
+  SwiftUI cap alone left sheets uncapped (the Garage sheet at the largest Larger Text size, figures
+  cut), and a view's `maximumContentSizeCategory` does not reach a presented controller. Fixed at
+  xxxLarge: the latest-drive card's figures stack when they do not fit (`ViewThatFits`), a
+  journey row's line takes two lines, `StatColumn` wraps rather than shrinking to 60 %, the Garage
+  card's paint and fuel take a line each in English and its model line keeps its wrapped height.
+  **Why agents kept writing `isAccessibilitySize` branches after the 2026-11-12 decision** (four
+  commits: `066de55`, `600d85d`, `ef7e8a8`, `393045d`): the rule lived only in TD-16 and an
+  agent's memory, while `AGENTS.md` asked for screenshots at "a large Dynamic Type size" and the
+  recipe in `docs/operations/setup.md` used `accessibility-extra-large`. The rule is now in
+  `AGENTS.md` (UI convention, evidence lines) and `docs/design-system.md#typography`, and the
+  recipe uses xxxLarge. **2b** (open): remove the ~60 `isAccessibilitySize` branches left in ~30
+  files, in its own commit when the files other sessions edit (Replay, Share, recording panels)
+  are quiet; TD-16 closes with it.
 
 ## Considered and not planned
 
