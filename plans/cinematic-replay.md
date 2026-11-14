@@ -666,6 +666,21 @@ where the winding try fails first: to measure on the iPhone in W4d-2, off the ma
 Next, W4d-2: `ReplayPlayer` and the renderer step through the table (story per frame), the camera
 reads its rate; the preview the same; then W4d-3 (the pace line, the owner's comparison).
 
+### W4d-2 and W4d-3 result (2026-11-14, carodo-ios 5f8870e, be3efa5)
+
+- W4d-2 (5f8870e): the Export screen's preview and the renderer follow the edit's table on the
+  clip's own clock (`ReplayPlayer.use`); the camera and the speed shown read its eased rate
+  (`cameraRate`). Made off the main actor per preview, dropped when replaced, awaited by Make
+  Video. Only a length is edited; a speed asked for stays one rate (owner's earlier "one of the
+  two": a label must say what plays). A 60 s clip of the sample 201 km drive rendered whole on the
+  simulator (1,800 frames).
+- W4d-3 (be3efa5): the pace pill reads the edit's two rates ("60 s · 141–282×"); the Trim's hint reads the
+  fast one; at xxxLarge the pill shows the length alone.
+
+Open: the owner's comparison on the iPhone (the edit against a one-rate clip of the same drive:
+pick 15× … 120× in the menu for the latter); the edit's making time on the iPhone (up to ~360 ms in
+Debug on the simulator for a city drive's minute); PV-20 as before.
+
 ### Brief for the next session
 
 ```text
