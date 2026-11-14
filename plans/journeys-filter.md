@@ -12,6 +12,16 @@ tested). After the owner's review (2026-11-15) carodo-ios `a5587ee`: the chips a
 share editor's Aa chip size, the Show button sits on its own ground, and the sheet measures itself
 to open exactly as tall as its chips need.
 
+### Owner's review (2026-11-15)
+
+- Copy approved as built, except the any-distance chip: "Mọi quãng" → "Tất cả" (carodo-ios
+  `795a084`); "Mọi lúc" stays.
+- The filter button stays primary ink at rest beside the Copper **+**: Copper with its dot is what
+  says "filtered".
+- Item 5 below (Places / Regions, tags, a no-car chip, Search) is **deferred**: not now.
+- Next proposed: fix TD-32 (the test host's `CLMonitor` crash) with its own plan, then the device
+  checks of PV-23.
+
 ### Open, for the owner's review
 
 1. **Device checks (PV-23):** the sheet and tokens at xxxLarge on an iPhone SE-class width; the
