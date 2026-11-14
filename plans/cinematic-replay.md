@@ -618,19 +618,40 @@ Owner's polish asks, each decided in a question with options (2026-11-14):
 Open: the overview's fit ignores the new column at the right (a route edge may sit under it: look
 on the iPhone); the round tool button and the font helper of TD-27 are still two.
 
-### W4d plan (drafted 2026-11-13, not approved; after W4c)
+### W4d plan (approved by the owner, 2026-11-14: "đồng ý các đề xuất")
 
-A pure `RecapScript` in `Core/Replay`, made once before rendering: the map from the video's
-seconds to the drive's story, in place of one rate. Slow (toward Replay's 15 ×): the opening and
-the arrival, about 3 s of video each, and winding stretches (the Reveal's own fact,
-`CameraScript.turning`, with a minimum length, near ones merged). The rest is compressed, its
-rate solved so the clip has the length asked. Rate changes ease over about 0.75 s on screen; stops
-keep a video's own hold (0.6 s, a tenth of the clip at most: W4c result) and gaps play at the rate.
-It builds on `ReplayVideoPace.videoTimeline` (the video's story axis and stop rules) rather than
-beside it; the pace menu's "one rate" line becomes the edit's. Limits: the slow parts take at most about half the clip, the fast rate has a
-ceiling (tiles), and a short or all-winding drive plays as the one-rate clip. All figures are
-hypotheses for a first step that prints them for the drives in `drive-data/`. Open for the owner:
-ramps (proposed) or cuts; which moments count in the first version; top speed is not one (ADR 0007).
+**Why a one-rate clip and a naive edit judder.** (1) A stop: the wheel runs at ~250× and halts dead
+for 0.6 s, then leaps on. (2) A cut between rates (15× ↔ 250×) jerks the wheel. (3) The Follow
+camera's distance follows the on-screen speed, so a rate jump pumps the zoom (600 m ↔ 15 km).
+
+**The edit is one speed curve, never a cut** (owner: ramps). A pure `RecapScript` in `Core/Replay`,
+made once before rendering from the video's timeline (`ReplayVideoPace.videoTimeline`, its stops
+and gaps) and `CameraScript`:
+
+1. **What plays slow** (first version, owner): the opening (~3 s on screen), winding stretches
+   (`CameraScript.turning` over the road ahead, as the Reveal reads it; a minimum length, near ones
+   merged), the arrival (~3 s) and the stops. Long straight stretches play fast. Top speed is not a
+   moment (ADR 0007).
+2. **A desired rate along the story**: fast `F`, slow `S = max(15×, F / 6)` (fast never more than
+   6× slow: a larger ratio still pumps the camera), a stop at its hold speed.
+3. **Smoothed in log rate**: the rate changes at most ×2 per 0.5 s on screen, both ways (a backward
+   pass slows before a slow part, a forward pass speeds up after it). A stop is entered slowing and
+   left speeding up: ~0.3 s down, the hold with "Stopped 45 min", ~0.3 s up.
+4. **`F` solved** (bisection) so the clip has the length asked; the slow parts take at most about
+   half of it (winding dropped first, then the ratio lowered); a short or all-winding drive, or one
+   whose `F` is under about 2 × 15×, plays as the one-rate clip.
+5. **One table**: the story at every frame (and the smoothed rate there), made before rendering;
+   the preview and the renderer read the same table, so what is seen is what is written. The
+   camera reads the smoothed rate, so the zoom follows the curve.
+
+**Proof.** Tests: the clip has the length asked; the story never goes back; no frame changes the
+rate past the limit; the slow parts hold their rate; stops are entered and left on a ramp; a short
+drive falls back to one rate. A DEBUG report prints the curve for the drives in `drive-data/`;
+the owner compares the edit with the one-rate clip of the same drive. 30 fps stays.
+
+**Slices.** W4d-1 `RecapScript` and its tests (pure, nothing on screen). W4d-2 the player and the
+renderer step through its table; the camera reads its rate. W4d-3 the editor's pace line says the
+edit; owner's comparison on the iPhone.
 
 ### Brief for the next session
 
