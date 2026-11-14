@@ -1,6 +1,6 @@
 # carodo-ios UI/UX and view organisation audit, 2026-11-14: findings and the order to fix them
 
-Status: **recorded 2026-11-14**, nothing built. Audit at carodo-ios `34c519f` (`main`). Each step
+Status: **recorded 2026-11-14**. Step 1 done (carodo-ios `7f1cc4b`); steps 2–8 open. Audit at carodo-ios `34c519f` (`main`). Each step
 below gets its own short plan, approved by the owner, before any code (AGENT_WORKFLOW.md); steps
 are taken one at a time, in order, and each is one commit.
 
@@ -62,6 +62,17 @@ What is sound and needs nothing: no deprecated SwiftUI API (`foregroundColor`, `
 | 6 | One type per file for the files in C4; `Features/Journeys/Views` and `ViewModels` into subfolders (Detail, Replay, Share, Day, Editing). Moves only, no behaviour change; done when no other session has those files open | C4, C5 | none | agent | 4, 5 |
 | 7 | View models made by a factory the view calls once; `@State private` | C6 | none | agent | 5 |
 | 8 | Remove `Theme.Colors` and `Theme.Typography`; keep one spacing and radius scale and apply it when a file is touched, never as a mass rewrite. A symbol of its own for the Map's layers button (owner picks) | U4, U5 | none | **owner review** | none |
+
+## Done
+
+- **Step 1** (carodo-ios `7f1cc4b`, 2026-11-14): one `LoadState` in `Core/Domain` (TD-10 closed),
+  `LoadFailedView` with Retry on Journeys, Day, Garage, a vehicle's page, Places, Replay, Trim and
+  Recently Deleted; the three unused state views removed. Retry is `.bordered` and large, not a
+  Copper fill: Start Drive keeps the screen's one fill. DEBUG `-carodo.debugReadFailure S` shows
+  the failed states with sample data; screenshots (Light English, Dark Vietnamese xxxLarge) of
+  Journeys, Day, Garage, Places. Left open: the failure titles of Places and Replay end with a full
+  stop, the others do not (copy, for the owner); a vehicle's page and Replay cannot be put in their
+  failed state with sample data (unit tests cover them).
 
 ## Considered and not planned
 
