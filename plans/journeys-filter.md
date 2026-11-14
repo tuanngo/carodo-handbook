@@ -25,7 +25,11 @@ to open exactly as tall as its chips need.
    "Remove filter: … / Bỏ lọc: …", "2 on / Đang lọc theo 2 mục".
 3. **Taste:** the filter button is primary ink at rest while **+** beside it is Copper (the app
    tint); the mockup draws both dark. Keep, or make both the same ink.
-4. **Not built, by plan:** Places / Regions groups; tags (Night, Long) as chips; a chip for drives
+4. **Pull to refresh fixed** (owner report 2026-11-15, carodo-ios `118a13a`): Explore could stay on
+   its spinner after a pull until the tab was reopened. Cause: the read ran in SwiftUI's refresh
+   task; cancelled there, `load()` returned with the state still loading. The model now owns the
+   refresh task. Proven by a unit test that failed before the fix; to confirm on the iPhone (PV-23).
+5. **Not built, by plan:** Places / Regions groups; tags (Night, Long) as chips; a chip for drives
    with no car; Search.
 Mockup: [`design/mockups/passport/passport-feed-headers.png`](../design/mockups/passport/passport-feed-headers.png),
 Round 3, frames J1 (at rest), J2 (the filter sheet), J3 (filtered, with tokens).
