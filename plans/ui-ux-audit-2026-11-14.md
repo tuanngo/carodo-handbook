@@ -1,6 +1,6 @@
 # carodo-ios UI/UX and view organisation audit, 2026-11-14: findings and the order to fix them
 
-Status: **recorded 2026-11-14**. Steps 1 (`7f1cc4b`) and 2 (2a `055e6b3`, 2b `5ee58ee`; TD-16 closed) done; step 3 done (`e4a0dbf`); step 4 done (`75a9977`); step 5 done (`f813f76`, TD-13 closed, PV-21 open); step 7 done (`62a623a`); 6 and 8 open. Audit at carodo-ios `34c519f` (`main`). Each step
+Status: **recorded 2026-11-14**. Steps 1 (`7f1cc4b`) and 2 (2a `055e6b3`, 2b `5ee58ee`; TD-16 closed) done; step 3 done (`e4a0dbf`); step 4 done (`75a9977`); step 5 done (`f813f76`, TD-13 closed, PV-21 open); step 6 done (`195fda6`, `b3d486e`); step 7 done (`62a623a`); 8 open (owner picks the layers symbol). Audit at carodo-ios `34c519f` (`main`). Each step
 below gets its own short plan, approved by the owner, before any code (AGENT_WORKFLOW.md); steps
 are taken one at a time, in order, and each is one commit.
 
@@ -108,6 +108,13 @@ What is sound and needs nothing: no deprecated SwiftUI API (`foregroundColor`, `
   Undo), finishes and their banners, the foreground catch-up and the diagnostics lines; 5 tests.
   `MainTabView` 1,127 → 898 lines (TD-13 closed). Not done, not needed for the target: the car-log
   sheets (fuel, odometer, expense) as a modifier of their own. A drive on an iPhone is PV-21.
+- **Step 6** (carodo-ios `195fda6`, `b3d486e`): `Features/Journeys/Views` and `ViewModels` in one
+  folder per part (Explore, Day, Detail, Editing, Visits, Replay, Share; `JourneyPresentation` at the
+  root), moves only. The seven files of C4 split into 64: each primary type with the private
+  helpers only it uses; a helper used by several files got its own file and lost `private`, the
+  generic names renamed (VehicleDetailSection/Symbol/Divider, FeedSwitchGroup,
+  RecordingMetricDivider). Screenshots at xxxLarge before and after differ only where the
+  simulator's location setting did.
 - **Step 7** (carodo-ios `62a623a`): measured first. With a journey open, `destination(for:)`
   makes its `JourneyDetailViewModel` 6 times in 40 s at rest and 9 while a drive records (a probe in
   its init, simulator, sample data), each from the simplified route only; the other models built
