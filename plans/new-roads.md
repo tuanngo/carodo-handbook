@@ -1,7 +1,8 @@
 # New roads per drive (`new_road_m`)
 
-Status: **approved** (owner, 2026-11-15: D1–D6 as recommended; table name `trip_new_roads`).
-Slice 1 next. Discussed with the owner on 2026-11-15: compute from the trips, not from a stored cell
+Status: **slices 1–2 committed** (carodo-ios `501ebdf`, 2026-11-15; owner approved D1–D6 and the
+`basis` invalidation). TD-7 resolved there (`visited_cells` dropped); TD-34 (bookkeeping on `trips`)
+and PV-25 (iPhone timing) recorded. Slice 3 (showing it) next, after D3 on the iPhone. Discussed with the owner on 2026-11-15: compute from the trips, not from a stored cell
 table like carstack's; the owner's concern is performance, answered in "Performance" below.
 
 ## Frame
@@ -46,7 +47,7 @@ Kept from carstack: **the figure lives on the trip and statistics are a SUM.**
 | Change | Detail |
 |---|---|
 | Drop `visited_cells` | Table, index `visited_cells_on_first_trip`, its `DataOwnership` reference and lists, the doc rows, the test lines. Resolves TD-7 (the FK goes with the table) |
-| New table `trip_new_roads`, WITHOUT ROWID | `trip_id` TEXT PK → `trips(id)` ON DELETE CASCADE (a trip's own derived row, like `trip_gaps`: classified **derived** in `DataOwnership`); `new_road_m` REAL NOT NULL: metres of this drive's display route on 20 m cells no earlier drive covered (the Discovery rule: a cell is new to the drive whose start is its `firstDriven`), a stretch the drive passes twice counted once; `rules_version` INTEGER NOT NULL (`NewRoads.rulesVersion`, bumped when the grid, the neighbourhood or the rule changes). **No row = not counted** (yet, or never: passenger, pending, a joined part; the journey's first part carries it). Derived: never synced, never backed up |
+| New table `trip_new_roads`, WITHOUT ROWID | `trip_id` TEXT PK → `trips(id)` ON DELETE CASCADE (a trip's own derived row, like `trip_gaps`: classified **derived** in `DataOwnership`); `new_road_m` REAL NOT NULL: metres of this drive's display route on 20 m cells no earlier drive covered (the Discovery rule: a cell is new to the drive whose start is its `firstDriven`), a stretch the drive passes twice counted once; `rules_version` INTEGER NOT NULL (`NewRoads.rulesVersion`, bumped when the grid, the neighbourhood or the rule changes); `basis` INTEGER NOT NULL (Invalidation below). **No row = not counted** (yet, or never: passenger, pending, a joined part; the journey's first part carries it). Derived: never synced, never backed up |
 
 **Why a side table and not two columns on `trips` (owner's question, 2026-11-15: the BLOB lesson).**
 SQLite rewrites a whole row on UPDATE. Measured (Mac, sqlite3, WAL, 2,000 rows with a 40 KB route
@@ -80,31 +81,37 @@ of 2,000 trips, 1.7 ms.
 the person ever drove: `SUM` over All time ≈ the length of distinct road driven, over a month = the
 road first driven that month, never counted twice.
 
-### Invalidation (persistent, so a kill never leaves a stale figure)
+### Invalidation: each row checks itself (`basis`; owner, 2026-11-15)
 
-A drive's figure depends on every drive that started before it. Every write that adds, removes or
-changes the route of a counted drive, or changes whether it counts, runs in the same transaction:
+A drive's figure depends on every drive that started before it. Rather than a helper in each of the
+~10 write paths on `trips` (complete, delete, trash and restore, trim, join and split, rider,
+confirming a pending drive, `SummaryRefresh`, iCloud, `.carodo`), where one missed path, today or
+later, leaves a wrong figure silently, each row carries the history it was counted against:
 
-```sql
-DELETE FROM trip_new_roads
-WHERE trip_id IN (SELECT id FROM trips WHERE started_at >= :startedAt)
-```
-
-(small rows only; `trips` is read, never written)
-
-Writes covered: complete (only the new drive, nothing after it in the usual case), delete for good,
-trash and restore from Recently Deleted, trim, join and split, rider change (driver ↔ passenger),
-a pending drive confirmed (`confirm_by` → NULL), a summary re-derived (`SummaryRefresh`), a trip
-saved from iCloud or a `.carodo` restore (the earliest `started_at` of the batch). One statement
-over a table in the thousands.
+- `trip_new_roads.basis` INTEGER NOT NULL: a stable 64-bit hash chained in start order over the
+  counted drives (driver, journal, route, not pending) up to and including this one, each adding
+  its `id`, `started_at`, `updated_at` and `revision` (what the Map's `routes(skipping:)`
+  already reads as a route's version; a drive becoming a passenger's leaves the chain). Stable means FNV-1a on the bytes, never
+  Swift's `Hasher`, which is seeded per launch.
+- The worker reads those small columns only (never a route blob: a few ms), chains the hashes, and
+  recounts every drive with no row, a different `basis` or an old `rules_version`; rows of drives
+  no longer counted are deleted. No write path on `trips` changes; a kill, a restore or iCloud is
+  caught at the next run.
+- Cost: 8 bytes a row; after a change, a figure may be the previous one for the seconds until the
+  worker runs (it runs after every journal change, like the Map's refresh).
 
 ### Computation (one worker, off the main actor)
 
-- Lives with `HistoryAtlas`, which already holds every route and the heat index: one index serves
-  Discovery and new roads. A pure `RouteHeatIndex.newRoadM(for:)` gives one drive's figure from the
-  index (unit-tested on its own).
-- Runs in the after-drive work (beside `points_version`, the narrative), never on the recording or
-  finish path, never before the finish banner, and **not while a drive records** (risk prevented:
+- **As built:** `NewRoadCounter`, an actor owned by the composition root, with its **own**
+  `RouteHeatIndex` (same grid and rule as Discovery). Sharing `HistoryAtlas`'s index was the plan,
+  but the atlas belongs to the Map's view model and a long-lived count cannot live in a view model;
+  moving the atlas into the composition root touches the Map (another session's files today). The
+  cost is memory only when both are held (2,000 drives: ~0.6 MB of route points each); revisit if
+  the device measurement says so. `RouteHeatIndex.newRoadM(for:)` gives one drive's figure.
+- The counter reads the small columns first and stops there when nothing is out of date (every
+  launch: ~3 ms); routes are read only for a count.
+- Runs on every journal change after the milestones (`MainTabView`, the task on
+  `journalRevision`), never on the recording or finish path, and **not while a drive records** (risk prevented:
   CPU and heat during a drive, beside GPS).
 - Asks for the counted drives with no row or `rules_version < current`, counts those drives from the index (built if not yet: the one
   expensive step, once per app session), writes in batches of ~200 rows per transaction and only
@@ -133,10 +140,9 @@ by `roads_version`, in its own ADR. Not built now.
 
 ## Slices
 
-1. **Schema.** Drop `visited_cells`; add `trip_new_roads`; invalidation in every listed write path
-   (one helper in the repository, called from each). Tests: migrator on an in-memory
-   `DatabaseQueue`; each write path deletes the rows of itself and later drives, never of earlier
-   ones, and leaves `trips` unwritten; deleting a trip cascades its row; `DataOwnership` and Erase
+1. **Schema.** Drop `visited_cells`; add `trip_new_roads` (with `basis`).
+   Tests: migrator on an in-memory `DatabaseQueue`; deleting a trip cascades its row; trashing
+   one deletes it (derived); `DataOwnership` and Erase
    tests updated. Docs: `data-model.md` (the new table, the dropped one, Indexes, Ownership),
    `backup.md`. TD-7 resolved. Devices reinstall with `CONFIRM=erase`.
 2. **Counting.** `RouteHeatIndex.newRoadM(for:)` + the worker. Tests: a drive on new ground counts
@@ -144,7 +150,8 @@ by `roads_version`, in its own ADR. Not built now.
    counts; a drive passing its own new road twice counts it once; passenger and pending get no row;
    deleting the first drive moves its new road to the next drive over the same road; the sum over
    drives equals the distinct road; out-of-order arrival (newer first, older later) ends with the
-   same figures as in order. Perf test with the budget above. Docs: `docs/specs/navigation.md`
+   same figures as in order; a changed older drive changes the `basis` of every later one and of
+   no earlier one; the chained hash is the same across launches. Perf test with the budget above. Docs: `docs/specs/navigation.md`
    (Discovery: the shared index), `docs/architecture.md` (algorithms: new roads reuse
    `RouteHeatIndex`).
 3. **Showing it** (after D3): Journey Detail line and the Passport figure for the chosen period,
@@ -175,8 +182,8 @@ any change to how Discovery classifies or draws.
 
 - A joined journey reaches `HistoryAtlas` as one route under its first part's id (the figure is
   stored there): check `routes(skipping:)` and the parts read before slice 2.
-- Every write path listed above goes through `GRDBJourneyRepository` (or the iCloud and restore
-  stores) where the invalidation can run in the same transaction: list them in slice 1.
+- Every change that moves a route also moves `updated_at` or `revision` (the Map relies on it
+  already): checked in slice 2 with the write paths' tests.
 - iPhone timing is unknown until measured (the simulator's 290 ms is the only number).
 
 ## Validation
