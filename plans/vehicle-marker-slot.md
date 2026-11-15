@@ -48,6 +48,29 @@ first. Two of them change nothing on screen, and the third fixes a defect that a
 Not now: marker size as a share of the frame. There is one frame (360 × 640 pt); it is done when a
 second aspect ratio arrives.
 
+## Later: the customisation feature — open decisions
+
+The slot and the box above mean a new marker is one case of `VehicleMarkerStyle`, drawn in
+`VehicleMarker`; the map, the camera, the Export editor's preview and the video need no change.
+What the feature still has to settle (owner, 2026-11-15: recorded for later, not scheduled):
+
+1. **Where the choice is kept (owner's decision).** One preference for every video
+   (UserDefaults), or per vehicle in the garage (a column, P6 and the schema). Either way the
+   style gets a stored raw value then, and that name never changes again (iOS invariant 8). A
+   per-vehicle choice would also reach iCloud sync (`docs/sync.md`).
+2. **Where it is picked.** Likely the Aa panel of the Export editor, beside the caption options;
+   whether Replay's screen shows the choice too, or only the video.
+3. **What a style must meet** (the box contract in carodo-ios `docs/design-system.md`, A vehicle's
+   position): drawn within `VehicleMarkerStyle.side` (52 pt), centred on the position; declares its
+   `headingDisplay` (a turning tip, or the whole drawing turns, for a top-down car); an edge that
+   holds on the light and the dark map; turned by the eased course (`MarkerTipEase`), never by its
+   own animation; drawn once per style and turned, if drawing it each frame costs (`meanDrawMs` in
+   the render report, before and after).
+4. **Privacy.** No photo of the person's car: a plate could show (P5). Shapes, icons and the
+   vehicle's paint colour only; never anything that reads as a place marker.
+5. **Size as a share of the frame.** Only when a second aspect ratio (1:1, 4:5, 16:9) arrives; with
+   one 360 × 640 pt stage, 32 pt already is a fixed share.
+
 ## Checks
 
 `task lint`, `task warnings`, `task test`; a Replay and an export on the simulator (the tip turns

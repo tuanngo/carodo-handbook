@@ -39,6 +39,7 @@ Status: `Done in code` · `Next` · `Later` · `Idea` · `Refused`. Phase number
 |---|---|---|---|
 | **3D replay** | Follow a small car across a 3D map, POIs shown, the car in the garage colour (b223, b232, b297) | Every fix is kept (ADR 0004), so the replay runs at 1 Hz; map technology needs an ADR first | Later |
 | **Replay video export** | A 9:16 video of the whole drive or a clip (b278) | Rendered on the device; the privacy trim applies; same lengths as the replay setting (15, 30, 60, 90 s) for Reels, TikTok and Shorts, on the replay's timeline model | Later |
+| **Custom vehicle marker** | The person picks the marker Replay and its video show (the wheel today), e.g. a top-down car in the vehicle's paint | The slot and the box are built (carodo-ios `ac5a361`): a new style is one case of `VehicleMarkerStyle` drawn in `VehicleMarker`. Open decisions before it is built: [vehicle-marker-slot.md](vehicle-marker-slot.md#later-the-customisation-feature--open-decisions) | Later |
 
 ## Share card (phase 4)
 
