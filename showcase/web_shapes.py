@@ -35,6 +35,20 @@ def fit(points, box, turn):
     return [((x - min(xs)) * k + ox, (y - min(ys)) * k + oy) for x, y in points]
 
 
+def smooth_path(points, tension=0.5):
+    """A Catmull-Rom spline through the points as cubic Béziers: soft corners, as the app draws a
+    drive's shape. The line still passes through every simplified point."""
+    p = [points[0]] + points + [points[-1]]
+    parts = [f"M{fmt(points[0])}"]
+    k = tension / 3 * 2  # Catmull-Rom (0.5) to Bézier handles: (P2 - P0) / 6
+    for i in range(1, len(p) - 2):
+        p0, p1, p2, p3 = p[i - 1], p[i], p[i + 1], p[i + 2]
+        c1 = (p1[0] + (p2[0] - p0[0]) * k / 2, p1[1] + (p2[1] - p0[1]) * k / 2)
+        c2 = (p2[0] - (p3[0] - p1[0]) * k / 2, p2[1] - (p3[1] - p1[1]) * k / 2)
+        parts.append(f"C{fmt(c1)} {fmt(c2)} {fmt(p2)}")
+    return " ".join(parts)
+
+
 def at_share(points, share):
     seg = [math.dist(a, b) for a, b in zip(points, points[1:])]
     target = sum(seg) * share
@@ -62,7 +76,7 @@ def main():
     ]
     for name, (source, box, turn, share) in SHAPES.items():
         pts = fit([tuple(p) for p in shapes[source]["points"]], box, turn)
-        d = "M" + " L".join(fmt(p) for p in pts)
+        d = smooth_path(pts)
         car = at_share(pts, share)
         r = lambda v: round(v, 1)
         out.append(
