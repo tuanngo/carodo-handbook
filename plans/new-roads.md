@@ -3,7 +3,15 @@
 Status: **slices 1–2 committed** (carodo-ios `501ebdf`, self-review fixes `06a19ab`: `RouteStamp` so a route
 derived again from iCloud changes the basis and the Map's version, and no count lost while one runs; 2026-11-15; owner approved D1–D6 and the
 `basis` invalidation). TD-7 resolved there (`visited_cells` dropped); TD-34 (bookkeeping on `trips`)
-and PV-25 (iPhone timing) recorded. Slice 3 (showing it) next, after D3 on the iPhone. Discussed with the owner on 2026-11-15: compute from the trips, not from a stored cell
+and PV-25 (iPhone timing) recorded. Slice 3 (showing it) **built 2026-11-15, uncommitted, waiting for the owner's look on the
+iPhone**: owner chose a separate block ("You explored · 2.4 km of new road", `NewRoadCallout`) in
+Explore's rows, the latest drive and Journey Detail, from 100 m; the Passport's Footprint shows the
+period's sum beside the explored area ("86 km new road"; All time "1,240 km of road driven"); the
+screens read again when the count writes (`AppState.newRoadsRevision`). Left for later: tapping the
+Passport figure to open the Map's Discovery layer in the same scope (the Map's files were being
+edited by another session), the month heading's new road, Day's rows. Found on the way and fixed
+(carodo-ios `555ece1`): the Footprint read the drives beside the journal read and kept the old
+answer. Discussed with the owner on 2026-11-15: compute from the trips, not from a stored cell
 table like carstack's; the owner's concern is performance, answered in "Performance" below.
 
 ## Frame
