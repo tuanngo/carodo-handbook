@@ -1,6 +1,6 @@
 # Map · Discovery layer ("Roads you've discovered")
 
-Status: **committed** (carodo-ios `08a6216`, 2026-11-15); device checks in PV-24, colours of Explored and Familiar in TD-33. Approved: every
+Status: **committed** (carodo-ios `08a6216`, 2026-11-15); device checks in PV-24; colours chosen on the iPhone (TD-33 resolved, carodo-ios `b2fa3b5`: Plum on a muted map, New solid). Approved: every
 recommendation, D1–D5. Slices 1–4 built in carodo-ios in one change (counting, atlas, screen, docs);
 lint, a clean build with no warnings and the full suite (2,214 passed, 19 skipped) pass. The
 palette below is in the code as the starting point; the owner picks colours and widths on the
