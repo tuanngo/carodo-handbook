@@ -69,3 +69,25 @@ lengths (fewer degraded runs on open passes and the expressway), the cross-track
 process with φ ≈ 0.93 per second and the measured sd, gaps at the measured rate (capped for the
 showcase so a Replay never jumps), stop drift and accuracy, speed noise, course accuracy and
 pressure drift.
+
+## Try a route in the app (Simulator)
+
+The app records the drive through its real path; nothing is imported. Real time: Prenn takes
+about 18 min, Hải Vân 34 min, the expressway 1 h 45.
+
+```sh
+U=<simulator UDID>                         # carodo-ios/.env SIM_ID
+xcrun simctl privacy $U grant location-always app.carodo.ios
+xcrun simctl location $U set 11.876520,108.470100      # the route's first point (routes/<id>.gpx)
+xcrun simctl launch $U app.carodo.ios -carodo.hasCompletedOnboarding YES
+xcrun simctl openurl $U carodo://trip/start              # tap Open (or tap Start Drive in the app)
+python3 showcase/sim_drive.py prenn --udid $U            # plays the route; the app ends the drive ~5 min after arrival
+```
+
+Then open what it recorded with the app's DEBUG launch arguments (carodo-ios
+`docs/operations/setup.md`), for example `-carodo.debugTab journeys -carodo.debugOpenJourney 0`
+with `-carodo.debugOpenReplay YES -carodo.debugReplayAt 0.55` or `-carodo.debugOpenShareCard YES`.
+
+First run (2026-11-15, Prenn, `--profile`): the drive saved and ended by itself; detail, Replay and
+the share card drew the pass correctly; 17 restarts of the scenario jumped ahead, so the app kept
+12.1 of 14.0 km and Replay shows those jumps as gaps. Plain playback (the default now) has no restart.
