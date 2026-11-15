@@ -105,8 +105,8 @@ xcrun simctl launch $U app.carodo.ios -carodo.hasCompletedOnboarding YES \
   -carodo.debugTab journeys                                  # add e.g. -carodo.debugOpenJourney 4 -carodo.debugOpenReplay YES
 ```
 
-Newest first: 0 Prenn, 1 Ngoạn Mục, 2 the expressway, 3 Hải Vân, 4 Mã Pí Lèng. The drives have no
-place names yet (the in-memory journal looks none up); titles read "Morning drive".
+Newest first: 0 Prenn, 1 Ngoạn Mục, 2 the expressway, 3 Hải Vân, 4 Mã Pí Lèng. Their ends are named
+with Apple's lookup a few seconds after launch (needs the network); nothing is kept or synced.
 
 ## Try a route in the app (Simulator, real time)
 

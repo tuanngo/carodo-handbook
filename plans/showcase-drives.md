@@ -4,8 +4,8 @@ Status: **S0–S3 done** (2026-11-15). S3 is carodo-ios `7139b9a`: DEBUG
 `-carodo.showcaseJournal <folder>` (+ `-carodo.showcaseNow YES`) loads `showcase/` into an in-memory
 journal through the real trip store; tried on the Simulator (Journeys, Mã Pí Lèng's detail and
 Replay, Hải Vân's share card). Next: S4 (tests on the drives), S5 (screenshots), S6 (web shapes).
-Open: the in-memory journal names no place ("Morning drive"); naming the showcase drives needs the
-place lookup the live journal runs, a choice for the owner.
+The drives' ends are named with Apple's lookup as saved drives are (carodo-ios `d67b0e0`: "X. Đồng
+Văn → X. Mèo Vạc", "P. Hải Vân → X. Chân Mây - Lăng Cô"); the journal stays in memory, no iCloud.
 
 One set of made-up car drives on real public roads (four of Vietnam's best-known passes and one
 long expressway run), generated as realistic raw GPS fixes. It serves three uses:
