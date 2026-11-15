@@ -94,7 +94,21 @@ braking; 12 s still before setting off and 20 s after arriving; stops under 5 mi
 sky, halves the degraded runs and keeps gaps to 4–9 s so a Replay never jumps; `--noise measured`
 uses S0's figures as measured. The generated figures are in `out/summary.md`.
 
-## Try a route in the app (Simulator)
+## Load all the drives in the app (Simulator, instant)
+
+The DEBUG loader (carodo-ios, `-carodo.showcaseJournal`) writes the five generated drives and the car
+into an in-memory journal at launch, through the app's real trip store; nothing is kept.
+
+```sh
+xcrun simctl launch $U app.carodo.ios -carodo.hasCompletedOnboarding YES \
+  -carodo.showcaseJournal ~/code/carodo/carodo-handbook/showcase -carodo.showcaseNow YES \
+  -carodo.debugTab journeys                                  # add e.g. -carodo.debugOpenJourney 4 -carodo.debugOpenReplay YES
+```
+
+Newest first: 0 Prenn, 1 Ngoạn Mục, 2 the expressway, 3 Hải Vân, 4 Mã Pí Lèng. The drives have no
+place names yet (the in-memory journal looks none up); titles read "Morning drive".
+
+## Try a route in the app (Simulator, real time)
 
 The app records the drive through its real path; nothing is imported. Real time: Prenn takes
 about 18 min, Hải Vân 34 min, the expressway 1 h 45.

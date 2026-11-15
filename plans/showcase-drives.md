@@ -1,9 +1,11 @@
 # Showcase drives: synthetic GPS on real mountain passes
 
-Status: **S0, S1 and S2 done** (2026-11-15): measured noise (`showcase/noise.json`), five routes
-(`showcase/routes/`), the generator and its outputs (`showcase/generate.py`, `showcase/out/`), and
-a Simulator player (`showcase/sim_drive.py`, tried on Prenn). Next: S3, the DEBUG loader in
-carodo-ios (needs the owner's go on that repository).
+Status: **S0–S3 done** (2026-11-15). S3 is carodo-ios `7139b9a`: DEBUG
+`-carodo.showcaseJournal <folder>` (+ `-carodo.showcaseNow YES`) loads `showcase/` into an in-memory
+journal through the real trip store; tried on the Simulator (Journeys, Mã Pí Lèng's detail and
+Replay, Hải Vân's share card). Next: S4 (tests on the drives), S5 (screenshots), S6 (web shapes).
+Open: the in-memory journal names no place ("Morning drive"); naming the showcase drives needs the
+place lookup the live journal runs, a choice for the owner.
 
 One set of made-up car drives on real public roads (four of Vietnam's best-known passes and one
 long expressway run), generated as realistic raw GPS fixes. It serves three uses:
