@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Live Activity Figures</title>
+<!-- Mockup for carodo-handbook/plans/live-activity.md: where the two figures sit in the Live card.
+     Rendered to ../drive/live-activity-figures.png. Synthetic figures. -->
+<style>
+  :root { --live:#373430; --copper:#BD8053; --copperL:#D09264; --ivory:#F3EEE5; --stone:#A49E95; --page:#F3EEE5; --ink:#242321; --muted:#77736D; }
+  * { box-sizing:border-box; }
+  body { margin:0; padding:36px 40px 40px; background:var(--page); color:var(--ink); font:16px/1.4 -apple-system,"SF Pro Text",system-ui,sans-serif; width:1800px; }
+  h1 { font-size:28px; margin:0 0 6px; } .lead { color:var(--muted); margin:0 0 22px; max-width:1200px; }
+  .grid { display:grid; grid-template-columns:repeat(4, 410px); gap:30px; }
+  .cell b.t { display:block; font-size:15.5px; margin-bottom:8px; } .cell small { display:block; color:var(--muted); font-size:13.5px; margin-top:9px; line-height:1.35; }
+  .tag { display:inline-block; padding:1px 7px; border-radius:7px; font-size:11.5px; font-weight:700; margin-left:6px; background:var(--copper); color:#242321; vertical-align:2px; }
+  .lock { border-radius:34px; padding:14px 10px; background:linear-gradient(160deg,#3a3f4a,#20242b); }
+  .la { border-radius:26px; padding:16px 18px 17px; color:var(--ivory); display:flex; flex-direction:column; gap:12px;
+        background: radial-gradient(120% 140% at 0% 0%, rgba(189,128,83,.30), rgba(189,128,83,.08) 45%, transparent 70%), var(--live); }
+  .row { display:flex; align-items:center; gap:8px; }
+  .st { font-weight:700; font-size:17px; } .cu { color:var(--copperL); }
+  img.mark { width:22px; height:22px; }
+  .figs { display:flex; }
+  .figs.split { justify-content:space-between; }
+  .figs.gap { gap:60px; }
+  .fig b { display:block; font-size:30px; font-weight:700; font-variant-numeric:tabular-nums; line-height:1.05; }
+  .fig b small { font-size:30px; }
+  .fig span { display:block; color:var(--stone); font-size:13px; }
+  .fig.above span { text-transform:uppercase; letter-spacing:.04em; font-size:12px; font-weight:600; margin-bottom:3px; }
+  .fig.below span { margin-top:4px; }
+  .fig.r { text-align:right; }
+  .figs.three { justify-content:space-between; }
+  svg.ic { width:18px; height:18px; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; }
+</style>
+</head>
+<body>
+<h1>Live Activity · the figures row</h1>
+<p class="lead">Today the time sits left and the distance in the middle, leaving the right third empty. Four ways to place them.
+The in-app recording panel names a figure under its value ("0,3 km / Distance").</p>
+<div class="grid" id="g"></div>
+<script>
+const mark = '<img class="mark" src="../../brand/svg/carodo-mark-small-on-dark.svg" alt="">';
+const wave = '<svg class="ic cu" viewBox="0 0 24 24"><path d="M3 12h2M7 8v8M11 5v14M15 9v6M19 11v2"/></svg>';
+const head = `<div class="row">${mark}<span class="st">Live</span>${wave}</div>`;
+const fig = (v, l, pos, right) => pos === 'above'
+  ? `<div class="fig above ${right ? 'r' : ''}"><span>${l}</span><b>${v}</b></div>`
+  : `<div class="fig below ${right ? 'r' : ''}"><b>${v}</b><span>${l}</span></div>`;
+const card = (figs) => `<div class="lock"><div class="la">${head}${figs}</div></div>`;
+const cells = [
+  ['A · today', card(`<div class="figs gap" style="gap:110px">${fig('3:30', 'Driving time', 'below')}${fig('350 m', 'Distance', 'below')}</div>`),
+   'The right third is empty.'],
+  ['B · split to both edges', card(`<div class="figs split">${fig('3:30', 'Driving time', 'below')}${fig('350 m', 'Distance', 'below', true)}</div>`),
+   'Time left, distance right, names under the values as in the app panel.', true],
+  ['C · names above', card(`<div class="figs split">${fig('3:30', 'Driving time', 'above')}${fig('350 m', 'Distance', 'above', true)}</div>`),
+   'The other app\'s pattern. Reads the name first; differs from Carodo\'s own panel.'],
+  ['D · the distance with the status', `<div class="lock"><div class="la"><div class="row">${mark}<span class="st">Live</span>${wave}<span style="flex:1"></span><span class="st" style="font-size:30px;font-variant-numeric:tabular-nums">350 m</span></div><div class="figs">${fig('3:30', 'Driving time', 'below')}</div></div></div>`,
+   'Shorter rows, but the two figures no longer read as a pair.'],
+];
+document.getElementById('g').innerHTML = cells.map(([t, c, n, rec]) => `<div class="cell"><b class="t">${t}${rec ? '<span class="tag">recommended</span>' : ''}</b>${c}<small>${n}</small></div>`).join('');
+</script>
+</body>
+</html>

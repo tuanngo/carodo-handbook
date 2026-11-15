@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Live Activity</title>
+<!-- Mockup for carodo-handbook/plans/live-activity.md (look C chosen 2026-11-15: the mark, a Copper
+     hairline and a warm Copper light). Rendered to ../drive/live-activity.png by render.sh. Ideas,
+     not specs: the spec wins. No map, no place, no route: figures are synthetic (P5). -->
+<style>
+  :root { --charcoal:#242321; --live:#373430; --copper:#BD8053; --copperL:#D09264; --ivory:#F3EEE5; --stone:#A49E95; --page:#F3EEE5; --ink:#242321; --muted:#77736D; }
+  * { box-sizing:border-box; }
+  body { margin:0; padding:40px 44px 56px; background:var(--page); color:var(--ink); font:16px/1.4 -apple-system,"SF Pro Text",system-ui,sans-serif; width:1800px; }
+  h1 { font-size:30px; margin:0 0 6px; } .lead { color:var(--muted); max-width:1200px; margin:0 0 4px; }
+  h2 { font-size:14px; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); margin:34px 0 12px; }
+  .grid { display:grid; grid-template-columns:repeat(4, 402px); gap:24px 30px; }
+  .cell b.t { display:block; font-size:15.5px; margin-bottom:8px; }
+  .cell > small { display:block; color:var(--muted); font-size:13.5px; margin-top:9px; line-height:1.35; }
+  .tag { display:inline-block; padding:1px 7px; border-radius:7px; font-size:11.5px; font-weight:700; margin-left:6px; vertical-align:2px; background:#e4dccf; color:#6a6056; }
+  .tag.c { background:var(--copper); color:var(--charcoal); }
+  .lock { width:402px; border-radius:38px; padding:16px 12px; background:radial-gradient(circle at 20% 30%, #b8e05a 0 20%, transparent 42%), radial-gradient(circle at 80% 70%, #3a5f9e 0 20%, transparent 45%), linear-gradient(135deg,#7a8f4a,#c48f6a 50%,#2b3b5a); }
+  .la { border-radius:26px; padding:14px 16px 15px; color:var(--ivory); display:flex; flex-direction:column; gap:11px;
+        background: radial-gradient(120% 140% at 0% 0%, rgba(189,128,83,.30), rgba(189,128,83,.08) 45%, transparent 70%), var(--live);
+        box-shadow: inset 0 0 0 1px color-mix(in srgb,var(--copper) 60%,transparent); }
+  .row { display:flex; align-items:center; gap:8px; white-space:nowrap; }
+  .st { font-weight:700; font-size:17px; } .n { font-variant-numeric:tabular-nums; }
+  .sub { color:var(--stone); font-size:14.5px; } .sp { flex:1; }
+  .figs { display:flex; gap:30px; }
+  .fig b { display:block; font-size:28px; font-weight:700; font-variant-numeric:tabular-nums; line-height:1.05; letter-spacing:-.01em; }
+  .fig b small { font-size:15px; color:var(--stone); font-weight:600; margin-left:3px; }
+  .fig span { display:block; color:var(--stone); font-size:12.5px; margin-top:3px; }
+  .btns { display:flex; gap:8px; }
+  .btn { flex:1; display:inline-flex; justify-content:center; align-items:center; gap:7px; padding:10px 12px; border-radius:20px; font-size:15.5px; font-weight:600;
+         background:color-mix(in srgb,var(--ivory) 13%,transparent); color:var(--ivory); }
+  .btn.p { background:var(--copper); color:var(--charcoal); }
+  .cu { color:var(--copperL); } .dim { opacity:.45; }
+  svg.ic { width:18px; height:18px; flex:none; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+  svg.ic.f { fill:currentColor; stroke:none; }
+  img.mark { width:22px; height:22px; flex:none; display:block; }
+  .isl { background:#000; color:var(--ivory); border-radius:22px; height:38px; display:inline-flex; align-items:center; padding:0 10px; font-size:14.5px; font-weight:600; }
+  .isl .cam { width:92px; } .isl img.mark { width:20px; height:20px; }
+  .islx { background:#000; color:var(--ivory); border-radius:42px; width:380px; padding:18px 20px 16px; display:flex; flex-direction:column; gap:11px; }
+  .wall { border-radius:26px; padding:16px 11px; background:linear-gradient(160deg,#5b6b78,#2f3a45); display:flex; justify-content:center; width:402px; }
+  .ax .st { font-size:23px; } .ax .sub { font-size:19px; } .ax .fig b { font-size:36px; } .ax .fig span { font-size:16px; } .ax .btn { font-size:20px; padding:12px; border-radius:24px; }
+  .ax img.mark { width:28px; height:28px; } .ax svg.ic { width:23px; height:23px; }
+  ul.notes { color:var(--muted); font-size:14.5px; max-width:1250px; margin:8px 0 0; padding-left:20px; } ul.notes li { margin-bottom:5px; }
+  .anat { display:grid; grid-template-columns:402px 1fr; gap:30px; align-items:center; }
+  .anat ol { margin:0; color:var(--ink); font-size:15px; padding-left:22px; } .anat li { margin-bottom:6px; }
+</style>
+</head>
+<body>
+<h1>Live Activity · a drive being recorded</h1>
+<p class="lead">Look C: the Carodo mark, the in-app live panel's Copper hairline and a warm Copper light, on Charcoal in Light and Dark alike.
+The words are the recording panels' (<code>DrivePhase</code>, <code>StopStage</code>). Clocks run by themselves; the app sends a new frame only when the status or the distance changes. No map, no place, no speed.</p>
+
+<h2>One layout, three rows</h2>
+<div class="anat" id="anat"></div>
+
+<h2>The drive</h2>
+<div class="grid" id="drive"></div>
+<h2>Stops</h2>
+<div class="grid" id="stops"></div>
+<h2>Pause and the edges</h2>
+<div class="grid" id="edges"></div>
+<h2>Dynamic Island</h2>
+<div class="grid" id="island"></div>
+<h2>Vietnamese · largest text (xxxLarge)</h2>
+<div class="grid" id="vi"></div>
+
+<ul class="notes">
+  <li><b>No drive (idle)</b> and a <b>pending</b> Auto Mode drive show no card at all.</li>
+  <li><b>Buttons appear only when the drive asks a question</b>: Resume while paused, Still going and Finish near an automatic end, Log fuel at a long stop. Moving, the card has no button.</li>
+  <li><b>Pause on the Lock Screen</b>: D4 said no. A Pause tapped by mistake in a pocket or a mount stops the GPS and loses the road until someone notices; in the app it sits in the expanded panel. Shown here once, for the decision.</li>
+  <li>Slices: the look and the rows are LA1; the buttons LA2; Log fuel LA3.</li>
+</ul>
+
+<script>
+const ic = {
+  wave: '<svg class="ic cu" viewBox="0 0 24 24"><path d="M3 12h2M7 8v8M11 5v14M15 9v6M19 11v2"/></svg>',
+  flat: '<svg class="ic" style="color:var(--stone)" viewBox="0 0 24 24"><path d="M3 12h18"/></svg>',
+  pause: '<svg class="ic f" style="color:var(--stone)" viewBox="0 0 24 24"><rect x="6" y="5" width="4" height="14" rx="1.3"/><rect x="14" y="5" width="4" height="14" rx="1.3"/></svg>',
+  pauseB: '<svg class="ic f" viewBox="0 0 24 24"><rect x="6" y="5" width="4" height="14" rx="1.3"/><rect x="14" y="5" width="4" height="14" rx="1.3"/></svg>',
+  play: '<svg class="ic f" viewBox="0 0 24 24"><path d="M7 4.5v15l12.5-7.5z"/></svg>',
+  stop: '<svg class="ic f" viewBox="0 0 24 24"><rect x="5.5" y="5.5" width="13" height="13" rx="2.5"/></svg>',
+  timer: '<svg class="ic cu" viewBox="0 0 24 24"><circle cx="12" cy="13.5" r="7.5"/><path d="M12 13.5V9.5M9.5 2.8h5"/></svg>',
+  audio: '<svg class="ic cu" viewBox="0 0 24 24"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4zM16 9.5l5 5M21 9.5l-5 5"/></svg>',
+  fuel: '<svg class="ic" viewBox="0 0 24 24"><path d="M5 20V5.5A1.5 1.5 0 0 1 6.5 4h6A1.5 1.5 0 0 1 14 5.5V20M4 20h11M7.5 8h4M14 11h1.5a1.5 1.5 0 0 1 1.5 1.5V16a1.5 1.5 0 0 0 3 0V9l-2.5-2.5"/></svg>',
+  check: '<svg class="ic cu" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>',
+  noloc: '<svg class="ic" style="color:var(--stone)" viewBox="0 0 24 24"><path d="M19.5 4.5l-6.2 15-2-6.3-6.3-2zM4 4l16 16"/></svg>',
+  gps: '<svg class="ic" style="color:var(--stone)" viewBox="0 0 24 24"><path d="M19.5 4.5l-6.2 15-2-6.3-6.3-2z"/></svg>',
+  car: '<svg class="ic" style="width:15px;height:15px;color:var(--stone)" viewBox="0 0 24 24"><path d="M4 16v-3l2-5h12l2 5v3M4 16h16M6.5 16v2M17.5 16v2M5 12h14"/></svg>',
+};
+const mark = '<img class="mark" src="../../brand/svg/carodo-mark-small-on-dark.svg" alt="">';
+const veh = (n = 'My car') => `<span class="sub row" style="gap:5px">${ic.car}${n}</span>`;
+// Row 1: the mark, the status (its icon, its detail), then the vehicle or the distance.
+const head = (title, icon = '', detail = '', trailing = veh()) =>
+  `<div class="row">${mark}<span class="st">${title}</span>${icon}${detail}<span class="sp"></span>${trailing}</div>`;
+// Row 2: the figures, each with its name.
+const figs = (items) => `<div class="figs">${items.map(([v, u, l]) => `<div class="fig"><b>${v}${u ? `<small>${u}</small>` : ''}</b><span>${l}</span></div>`).join('')}</div>`;
+// Row 3: buttons, only when the drive asks something.
+const btns = (...b) => `<div class="btns">${b.join('')}</div>`;
+const lock = (inner, o = {}) => `<div class="lock"><div class="la ${o.ax ? 'ax' : ''} ${o.cls || ''}">${inner}</div></div>`;
+const cell = (title, body, note = '', tag = '') => `<div class="cell"><b class="t">${title}${tag}</b>${body}<small>${note}</small></div>`;
+const T = (t) => `<span class="tag">${t}</span>`, TC = (t) => `<span class="tag c">${t}</span>`;
+const km = (v) => `<span class="sub n">${v} km</span>`;
+const dot = (t, cls = 'sub') => `<span class="${cls} n">· ${t}</span>`;
+
+document.getElementById('anat').innerHTML = `
+  ${lock(head('Looks parked', ic.timer, dot('ends in 1:30', 'cu st'), km('31.4')) + btns('<span class="btn p">Still going</span>', `<span class="btn">${ic.stop}Finish</span>`))}
+  <ol>
+    <li><b>Status row</b>: the Carodo mark, what the drive is doing in the panels' words, its clock or countdown; at the right the vehicle, or the distance when no figures row shows it.</li>
+    <li><b>Figures row</b> (moving, saved): time and distance, each named, so "12:48" never reads as the hour.</li>
+    <li><b>Buttons row</b>, only when the drive asks something; the main answer in Copper.</li>
+  </ol>`;
+
+document.getElementById('drive').innerHTML = [
+  cell('Finding GPS', lock(head('Finding GPS', ic.gps)), 'Right after Start. One row, no zeros.', T('LA1')),
+  cell('Ready', lock(head('Ready', ic.flat, dot('Waiting to move'))), 'Recording, not moved yet. A still line, not the live waveform.', T('LA1')),
+  cell('Live', lock(head('Live', ic.wave) + figs([['12:48', '', 'Driving time'], ['6.1', 'km', 'Distance']])), 'No button while moving. Time ticks by itself.', T('LA1')),
+  cell('Saved · the last frame', lock(head('Saved', ic.check) + figs([['38', 'min', 'Driving time'], ['24.6', 'km', 'Distance']])), 'No timer. Stays 5 minutes.', T('LA1')),
+].join('');
+
+document.getElementById('stops').innerHTML = [
+  cell('Stopped (a light, a jam)', lock(head('Stopped', ic.flat, dot('1:12'), km('6.1'))), 'Smaller, like the panel\'s quiet line. Still recording.', T('LA1')),
+  cell('Stopped 2 min or more', lock(head('Stopped', ic.flat, dot('4:05'), km('31.4')) + btns(`<span class="btn">${ic.fuel}Log fuel</span>`)), 'Opens Carodo on the fuel form.', T('LA3')),
+  cell('Looks parked', lock(head('Looks parked', ic.timer, dot('ends in 1:30', 'cu st'), km('31.4')) + btns('<span class="btn p">Still going</span>', `<span class="btn">${ic.stop}Finish</span>`)), 'The countdown runs by itself.', T('LA2')),
+  cell('Car audio off', lock(head('Car audio off', ic.audio, dot('ends in 1:10', 'cu st'), km('31.4')) + btns('<span class="btn p">Still going</span>', `<span class="btn">${ic.stop}Finish</span>`)), 'P4: a disconnect only starts a countdown.', T('LA2')),
+].join('');
+
+document.getElementById('edges').innerHTML = [
+  cell('Paused', lock(head('Paused', ic.pause, '', km('6.1')) + btns(`<span class="btn p">${ic.play}Resume</span>`)), 'Paused in the app; resumed from here.', T('LA2')),
+  cell('Live · with a Pause button', lock(head('Live', ic.wave) + figs([['12:48', '', 'Driving time'], ['6.1', 'km', 'Distance']]) + btns(`<span class="btn">${ic.pauseB}Pause</span>`)), 'Only if D4 changes. Not recommended.', TC('decision')),
+  cell('No location', lock(head('No location', ic.noloc, '', '') + '<span class="sub">Location is off. Not recording.</span>'), 'A tap opens Carodo, which offers Open Settings.', T('LA1')),
+  cell('Not updating (stale)', lock(`<div class="dim">${head('Not updating', '')}</div><div class="dim">${figs([['–', '', 'Driving time'], ['6.1', 'km', 'Distance']])}</div>`), 'iOS suspended Carodo: the last figure dims, the time stops.', T('LA1')),
+].join('');
+
+const wall = (inner) => `<div class="wall">${inner}</div>`;
+document.getElementById('island').innerHTML = [
+  cell('Compact · live', wall(`<span class="isl">${mark}<span class="cam"></span><span class="n">6.1 km</span></span>`), 'The mark, then the figure that grows.'),
+  cell('Compact · looks parked', wall(`<span class="isl">${mark}<span class="cam"></span><span class="n cu">1:30</span></span>`), 'The countdown in Copper.'),
+  cell('Minimal (shared with another app)', wall(`<span class="isl" style="padding:0 9px">${mark}</span>`), 'The mark alone.'),
+  cell('Expanded (long press)', wall(`<div class="islx">${head('Looks parked', ic.timer, dot('ends in 1:30', 'cu st'), km('31.4'))}${btns('<span class="btn p">Still going</span>', `<span class="btn">${ic.stop}Finish</span>`)}</div>`), 'The Lock Screen\'s rows.'),
+].join('');
+
+document.getElementById('vi').innerHTML = [
+  cell('Live', lock(head('Đang ghi', ic.wave, '', '') + figs([['12:48', '', 'Thời gian lái'], ['6,1', 'km', 'Quãng đường']]), { ax: true }), 'The vehicle leaves first when the row is short.'),
+  cell('Ready', lock(head('Sẵn sàng', ic.flat, dot('Chờ xe chạy'), ''), { ax: true }), ''),
+  cell('Looks parked', lock(head('Đã đỗ xe', ic.timer, dot('Lưu sau 1:30', 'cu st'), '') + btns('<span class="btn p">Đi tiếp</span>', `<span class="btn">${ic.stop}Kết thúc</span>`), { ax: true }), 'The distance gives way to the countdown.'),
+  cell('Paused', lock(head('Đã tạm dừng ghi', ic.pause, '', '') + btns(`<span class="btn p">${ic.play}Tiếp tục ghi</span>`), { ax: true }), ''),
+].join('');
+</script>
+</body>
+</html>
