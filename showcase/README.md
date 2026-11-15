@@ -21,6 +21,7 @@ along the road. Anything shown in public that is drawn from these lines credits 
 | `out/<id>.sim.gpx` | The same fixes, timed, for Xcode's location playback |
 | `out/summary.md`, `out/shapes.json` | Per-drive figures; simplified unit-box shapes for the website (no coordinate) |
 | `sim_drive.py` | Plays a route on the iOS Simulator so the app records it live |
+| `web_shapes.py` | S6: the website's route shapes (Prenn, Mã Pí Lèng, Hải Vân), fitted to each illustration, into carodo-app `apps/web/src/components/site/route-shapes.ts` |
 
 Python 3, standard library only; network through `curl`. Run from the handbook root:
 
