@@ -7,9 +7,10 @@ and PV-25 (iPhone timing) recorded. Slice 3 (showing it) **built 2026-11-15, unc
 iPhone**: owner chose a separate block ("You explored · 2.4 km of new road", `NewRoadCallout`) in
 Explore's rows, the latest drive and Journey Detail, from 100 m; the Passport's Footprint shows the
 period's sum beside the explored area ("86 km new road"; All time "1,240 km of road driven"); the
-screens read again when the count writes (`AppState.newRoadsRevision`). Left for later: tapping the
-Passport figure to open the Map's Discovery layer in the same scope (the Map's files were being
-edited by another session), the month heading's new road, Day's rows. Found on the way and fixed
+screens read again when the count writes (`AppState.newRoadsRevision`). Added the same day (owner): the
+Passport figure opens the Map's Discovery in the same scope (the focus reads every drive, New = first
+driven since the scope's start, framed on the scope's drives), and Explore's month heading carries
+the month's new road within the filter (`newRoadM(matching:)`). Left: Day's rows. Found on the way and fixed
 (carodo-ios `555ece1`): the Footprint read the drives beside the journal read and kept the old
 answer. Discussed with the owner on 2026-11-15: compute from the trips, not from a stored cell
 table like carstack's; the owner's concern is performance, answered in "Performance" below.
