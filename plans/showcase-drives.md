@@ -9,7 +9,7 @@ side) and Hải Vân from `showcase/web_shapes.py`, with "Route shapes © OpenSt
 under them; carodo-app is not committed until its first deploy. Then replaced (owner, 2026-11-15:
 real app images rather than drawings, no sharing feature on a private journal): the landing's rows
 show cropped Simulator screens of the showcase (Auto Mode, Mã Pí Lèng in Journeys and in Replay),
-embedded in the Worker; `web_shapes.py` stays for later use. Next: S5 (the App Store set).
+embedded in the Worker; `web_shapes.py` stays for later use. Next: S5 (the App Store set). The landing's state and next steps: `web-landing.md`.
 The drives' ends are named with Apple's lookup as saved drives are (carodo-ios `d67b0e0`: "X. Đồng
 Văn → X. Mèo Vạc", "P. Hải Vân → X. Chân Mây - Lăng Cô"); the journal stays in memory, no iCloud.
 
