@@ -233,3 +233,129 @@ No schema, API, permission, entitlement or dependency change.
   Familiar moved to **TD-33**; the drained copper stays as a placeholder. The legend shows only
   the three names (New roads, Explored, Familiar), no description lines (owner, 2026-11-15).
 
+
+## Slice 5 · A veil over the base map (look A, 2026-11-15)
+
+Status: **approved** (owner, 2026-11-15: D-A1 Developer slider, D-A2 default Light map); D-A3
+F2 first, F1 if F2 costs too much on the iPhone; Discovery built first, then Footprint.
+**Built** in carodo-ios (uncommitted, waiting for the owner's review on the iPhone). Owner on the
+iPhone (2026-11-15): 70–80 % suits Footprint, an even wash hid Discovery's roads, and the map did
+not feel smooth. Look B (a band cleared along each road by a renderer of its own) was built, then
+dropped the same day: owner, "follow what MapKit supports, avoid custom layers for performance and
+battery". Final: MapKit's own polygons with `MKOverlayRenderer.blendMode` (Apple's "Displaying
+overlays on a map" sample): colour taken away 85 % (saturation blend), a wash of 35 % Light / 30 %
+Dark (preset B of three compared on the simulator); Footprint's squares holes in both. The jank was
+the veil re-added with every new answer for the view: it is now its own group, kept while
+Discovery's lines change. `mutesLight` removed; Developer → Map veil tunes the three values. Lint,
+no warnings, 2,272 tests pass. Open: values chosen on the iPhone, Time Profiler before/after
+(PV-24).
+
+**Measured on the simulator (2026-11-15)**, `-carodo.debugMapTour 3` (63 s of zooms and pans,
+sample journal, Light, Mac's iOS 27.2 simulator, `ps` CPU time of the app and peak RSS; one or two
+runs each, so ±0.7 s is noise). Discovery: Standard + 2 blends 11.8 / 10.7 s, Muted + 1 blend 11.0 /
+10.7 s, Muted only 11.3 / 11.0 s; peak RSS 515–590 MB in every mode. Footprint: Standard + 2 blends
+13.3 s, Muted only 11.6 s (its fog is two polygons with a hole per square, made again with every
+answer). Reading: no measurable cost for Discovery's veil; Footprint's fog about +15 % CPU over the
+tour. The simulator draws with the Mac's GPU and says nothing of battery: the iPhone decides
+(Developer → Map veil → Mode, the same tour, Instruments' Time Profiler and Energy).
+
+**Measured on the iPhone 17 Pro Max (2026-11-15)**, the same tour on the owner's real journal,
+Light, brightness 72 %, charging, the app attached with `xctrace` (60 s each). Time Profiler, the
+app's mean CPU: Discovery Standard + 2 blends 25.8 / 24.4 / 25.8 %, Muted + 1 blend 25.8 %, Muted
+only 24.6 / 24.9 %; Footprint Standard + 2 blends 31.0 / 29.3 %, Muted only 25.8 / 27.0 %. Power
+Profiler, the app's mean impact (CPU / GPU / display): Discovery Standard + 2 blends 0.21 / 0.80 /
+2.73 and 0.32 / 0.85 / 2.75; Muted + 1 blend 0.16 / 0.55 / 3.15; Muted only 0.16 / 0.43 / 2.98 and
+0.16 / 0.43 / 2.92. Footprint Standard + 2 blends 0.41 / 0.89 / 2.75 and 0.48 / 0.93 / 2.72; Muted
+only 0.40 / 0.42 / 3.05 and 0.42 / 0.43 / 3.09. Reading: the two blended polygons about double the
+GPU (+0.4), one blend +0.1; Discovery's CPU does not move, Footprint's fog adds about 14 % CPU (its
+holes, made again with each answer). The display costs most and the muted map's lighter ground
+costs it about 0.25 more, so the totals sit within 5–8 % of each other (Muted only lowest). The
+history is hidden while a drive records, so none of this runs during a drive.
+
+**Chosen (owner, 2026-11-15): the cheapest look per layer.** Discovery: Apple's muted map, no
+overlay (its Plum palette was chosen on the muted map, TD-33). Footprint: the muted map and one fog
+polygon of the ground (Ivory 70 % / Charcoal 60 %), each square a hole, in the normal blend (the
+cheapest; the saturation blend reads the map under it). The blended veils, the veil mode picker and
+the colour slider are gone; Developer → Footprint fog tunes the two opacities; `-carodo.debugMapTour`
+stays. Measured on the iPhone after the change (Instruments launching the app, seconds 10–70 of the
+tour, brightness 66 %, so the display figures do not compare with the runs above): Discovery CPU
+23.6 / 23.3 %, GPU 0.42 / 0.42 (as Muted only); Footprint CPU 28.1 / 28.3 %, GPU 0.53 / 0.52 (two
+blends were 30.2 % and 0.91, no fog 26.4 % and 0.43). Lint, no warnings, 2,271 tests pass in a
+worktree holding only this change (the shared tree was mid-change in another session). Look B (a clear band along each road, as the
+share card) is not part of this slice; it is weighed only if A is not enough on the iPhone.
+
+**Outcome.** Under Discovery the base map steps back behind one even veil, so the three classes
+read as pen strokes on a quiet map, and the Light map can go back to Apple's default Standard
+(owner, 2026-11-15: "keep the standard map, clear, but fade everything around, only the route like
+a pen stroke, keep the colours").
+
+**User story.** Zoomed out over months of drives, I see where I have been, New, Explored and
+Familiar, without Apple's highways and province borders competing with my lines; I can still read
+the place names.
+
+**Existing behaviour (files read).**
+- Every history overlay is added at `.aboveRoads` (`AtlasMapView.swift`, `AtlasOverlaySync.replace`):
+  above roads and land, under Apple's labels. Groups bottom to top: `history`, `accuracy`, live.
+- Discovery is 4 `MKMultiPolyline`s (Familiar, Explored, New's casing, New); routes 2; footprint 1.
+- Under Discovery the Light map is Apple's muted one (`AtlasMapConfiguration.mutesLight`,
+  `CarodoMapLook.standard(mutesLight:)`); Dark is always muted.
+- The share card's veil (`ShareCardRenderer.veil`, `veilOpacity` 0.78 of the card's ground, a clear
+  band 80 pt on the route) works on one still image; it is not reused here (a live map with
+  thousands of runs, see look B above).
+
+**Design.**
+- One overlay: an `MKPolygon` over `MKMapRect.world`, filled with the map's ground (Ivory/cream on
+  a light map, Charcoal on a dark one) at a tuned opacity, drawn **first** in the `history` group,
+  so every Discovery line, the accuracy circle and the live drive sit above it, and Apple's labels
+  stay above everything.
+- Only under Discovery on Standard. Routes, Footprint, Hybrid and Satellite unchanged (imagery keeps
+  its Charcoal casing).
+- `mutesLight` is removed if the default Light map under the veil reads as well as the muted one
+  (decided on the iPhone, D-A2); if not, it stays and the veil is lighter.
+- Zoomed out the veil may deepen a little, restyled in place when the map settles as
+  `atlasThinning` does (never rebuilt), only if the iPhone shows it is needed.
+- `DiscoveryPalette` keeps its colours; a colour is lifted only if Familiar sinks under the veil on
+  the dark map (same hue, owner's call).
+
+**Cost (battery, CPU).** One polygon with four corners; MapKit draws it into the tiles it caches, so
+it costs a fill per tile when a tile is drawn, nothing per frame, nothing while the map is still.
+The Map's history build (`HistoryAtlas`) is untouched. Check: Instruments' Time Profiler and the
+"Map history overlays" signpost before and after, on the iPhone, with the same pan and zoom; the
+screen at rest stays under 1 % CPU.
+
+**Acceptance criteria**
+1. Discovery on Standard, Light and Dark: the base map (land, roads, borders) reads faded; place
+   and road names stay legible; New, Explored and Familiar read at 2D zoom from street to country.
+2. Routes, Footprint, Hybrid, Satellite look exactly as before.
+3. A drive recorded while Discovery is shown draws its live line above the veil.
+4. Switching layers adds or drops the veil with the history, no flash of an unveiled map in
+   between (the history's fade-in, `atlasRevealFadeS`, covers it too).
+5. No more overlays than Discovery + 1; no per-frame work; at rest < 1 % CPU on the iPhone.
+6. `docs/specs/navigation.md` (Discovery) and `docs/design-system.md` (route line colours,
+   `CarodoMapLook`) say what the veil is and why.
+
+**Non-goals.** No blur (MapKit cannot blur its tiles under sharp overlays without a mask redrawn
+every frame), no clear band along roads (look B), no change to `RoadDiscovery`, no new tokens unless
+the veil colour cannot be an existing one.
+
+**Decisions for the owner**
+- **D-A1 · Tuning on the iPhone:** a Developer slider for the veil's opacity, Light and Dark apart,
+  DEBUG only, removed once the values are chosen (recommended: the opacity is a matter of eye on
+  the real map), or three fixed builds to compare (30 / 45 / 60 %).
+- **D-A2 · Light map:** back to the default Standard under the veil (recommended, as asked), or
+  keep the muted one and a lighter veil; the iPhone decides.
+
+- **D-A3 · Footprint** (owner, 2026-11-15: "footprint could use the same so the squares read"):
+  F1, the same even veil under the copper squares (one overlay, no extra cost); or F2, a fog: the
+  veil with the squares as holes, so visited ground shows the real map and the rest is fogged. F2
+  is one `MKPolygon` with up to 1,500 holes (the footprint's cap), drawn per tile and cached, never
+  per frame, but each tile walks the holes: measured in the same pass before it is kept.
+
+**Validation.** `task lint`, `task warnings`, `task test` (a test that Discovery's overlays start
+with the veil and that the other layers have none); simulator screenshots Light/Dark, Vietnamese,
+city and country zoom; iPhone: opacity chosen, Time Profiler before/after, at rest < 1 % CPU (adds to
+PV-24).
+
+**Allowed scope.** `Features/Map/Views/AtlasOverlays.swift`, `AtlasMapView.swift`,
+`MapAtlasView.swift`, `DesignSystem/Map/CarodoMapLook.swift`, `DesignSystem/MapTuning.swift`, the
+Developer screen (D-A1 only), tests, the two docs above.
