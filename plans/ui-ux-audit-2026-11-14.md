@@ -356,6 +356,74 @@ Method notes: the device-interaction hierarchy lists children of combined elemen
 Simulators kept for this: "Carodo A11y QA" C24D62C2…, "Carodo A11y QA 2" 2F921BB6… (iOS 27.2).
 ```
 
+## Third pass: the mark on the Start Drive button and the vehicle marker (owner, 2026-11-15)
+
+Two items the owner raised after using the app. Assessed at carodo-ios `361e3a2` with a
+simulator run (iPhone 18 Pro, iOS 27.2, `-carodo.sampleData YES`, `-carodo.debugStartDrive YES
+-carodo.debugFollow close`) and an HTML mockup drawn from the brand SVG (`carodo-mark-mono.svg`,
+the same geometry as `CarodoMarkGeometry`). Mockup and screenshots are session scratch, not kept.
+
+### Findings
+
+| ID | Finding | Evidence |
+|---|---|---|
+| B1 | **The Start Drive button's mark is Charcoal on Copper, while every other place the wheel sits on a dark or tinted fill draws it light** (the live marker: Ivory wheel, Copper road on Charcoal; About Carodo's tile: white wheel). The owner reads the Charcoal mark as heavy ("black on ivory"). On the simulator the iOS 26 Copper glass samples at about (179, 120, 76), close to brand Copper; on an iPhone over a light map it may wash lighter, which is the owner's impression to confirm | `FloatingNavigation.swift` `SpinningMark` (`CarodoMarkView(wheelColor: .charcoal, journeyColor: .charcoal)`); `docs/design-system.md` colour table: "the mark or icon on the Copper Start Drive button" is Charcoal |
+| B2 | **Contrast limits the light options.** Against brand Copper: Charcoal 4.8:1, white 3.3:1, Ivory 2.9:1 (a graphic needs 3:1, and the button is a driving surface read at a glance). Against the glass sample: white 3.6:1. Against one step deeper Copper (#A86F47): white 3.9:1. Ivory alone falls short; white passes narrowly; white on a deeper Copper passes with margin | Computed, WCAG relative luminance |
+| B3 | **The vehicle marker is large for a street-level map.** `DriveLocationMarker` is a 40 pt disc (wheel 30 pt inside) with a Copper tip outside it, 64 pt in all; at the follow camera's close zoom it covers about a block and the junction the car is at, about 10 % of the screen's width. The system's own location dot is roughly half that. The same marker moves along Replay (`ReplayMapView` hosts it at a fixed 64 × 64) | `VehiclePositionMarker.swift` (`size = 40`, frame `size + 24`), `ReplayMapView.swift:538`; screenshot at follow close |
+
+### Options for B1 (owner's choice, mockup A–D)
+
+- **A. As today:** Charcoal mark on Copper (4.8:1).
+- **B. Ivory mark on Copper** (2.9:1): matches the live marker's wheel, below 3:1. Not recommended.
+- **C. White mark, the button one step deeper Copper** (#A86F47, 3.9:1): reads like iOS 26's own
+  prominent tinted buttons (white glyph on a tinted glass), and like the live marker's light wheel.
+  Changes the "Drive action" row of the design system: the same rule binds Start in the panel and
+  Hold to Finish, so they move together, or the bar button is named the one exception.
+- **D. Two-tone:** Ivory wheel, Charcoal road (2.9 / 4.8): busy at 38 pt, the wheel still under 3:1.
+
+Recommendation: **C**, if the owner prefers the light wheel after seeing it; otherwise A stays.
+Either way the stop and pause symbols that replace the mark during a drive take the same colour as
+the mark, so the button does not change ink when a drive starts.
+
+### Recommendation for B3
+
+A **32 pt** disc (wheel about 25 pt; spokes and road still read), the tip scaled with it, one size
+constant shared with Replay's host frame instead of its literal 64. 28 pt starts to lose the
+spokes; 34 pt is a smaller change if 32 feels too light on the iPhone. The ring, hairline, shadow
+and tip colours stay. Proof is on the iPhone during a drive (glance legibility at speed, in
+CarPlay-less daylight), not on the simulator.
+
+### Order of work (third pass)
+
+| Step | What | Findings | Commit by | Depends on |
+|---|---|---|---|---|
+| 16 | Vehicle marker to 32 pt, one size for the live map and Replay; `docs/design-system.md` Map markers row | B3 | agent with screenshots (Light, Dark, Replay); **owner device check** (PV) | none |
+| 17 | The Start Drive mark in the option the owner picks; if C, the Drive action row of `docs/design-system.md`, Start in the panel and Hold to Finish with it, contrast checked in Light and Dark on glass and on the iOS 18 fallback | B1, B2 | **owner review** (taste) | owner's pick from the mockup |
+
+Why 16 first: it needs no decision (one size, measurable), it is small, and its proof rides on the
+next real drive; step 17 waits on the owner's pick and changes a design-system rule.
+
+Owner, 2026-11-15: **C** for B1 and **32 pt** for B3, both as recommended.
+
+### State (third pass)
+
+- **Step 16 done** (carodo-ios `15f6c08`): `DriveLocationMarker` 32 pt disc
+  (mark padding 4, ring 2 pt, tip 12 × 8 pt), 52 pt in all as `DriveLocationMarker.side`, which
+  Replay's annotation now uses; the Map tab's annotation keeps its 80 pt box (shared with the user
+  dot's cone). Docs: `design-system.md` Map markers row, `specs/navigation.md`.
+- **Step 17 done** (carodo-ios `1b53306`): `CarodoColor.copperDeep`
+  (168, 111, 71); Start Drive in the bar (glass tint, the mark, stop and pause) and Hold to Finish
+  in white on it. **Narrower than first written:** the Start panel's labelled button keeps
+  Charcoal text on brand Copper, because white text on `copperDeep` is 3.9:1, under the 4.5:1
+  text needs (a Copper deep enough for white text, ≈ #9D653C, reads brown and drops to 3.3:1
+  against a Charcoal page). Replay's play and the Auto Mode sheet's round button were not Drive
+  action and stay Charcoal on Copper. Docs: `design-system.md` (colour table, Which copper,
+  Driving surfaces, Buttons), `specs/drive-recording.md`, `specs/navigation.md`.
+- Checks: swift-format lint on the touched files, `task warnings` (no warnings), `task test`
+  (2,240, 0 failures). Simulator screenshots Light and Dark: Map idle, live drive, Hold to
+  Finish, Replay. Device check open: the marker's glance legibility at speed, the white mark on
+  glass over a light map in daylight.
+
 ## Considered and not planned
 
 So nobody audits them again:
