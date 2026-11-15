@@ -1,6 +1,7 @@
 # New roads per drive (`new_road_m`)
 
-Status: **slices 1–2 committed** (carodo-ios `501ebdf`, 2026-11-15; owner approved D1–D6 and the
+Status: **slices 1–2 committed** (carodo-ios `501ebdf`, self-review fixes `06a19ab`: `RouteStamp` so a route
+derived again from iCloud changes the basis and the Map's version, and no count lost while one runs; 2026-11-15; owner approved D1–D6 and the
 `basis` invalidation). TD-7 resolved there (`visited_cells` dropped); TD-34 (bookkeeping on `trips`)
 and PV-25 (iPhone timing) recorded. Slice 3 (showing it) next, after D3 on the iPhone. Discussed with the owner on 2026-11-15: compute from the trips, not from a stored cell
 table like carstack's; the owner's concern is performance, answered in "Performance" below.
