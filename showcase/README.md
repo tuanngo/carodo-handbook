@@ -16,7 +16,11 @@ along the road. Anything shown in public that is drawn from these lines credits 
 | `routes/<id>.gpx` | The road line with elevation (no time): the generator's input |
 | `routes/<id>.svg` | A preview: the line, its waypoints and the elevation profile |
 | `noise.json` | S0: GPS noise measured on real drives, aggregate figures only |
-| `generate.py`, `out/` | S2 (not yet): the generated fixes, Simulator GPX and summaries |
+| `generate.py` | S2: turns each route into a drive of raw fixes (`--check` runs its self-test) |
+| `out/<id>.json` | Every fix with every `trip_points` field, 1 Hz, UTC; the app's loader (S3) and tests read these |
+| `out/<id>.sim.gpx` | The same fixes, timed, for Xcode's location playback |
+| `out/summary.md`, `out/shapes.json` | Per-drive figures; simplified unit-box shapes for the website (no coordinate) |
+| `sim_drive.py` | Plays a route on the iOS Simulator so the app records it live |
 
 Python 3, standard library only; network through `curl`. Run from the handbook root:
 
@@ -64,11 +68,31 @@ streets. Full figures in `noise.json`; the analysis script is not kept (it reads
 | Course accuracy | median 25°, p90 180°; missing in 1.6 % of fixes below 1.5 m/s |
 | Pressure | lapse −11.9 Pa/m (physics; the measured slope is not usable on flat roads); drift at stops median 1.7 Pa/min |
 
+**What S0's cross-track figure measures.** The ±15 s moving-average residual mixes GPS error with
+the road's own turns: on the generated mountain drives the same measure reads about 20 m, on the
+expressway 8 m, and no pure noise process reproduces the real 0.37 correlation at 10 s (2026-11-15).
+On city streets the 5.1 m is mostly turns. The generator therefore sizes the error from the reported
+accuracy instead (below), and S0's cross-track figure is kept as a record, not a target.
+
 What the generator takes from it (S2): the two accuracy states as a Markov chain with these run
-lengths (fewer degraded runs on open passes and the expressway), the cross-track error as an AR(1)
-process with φ ≈ 0.93 per second and the measured sd, gaps at the measured rate (capped for the
-showcase so a Replay never jumps), stop drift and accuracy, speed noise, course accuracy and
-pressure drift.
+lengths, the error as a smooth second-order process (an AR(1) of φ 0.93 driven by an AR(1) of 0.9,
+as iOS's filtered fixes drift rather than jitter) sized so its 68 % radius matches the reported
+accuracy (generated: 2.3 m good, 8.4 m degraded, against 2.0 and 8.0 reported), gaps at the
+measured rate, stop drift and accuracy, speed noise, course accuracy and pressure drift.
+
+## Generating (S2, 2026-11-15)
+
+```sh
+python3 showcase/generate.py --check     # self-test: curve speed, accel/brake caps, determinism, stops, gaps
+python3 showcase/generate.py             # all drives into out/ (about 1 s); --noise measured for tests
+```
+
+Speed follows the road: `v = min(road speed × the driver's slowly drifting pace, √(a_lat × R))`,
+a_lat 2.0 m/s² on passes and 1.5 on the expressway, capped by +1.2 m/s² acceleration and −2.0
+braking; 12 s still before setting off and 20 s after arriving; stops under 5 min (past the app's
+300 s grace a stop ends the drive). `--noise showcase` (the default) starts each drive with a clear
+sky, halves the degraded runs and keeps gaps to 4–9 s so a Replay never jumps; `--noise measured`
+uses S0's figures as measured. The generated figures are in `out/summary.md`.
 
 ## Try a route in the app (Simulator)
 

@@ -1,5 +1,5 @@
 {
-  "about": "Synthetic showcase drives on public roads (plans/showcase-drives.md). Waypoints are public places (OpenStreetMap / Nominatim); start times are local (time_zone) and fixed (D5); seeds make the generated fixes deterministic. Not recorded drives. A waypoint with \"via\": false only marks a stop; the route is not forced through it.",
+  "about": "Synthetic showcase drives on public roads (plans/showcase-drives.md). Waypoints are public places (OpenStreetMap / Nominatim); start times are local (time_zone) and fixed (D5); seeds make the generated fixes deterministic. Not recorded drives. Stops stay under 5 min: past StopDetector's 300 s grace the app ends the drive there. A waypoint with \"via\": false only marks a stop; the route is not forced through it.",
   "vehicle": {
     "kind": "car",
     "name": "Mazda CX-5",
@@ -36,7 +36,7 @@
       "stops": [
         {
           "at_waypoint": 1,
-          "minutes": 9
+          "minutes": 4
         }
       ],
       "road_speed_kmh": 40
@@ -67,7 +67,7 @@
       "stops": [
         {
           "at_waypoint": 1,
-          "minutes": 12
+          "minutes": 4
         }
       ],
       "road_speed_kmh": 45
@@ -93,7 +93,7 @@
       "stops": [
         {
           "at_fraction": 0.52,
-          "minutes": 15
+          "minutes": 4
         }
       ],
       "road_speed_kmh": 100
@@ -125,7 +125,7 @@
       "stops": [
         {
           "at_waypoint": 1,
-          "minutes": 7
+          "minutes": 4
         }
       ],
       "road_speed_kmh": 50

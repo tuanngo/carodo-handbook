@@ -1,8 +1,9 @@
 # Showcase drives: synthetic GPS on real mountain passes
 
-Status: **S0 and S1 done** (2026-11-15): `showcase/noise.json` (19 real car drives, aggregate
-figures only) and the five routes in `showcase/routes/` with previews, waiting for the owner to
-confirm the lines. Next: S2 (the generator).
+Status: **S0, S1 and S2 done** (2026-11-15): measured noise (`showcase/noise.json`), five routes
+(`showcase/routes/`), the generator and its outputs (`showcase/generate.py`, `showcase/out/`), and
+a Simulator player (`showcase/sim_drive.py`, tried on Prenn). Next: S3, the DEBUG loader in
+carodo-ios (needs the owner's go on that repository).
 
 One set of made-up car drives on real public roads (four of Vietnam's best-known passes and one
 long expressway run), generated as realistic raw GPS fixes. It serves three uses:
@@ -171,8 +172,11 @@ Order: S0 and S1 together → S2 → S4 → S3 → S5 → S6. After S2 the data 
 
 - `python3 showcase/generate.py --check` passes; the same inputs give byte-identical outputs.
 - Every fix in `out/` fills every `TripPointRecord` field plausibly; `summary.md` lists each drive.
-- `noise.json` records the real drives it was measured on; the synthetic drives' median horizontal
-  accuracy and error autocorrelation are within ±25 % of the real ones (printed by S4's comparison).
+- `noise.json` records the real drives it was measured on. The generated moving accuracy matches the
+  real one (median 2.26 m both; degraded share 21 % against 31 % over five drives) and so does the
+  gap rate (8.6 against 8.5 per moving hour, `--noise measured`). The error autocorrelation is **not**
+  compared: S0's cross-track measure mixes the road's turns with the GPS error (README, S0), so the
+  error is sized from the reported accuracy instead (68 % radius 2.3 m against 2.0 reported).
 - With `CARODO_SHOWCASE` set, `ShowcaseDriveTests` passes on all five drives in under 10 s.
 - `-carodo.showcaseJournal` opens the Simulator app on the five drives and the car, with no network,
   no location service and no device database touched.
