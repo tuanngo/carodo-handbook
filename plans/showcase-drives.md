@@ -3,7 +3,9 @@
 Status: **S0–S3 done** (2026-11-15). S3 is carodo-ios `7139b9a`: DEBUG
 `-carodo.showcaseJournal <folder>` (+ `-carodo.showcaseNow YES`) loads `showcase/` into an in-memory
 journal through the real trip store; tried on the Simulator (Journeys, Mã Pí Lèng's detail and
-Replay, Hải Vân's share card). Next: S4 (tests on the drives), S5 (screenshots), S6 (web shapes).
+Replay, Hải Vân's share card). S4 done (carodo-ios `40efc1c`, `task showcase`): all five drives read as planned (distance within
+0.7 %, stops 1/1, climb within 7 %, 600 m trimmed, Replay with no jump; 0.15 s). Next: S5
+(screenshots), S6 (web shapes).
 The drives' ends are named with Apple's lookup as saved drives are (carodo-ios `d67b0e0`: "X. Đồng
 Văn → X. Mèo Vạc", "P. Hải Vân → X. Chân Mây - Lăng Cô"); the journal stays in memory, no iCloud.
 

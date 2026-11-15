@@ -192,3 +192,11 @@ Lessons already paid for that L5 gathers, beside the entries below:
 - Why it matters: a peer's half-finished change lands in a commit under the wrong message, and the peer's own commit later shows it missing.
 - Rule now in: carodo-ios `AGENTS.md` Git ("`git diff --cached --stat` lists exactly the files this work touched" — the check must come before the commit, not in the same call)
 
+
+### new-test-file-not-in-the-project
+- applies_when: adding a new test file (or any new Swift file) to carodo-ios and reporting the tests passed
+- area: carodo-ios project.yml / Carodo.xcodeproj · found: 2026-11-15, carodo-ios 7139b9a → 40efc1c · severity: medium
+- Context: `ShowcaseJournalTests.swift` was added and `xcodebuild test -only-testing:CarodoTests/ShowcaseJournalTests` exited 0, so the tests were reported passing. The file was not in the project (XcodeGen had been run before the file existed), so nothing ran: the full suite counted 2,277 tests before and after. It surfaced only when a second new test printed nothing; after `xcodegen generate` the count was 2,281.
+- Guidance: after adding a Swift file, run `xcodegen generate` and check `project.pbxproj` names it; after adding tests, check the total test count went up (the xcresult summary), never just the exit code: `-only-testing` on an unknown class exits 0.
+- Why it matters: a test that never runs reads as a passing test in a completion report.
+- Rule now in: nowhere yet
