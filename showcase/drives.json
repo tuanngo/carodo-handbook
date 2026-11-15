@@ -1,0 +1,155 @@
+{
+  "about": "Synthetic showcase drives on public roads (plans/showcase-drives.md). Waypoints are public places (OpenStreetMap / Nominatim); start times are local (time_zone) and fixed (D5); seeds make the generated fixes deterministic. Not recorded drives. A waypoint with \"via\": false only marks a stop; the route is not forced through it.",
+  "vehicle": {
+    "kind": "car",
+    "name": "Mazda CX-5",
+    "make": "Mazda",
+    "model": "CX-5",
+    "body_style": "suv",
+    "color": "copper"
+  },
+  "drives": [
+    {
+      "id": "ma-pi-leng",
+      "title": "Mã Pí Lèng",
+      "start": "2026-10-18T08:10:00",
+      "time_zone": "Asia/Ho_Chi_Minh",
+      "seed": 1018,
+      "waypoints": [
+        {
+          "name": "Phố cổ Đồng Văn",
+          "lat": 23.27967,
+          "lon": 105.36078
+        },
+        {
+          "name": "Mã Pí Lèng viewpoint",
+          "lat": 23.24062,
+          "lon": 105.41208,
+          "via": false
+        },
+        {
+          "name": "Chợ Mèo Vạc",
+          "lat": 23.16438,
+          "lon": 105.40877
+        }
+      ],
+      "stops": [
+        {
+          "at_waypoint": 1,
+          "minutes": 9
+        }
+      ],
+      "road_speed_kmh": 40
+    },
+    {
+      "id": "hai-van",
+      "title": "Đèo Hải Vân",
+      "start": "2026-10-25T15:40:00",
+      "time_zone": "Asia/Ho_Chi_Minh",
+      "seed": 1025,
+      "waypoints": [
+        {
+          "name": "Cầu Nam Ô",
+          "lat": 16.12158,
+          "lon": 108.12272
+        },
+        {
+          "name": "Hải Vân Quan",
+          "lat": 16.189461,
+          "lon": 108.129418
+        },
+        {
+          "name": "Lăng Cô station",
+          "lat": 16.22203,
+          "lon": 108.08132
+        }
+      ],
+      "stops": [
+        {
+          "at_waypoint": 1,
+          "minutes": 12
+        }
+      ],
+      "road_speed_kmh": 45
+    },
+    {
+      "id": "expressway",
+      "title": "Ho Chi Minh City → Phan Thiết",
+      "start": "2026-11-07T06:45:00",
+      "time_zone": "Asia/Ho_Chi_Minh",
+      "seed": 1107,
+      "waypoints": [
+        {
+          "name": "Nút giao An Phú",
+          "lat": 10.79095,
+          "lon": 106.75141
+        },
+        {
+          "name": "Phan Thiết",
+          "lat": 10.92963,
+          "lon": 108.10439
+        }
+      ],
+      "stops": [
+        {
+          "at_fraction": 0.52,
+          "minutes": 15
+        }
+      ],
+      "road_speed_kmh": 100
+    },
+    {
+      "id": "ngoan-muc",
+      "title": "Đèo Ngoạn Mục",
+      "start": "2026-11-08T09:20:00",
+      "time_zone": "Asia/Ho_Chi_Minh",
+      "seed": 1108,
+      "waypoints": [
+        {
+          "name": "Cầu Sông Pha",
+          "lat": 11.82614,
+          "lon": 108.70259
+        },
+        {
+          "name": "Đèo Ngoạn Mục",
+          "lat": 11.83337,
+          "lon": 108.66556,
+          "via": false
+        },
+        {
+          "name": "Thạnh Mỹ, Đơn Dương",
+          "lat": 11.75729,
+          "lon": 108.48433
+        }
+      ],
+      "stops": [
+        {
+          "at_waypoint": 1,
+          "minutes": 7
+        }
+      ],
+      "road_speed_kmh": 50
+    },
+    {
+      "id": "prenn",
+      "title": "Đèo Prenn",
+      "start": "2026-11-09T07:30:00",
+      "time_zone": "Asia/Ho_Chi_Minh",
+      "seed": 1109,
+      "waypoints": [
+        {
+          "name": "Thác Prenn",
+          "lat": 11.87652,
+          "lon": 108.4701
+        },
+        {
+          "name": "Chợ Đà Lạt",
+          "lat": 11.94344,
+          "lon": 108.43718
+        }
+      ],
+      "stops": [],
+      "road_speed_kmh": 50
+    }
+  ]
+}

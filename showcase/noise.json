@@ -1,0 +1,49 @@
+{
+  "about": "GPS noise measured on the owner's and testers' real car drives (drive-data/, S0 of plans/showcase-drives.md). Aggregate figures only: no coordinate, no per-drive value. Mostly city streets in southern Vietnam; open mountain roads and expressways usually see better accuracy.",
+  "measured_on": {
+    "car_drives": 19,
+    "fixes": 50914,
+    "moving_hours": 12.8,
+    "dates_utc": ["2026-10-30", "2026-11-10"],
+    "measured": "2026-11-15"
+  },
+  "interval_s": { "p50": 1.0, "p99": 1.001 },
+  "horizontal_accuracy_m": {
+    "while_moving": {
+      "good": { "p10": 2.0, "p50": 2.01, "p90": 2.93 },
+      "degraded": { "p10": 8.0, "p50": 8.04, "p90": 14.25 },
+      "degraded_share": 0.308,
+      "good_run_s": { "p25": 14, "p50": 79, "p75": 417, "p90": 2599, "mean": 560.4 },
+      "degraded_run_s": { "p25": 2, "p50": 6, "p75": 39, "p90": 948, "mean": 211.8 }
+    },
+    "while_stopped": { "p25": 8.0, "p50": 13.72, "p75": 14.25, "p90": 14.25 },
+    "all": { "p10": 2.0, "p25": 2.0, "p50": 2.26, "p75": 8.0, "p90": 14.25, "p99": 14.47 }
+  },
+  "cross_track_error": {
+    "method": "fix minus a ±15 s centred moving average, across the direction of travel, moving > 5 m/s, no gap",
+    "sd_m": { "p25": 3.72, "p50": 5.06, "p75": 7.12 },
+    "autocorrelation": { "1s": 0.931, "2s": 0.856, "3s": 0.778, "5s": 0.639, "8s": 0.473, "10s": 0.368, "15s": 0.135, "20s": 0.009, "30s": -0.019 },
+    "decorrelation_s": 11
+  },
+  "gaps": {
+    "over_3s_per_moving_hour": 8.51,
+    "length_s": { "p10": 4.0, "p25": 6.0, "p50": 11.5, "p75": 35.0, "p90": 111.0, "p95": 181.0, "p99": 825.0 }
+  },
+  "stopped": {
+    "drift_rms_m": { "p25": 0.57, "p50": 0.75, "p75": 1.79, "p90": 2.0 }
+  },
+  "vertical_accuracy_m": { "p10": 3.0, "p25": 4.54, "p50": 6.42, "p75": 8.69, "p90": 10.95, "p99": 14.56 },
+  "speed": {
+    "accuracy_mps": { "p10": 0.72, "p25": 0.96, "p50": 1.52, "p75": 2.69, "p90": 3.67, "p99": 4.08 },
+    "error_vs_positions_mps": { "median": -0.02, "sd": 0.56 }
+  },
+  "course": {
+    "accuracy_deg": { "p10": 9.49, "p25": 14.48, "p50": 25.1, "p75": 65.91, "p90": 180.0 },
+    "missing_share_below_1_5_mps": 0.016
+  },
+  "pressure": {
+    "lapse_pa_per_m": -11.9,
+    "lapse_note": "Physics (barometric formula near sea level). The measured slope (-0.58 Pa/m) is not usable: on flat city roads the GPS altitude's noise is larger than the altitude change.",
+    "drift_pa_per_min_at_stops": { "p25": 1.52, "p50": 1.7, "p75": 1.94, "p90": 2.81 }
+  }
+}

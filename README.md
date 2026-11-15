@@ -20,6 +20,7 @@ This folder may link into them; they never link here. Rules for changing code: e
 | [`audits/`](audits/README.md) | Source audits and what they taught: each case, its fix commit, the test that guards it and the pattern to avoid ([2026-11-07 iOS](audits/2026-11-07-ios-source-audit.md): seven cases, all fixed) |
 | [`field-tests/`](field-tests/README.md) | Test drives: the script the owner reads on the phone before a drive, and the agent's review of its logs after |
 | [`drafts/`](drafts/README.md) | Specs and designs for features with no code yet |
+| [`showcase/`](showcase/README.md) | Synthetic showcase drives on public roads (passes, the Phan Thiết expressway): routes, measured GPS noise, the generator; for screenshots, the website and tests ([plan](plans/showcase-drives.md)) |
 | [`design/mockups/`](design/mockups/README.md) | The owner's visual explorations: ideas, not specs |
 | [`design/brand/brand.md`](design/brand/brand.md) | Logo mark, wordmark, lockup, app-icon sources; how to edit and regenerate them |
 | [`design/vehicle-art/`](design/vehicle-art/README.md) | Archived vector explorations (rounded and detailed v4); current iOS vehicle identity uses SF Symbols |
