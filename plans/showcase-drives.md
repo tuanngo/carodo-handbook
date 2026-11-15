@@ -6,7 +6,10 @@ journal through the real trip store; tried on the Simulator (Journeys, Mã Pí L
 Replay, Hải Vân's share card). S4 done (carodo-ios `40efc1c`, `task showcase`): all five drives read as planned (distance within
 0.7 %, stops 1/1, climb within 7 %, 600 m trimmed, Replay with no jump; 0.15 s). S6 done (2026-11-15): the landing's three illustrations draw Prenn, Mã Pí Lèng (turned on its
 side) and Hải Vân from `showcase/web_shapes.py`, with "Route shapes © OpenStreetMap contributors"
-under them; carodo-app is not committed until its first deploy. Next: S5 (screenshots).
+under them; carodo-app is not committed until its first deploy. Then replaced (owner, 2026-11-15:
+real app images rather than drawings, no sharing feature on a private journal): the landing's rows
+show cropped Simulator screens of the showcase (Auto Mode, Mã Pí Lèng in Journeys and in Replay),
+embedded in the Worker; `web_shapes.py` stays for later use. Next: S5 (the App Store set).
 The drives' ends are named with Apple's lookup as saved drives are (carodo-ios `d67b0e0`: "X. Đồng
 Văn → X. Mèo Vạc", "P. Hải Vân → X. Chân Mây - Lăng Cô"); the journal stays in memory, no iCloud.
 
