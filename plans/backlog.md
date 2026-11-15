@@ -63,7 +63,7 @@ Status: `Done in code` · `Next` · `Later` · `Idea` · `Refused`. Phase number
 
 | Feature | What it is | Carodo angle | Status |
 |---|---|---|---|
-| **Roads driven for the first time** | Fog of war that opens as you drive, "% of the ward or city driven", new-road distance per drive (b15, b93, b201, b248) | `visited_cells` and `new_route_m` are reserved; on the device only, never in the Feed | Later |
+| **Roads driven for the first time** | Fog of war that opens as you drive, "% of the ward or city driven", new-road distance per drive (b15, b93, b201, b248) | New-road distance per drive planned in [new-roads.md](new-roads.md) (`trip_new_roads.new_road_m`, `visited_cells` dropped); on the device only, never in the Feed | Planned |
 | **Achievements** | Tiered badges, visible on the profile; earned ones post a Feed item (b241, b248, b252) | Stamps in the Passport, not medals, with a 3D stamp in SceneKit (carodo-ios ADR 0013, decided 2026-11-03). Feed badges only about distance, a car's milestones, long drives and new roads (never named); never speed; time-of-day badges stay in the Passport (ADR 0007). Contract has `BadgeEarned`, `PUT /v1/me/badges/{badgeId}` and the catalogue endpoint; spec draft [`../drafts/achievements.md`](../drafts/achievements.md); slices Badges 1–3 in [`ios.md`](ios.md) | Next |
 | **Recaps** | Weekly and monthly stories | Facts in Swift, words by Apple Intelligence (ADR 0012) | Next |
 
