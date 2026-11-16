@@ -1,7 +1,7 @@
 # Web landing (carodo-app `apps/web`)
 
 Status: **built, uncommitted** (2026-11-15). carodo-app is not committed until its first deploy;
-`task check` passes (api 174, web 21). Next: the items under "Next", in that order.
+`task check` passes (api 173, web 25). Next: the items under "Next", in that order.
 
 ## Where it is
 
@@ -22,30 +22,56 @@ Status: **built, uncommitted** (2026-11-15). carodo-app is not committed until i
   for three). `scripts/build-media.mjs` (run with the styles) embeds them in
   `src/.generated/media.ts`; the Worker serves `/media/<name>.<hash>.jpg`, cached a year. No binding.
   The language switch updates `alt` (`data-i18n-alt`).
+- **Dark screens (done 2026-11-15):** each hero screen has a twin `<name>-dark.jpg`, chosen by a
+  `<picture>` source on `prefers-color-scheme`. The app's own setting overrides the Simulator's
+  appearance; force it with `-carodo.appearance dark|light`. All six shot on the Pro Max (Showcase)
+  with `-carodo.showcaseJournal` **without** `-carodo.showcaseNow` (dates stay "Sunday, 25 Oct",
+  reproducible): the drive page `-carodo.debugTab journeys -carodo.debugOpenJourney 3` (wait ~30 s
+  for the place names); the Replay frame at 7.5 s of `-carodo.debugOpenReplay YES
+  -carodo.debugReplayExport 30` (frame grabbed with AVFoundation, no ffmpeg here); the live screen
+  with `-carodo.debugStartDrive YES` and `sim_drive.py hai-van`, shot at 6:13 / 3.6 km, recorded in
+  the in-memory showcase journal (the simulator's database was not touched). The light live screen
+  is still the earlier one (6:33). Both exports are kept in the app's `Documents/replay-export/`
+  (`replay.mov` light, `replay-dark.mov`) for the clip (3).
+- **Showcase car is a Kia Sportage (owner, 2026-11-16; was a Mazda CX-5):** `showcase/drives.json`
+  names it, and the app's placeholders and sample data follow (carodo-ios). Reshot the same day with
+  the same arguments: the drive page (Light, Dark: the car shows faintly under the tab bar) and both
+  Replay exports, then the still at 7.5 s (440 px JPEG) and the clip 7.5–14.5 s (H.264 720×1280,
+  600 kbit/s, ~533 KB) cut with AVFoundation. The live screens show no car and were kept. A
+  sandboxed write leaves a `<name>.mp4.sb-*` temp file beside the output: never copy it into
+  `media/`.
+- **Replay clip (done 2026-11-15, owner: R2):** the right phone plays 7 s of the Replay export
+  (from 7.5 s, so its first frame is the still), muted, looping, no poster, hidden with Reduce
+  Motion; Light and Dark (`replay-clip.mp4`, `replay-clip-dark.mp4`, ~535 KB each, H.264 720×1280,
+  encoded with AVFoundation). Served from a new public R2 bucket `carodo-media` on
+  `media.carodo.app`, shared by staging and production, no binding on the web; every deploy uploads
+  it first. Checked in Simulator Safari, both schemes, from a local copy (the bucket does not exist
+  yet).
+- **Link preview (done 2026-11-15):** `/`, `/privacy`, `/terms` carry Open Graph (`og:title`,
+  `og:description`, `og:url`, `og:locale`, image 1200×630) and `twitter:card` =
+  `summary_large_image` (X reads the `og:` tags for the rest). Absolute URLs come from the request's
+  origin, so staging previews point at staging; the 404 page has none. The card is the brand's
+  `og-image.png`, served from `/media` like the screens.
+- **Icons:** `apple-touch-icon.png`, `icon-192/512.png` and the maskable icon (brand export) are in
+  `media/` too; `/apple-touch-icon.png` keeps its fixed name (iOS asks for it at the root), the
+  manifest points at the hashed paths. They 404'd before.
 - **Motion (CSS only, none with Reduce Motion):** cards and phones rise into view
   (`landing-rise`, scroll-driven), the centre phone floats, the Auto Mode arrow turns, the Journeys
   route draws, the Replay strip plays.
 
 ## Next
 
-1. **Open Graph and Twitter card.** `carodo.app` is the link the app points to: a preview with image
-   and title in Messages, Zalo, Facebook. The image exists: `design/brand/export/web/og-image.png`.
-   Add `og:` / `twitter:` meta to `Layout`, serve the image through `/media`.
-2. **Dark screenshots.** The dark page shows light app screens. Shoot the three screens with the app
-   in Dark (find how to force the app's own appearance setting on the Simulator; `simctl ui
-   appearance dark` alone did not change it) and serve them with `<picture>` by
-   `prefers-color-scheme`.
-3. **A real Replay clip** in the right phone instead of the still: 6–8 s, muted, autoplay, loop,
-   `playsinline`, the current frame as poster. ~400–600 KB: serve through **Workers Static Assets**
-   (a new binding: the owner's approval first, P6), or embed in the Worker as the images are (heavier
-   bundle). Source: the exported `replay.mov` (`-carodo.debugReplayExport 30` on journey 3, Hải Vân).
-4. *(Optional)* **Passport stamp** (`design/passport-stamp/`) as an accent: a corner of the privacy
+1. *(Check after the first deploy)* the preview in Messages, Zalo and Facebook's Sharing Debugger.
+   The card is the logo only; a card with the phone fan could replace it later (same file name).
+2. **Provision `carodo-media`** (owner, once): `.env.deploy` on this Mac, the bucket, the custom
+   domain `media.carodo.app`, then `task media:upload` (docs/operations/deploy.md). Until then the
+   right phone shows its still (the clip's URL does not resolve), which is the intended fallback.
+3. *(Optional)* **Passport stamp** (`design/passport-stamp/`) as an accent: a corner of the privacy
    band, or a fourth card "Passport".
-5. **Effects:** the phone fan opens as the page scrolls (side phones from 0° to ±6°, sliding out; the
+4. **Effects:** the phone fan opens as the page scrolls (side phones from 0° to ±6°, sliding out; the
    centre one rises), scroll-driven like `landing-rise`; a faint Copper glow behind the fan, as behind
    the app icon. Nothing more: the page stays calm.
 
-Owner's call before 3: turn on Workers Static Assets for `carodo-web`, or embed the clip.
 
 ## Open
 
