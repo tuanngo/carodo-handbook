@@ -15,12 +15,10 @@ rebuilds the first commit once the skeleton deploys to staging.
 |---|---|
 | Skeleton | Two Workers (api, web via WebRpc), three environments (ADR 0004), D1 baseline, Biome layers, Vitest `unit` (Node) and `workers` (workerd), full-scan guard over every query |
 | App Attest | Challenge, attestation (Apple's steps, pinned root), `carodo-debug` for the Simulator, assertions, shared vectors with iOS |
-| Identity | Guest token, claim username, session from the account secret, refresh rotation with reuse detection, sign out everywhere, delete account (username held 90 days) |
-| Jobs | Hourly cron, leases, `account.erase` (R2 then rows), pruning (challenges, holds, sessions, web sessions, drive tombstones) |
+| Identity | Guest token, claim username, session from the account secret, refresh rotation with reuse detection, delete account, the username held 90 days (sign out everywhere left in contract 0.28.0) |
+| Jobs | Hourly cron, leases, `account.erase` (R2 then rows), pruning (challenges, holds, sessions, username changes, drive tombstones) |
 | Storage, metrics | R2 layout by id (`BLOBS`), Analytics Engine `carodo_events` / `carodo_metrics`, request metrics in place of invocation logs |
-| Publish drive | `PUT` / `DELETE /v1/drives/{tripId}`: revisions, tombstones, time checks, plausibility verdict (`ranked`) without storing top speed |
-| Feed read | `GET /v1/feed` Discover and Following: items are one person's drives in one hour, keyset pages on (`drove_at`, `account_id`) with sealed cursors, deleted / opted-out / hidden drives and blocks (both ways) left out, ETag and 304, Discover cached by TTL-bucketed keys with stale-while-revalidate and one computation per key (ADR 0008); rows read measured at 500 accounts and 10,000 drives |
-| Live status | `PUT` / `DELETE /v1/live?tripId=`: a `live_status` row renewed for 15 minutes, a tombstone at the end so a late renewal is refused, no index on `expires_at` so a renewal writes one row, `liveOptIn` checked, listed above the Feed's first page (everyone, or the followed), pruned hourly, cleared on account deletion (ADR 0008; carodo-ios ADR 0010 changed) |
+| Feed V1 (2026-11-15) | Contract 0.28.1→0.28.2-draft, [`backend-feed-v1.md`](backend-feed-v1.md): claim with sharing off, username rules with seeded policies, `/v1/me/profile` (rename limit, old name held), `/v1/usernames/{username}`, `/v1/me/sharing` (Stop sharing), `PUT`/`DELETE /v1/feed/drives/{tripId}` (geographic refusal, 50 a day), items per person and local day with random ids, the shared page with a member's overlay, `/v1/feed/stats`, reactions. Live, Following, regions, leaderboards, Feed badges, Sign in with Apple and `/v1/account/secret` deleted; foreign keys with cascade from `accounts`, CHECK only on `job_runs.status` |
 
 ## Open audit findings
 
@@ -32,6 +30,10 @@ Fix APP-01 first, then the P2 findings before using real user data. Track fixes,
 and verification dates in that audit record; documentation alignment alone closes none of them.
 
 ## Next, in order
+
+> **Superseded 2026-11-15 by [`backend-feed-v1.md`](backend-feed-v1.md)** (align with contract
+> 0.28.1-draft, Feed V1; the owner chose to delete Live, Following, regions and leaderboards).
+> Outside services (OSM): [`geodata-osm.md`](geodata-osm.md). The list below is kept as history.
 
 1. **Profile** `GET`/`PUT /v1/me/profile`, `GET /v1/usernames/{username}`, `GET /v1/users/{id}`: a
    renamed username is held 90 days like a deleted one; turning the Feed off takes the person's
