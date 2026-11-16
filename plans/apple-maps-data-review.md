@@ -44,7 +44,8 @@ iOS 18.0. `MKPointsOfInterestRequestMaxRadius` exists since iOS 14.
 6. Whether §2.4 applies to address text in a list or a title when the same screen has no map.
 
 Ways out: ask Apple in writing (Developer Technical Support or Apple Developer's legal contact), or redesign so nothing
-depends on the interpretation (section 4).
+depends on the interpretation (section 4). The questions, channels and drafts to send are in
+[apple-questions.md](apple-questions.md) (A1–A6).
 
 ## 3. The Carodo data flows affected (source audit 2026-11-09)
 

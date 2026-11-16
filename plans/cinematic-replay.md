@@ -719,8 +719,8 @@ the MapKit documentation and Apple's design guidelines were not read.
 - **§2.4:** Map Data is shown "only on an Apple map": on another engine (OpenStreetMap,
   ImmersiveMap from W3), every Apple road and place name leaves the frame.
 
-Next, before the video or the card leaves development builds (TD-41): ask Apple for written
-confirmation (Developer Support or the MapKit contact) that a user-exported image or video of an
+Next, before the video or the card leaves development builds (TD-41): ask Apple
+([apple-questions.md](apple-questions.md) B1–B2) for written confirmation (Developer Support or the MapKit contact) that a user-exported image or video of an
 Apple map with the app's own route, logo and Legal in frame is permitted, and check the account's
 accepted ADPLA against this text (TD-2's O1). If Apple says no or does not answer, the fallback is
 an OpenStreetMap engine for exports: its own plan and an ADR beside ADR 0015, with the open points
