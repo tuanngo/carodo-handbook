@@ -686,6 +686,46 @@ Open: the owner's comparison on the iPhone (the edit against a one-rate clip of 
 pick 15× … 120× in the menu for the latter); the edit's making time on the iPhone (up to ~360 ms in
 Debug on the simulator for a city drive's minute); PV-20 as before.
 
+### TD-37 result: a video on the recorded fixes only (2026-11-16, carodo-ios 2aef339)
+
+The Export screen took Replay's timeline, whose healed gaps and lead-ins are roads Apple Maps drew
+(Map Data, Attachment 6 §2.3). It now reads the track again as it opens and builds its own timeline
+(`ReplayTimeline.Roads.recorded`, `ReplayViewModel.videoTimeline`): a healed gap is a straight
+glide between its two fixes, drawn as estimated, counting its road's metres as the journal does;
+a lead-in before the first fix is left out (the video starts there at 0 m, as the share card); one
+across a joined wait is a jump. A track that cannot be read makes no video. Replay in the app keeps
+the roads. No cache for the second read: once per Export, off the main actor; a cache in the
+repository would serve it as is. TD-37 resolved. Left: a journey with no stored fixes (sample data,
+or a track not yet synced) still plays its display route, as the share card draws it.
+
+### Apple's terms on an exported map (read 2026-11-16)
+
+The public ADPLA (developer.apple.com/support/terms/apple-developer-program-license-agreement/; no
+version date on the page), Attachment 6, read for the video and the share card. Not legal advice;
+the MapKit documentation and Apple's design guidelines were not read.
+
+- **Our own route on Apple's map is allowed.** The person's GPS is not Map Data; §3.3.3(F) speaks
+  of "overlaying a map or route You have created on top of an Apple map" (read as a summary, not
+  verbatim). Apple's roads (healed gaps, lead-ins) are Map Data: TD-37 keeps them out.
+- **§2.1:** Apple's logo and legal notices are never removed, obscured or altered (the video keeps
+  the logo and Legal in frame; TD-38 on the card). §4: obscuring them is a ground to revoke access.
+- **§2.3:** no copying, publishing or "publicly display[ing] the Map Data in any way" except as
+  expressly permitted. No clause expressly permits exporting map imagery (a frame, a snapshot) out
+  of the app; a clip posted to TikTok or Reels reads close to public display.
+- **§2.5:** Map Data is not cached or stored beyond a temporary basis; a clip kept in Photos may
+  read as storage.
+- **§1.2:** MapSnapshotter is part of the Apple Maps Service: a rendered image is not outside the
+  terms. The share card is in the same open question as the video.
+- **§2.4:** Map Data is shown "only on an Apple map": on another engine (OpenStreetMap,
+  ImmersiveMap from W3), every Apple road and place name leaves the frame.
+
+Next, before the video or the card leaves development builds (TD-41): ask Apple for written
+confirmation (Developer Support or the MapKit contact) that a user-exported image or video of an
+Apple map with the app's own route, logo and Legal in frame is permitted, and check the account's
+accepted ADPLA against this text (TD-2's O1). If Apple says no or does not answer, the fallback is
+an OpenStreetMap engine for exports: its own plan and an ADR beside ADR 0015, with the open points
+of W3 (who hosts the tiles, P5 for tile requests, ODbL credit in frame, the detail in Vietnam, P6).
+
 ### Brief for the next session
 
 ```text
