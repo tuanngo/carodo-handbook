@@ -21,7 +21,8 @@ This file keeps apart **Today** (what the code does, with its file), **Proposed*
 **Status (2026-11-16):** phase 1 is built and merged into `carodo-ios` `main` (`dd58a24`), after
 a self-review that fixed three cases: a file sealed before the first unlock is kept, the Journeys
 list re-reads titles only, and a place's page asks its one address now. The device checks are
-still pending (TD-40). The Settings question was
+still pending (TD-40). Phase 1b (Apple's points of interest and fuel stations, kept for good today)
+is planned in [`../plans/apple-poi-data-phase-1b.md`](../plans/apple-poi-data-phase-1b.md). The Settings question was
 settled as Developer only: Developer → Clear place names (`docs/specs/developer-mode.md`). Phase 2
 has not started. What phase 1 leaves open is TD-40.
 
