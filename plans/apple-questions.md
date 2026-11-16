@@ -1,112 +1,161 @@
 # Questions for Apple
 
-Status: **collected, not sent** (2026-11-16). Every question Carodo needs Apple to answer, in one
-place, with the channel each goes to and a draft ready to send. The owner sends them; an answer is
-recorded here with its date and link, and the entry it unblocks (TD-2, TD-41) is updated.
+Status: **researched, not sent** (2026-11-16). Every question Carodo needs Apple to answer, in one
+place: what Apple's own documentation and forums already say (read first, §1), what is left to ask
+(§3), the channel for each and a draft ready to send (§4). The owner sends them; an answer is
+recorded in §5 with its date and link, and the entry it unblocks (TD-2, TD-41) is updated.
 
 The questions come from [apple-maps-data-review.md](apple-maps-data-review.md) §2 (TD-2) and
 [cinematic-replay.md](cinematic-replay.md) (Apple's terms on an exported map, TD-41). A new question
 for Apple is added here, not in the plan that raised it.
 
-## 1. Will asking change anything?
+## 1. What Apple already says (research, 2026-11-16)
 
-Honestly: a binding "yes" is unlikely, but asking is cheap and some of it can help everyone.
+Read on developer.apple.com (documentation in its Markdown form, forums) on 2026-11-16.
 
-- **A written permission for Carodo alone** (§2.5 "expressly permitted in writing by Apple"): Apple
-  rarely gives one. Developer Technical Support (DTS) answers technical questions and usually
-  declines to interpret the license ("consult your legal counsel"). Program Support may forward a
-  question to legal; an answer can take weeks or never come. **Do not plan around it.** Carodo
-  already works without it (phase 1 and 1b keep Apple's data 7 days at most, identifiers for good).
-- **A public answer on the Developer Forums**: likely to get a reply, sometimes from a MapKit
-  engineer or DTS. Not a legal permission, but it is evidence of Apple's own reading, it is
-  searchable, and it helps every developer with the same question. This is where "thousands of
-  developers have this problem" pays off: one good thread is cited by all.
-- **A documentation fix through Feedback Assistant**: the strongest lever. §2.5 also permits what
-  the **MapKit Documentation** permits. If Apple writes in the docs what WWDC25 session 204 already
-  says ("identifiers can be persisted"), or how long a geocoding result may be cached, that becomes
-  permission for every app, without a private letter. Feedback reports with a clear, general ask
-  ("please state in the documentation …") are the kind Apple acts on, slowly.
-- **App Review**: decides in practice for a submitted build. It is not a channel to ask in advance,
-  but a rejection or approval of a TestFlight external build is also an answer (TD-41's export).
+**Identifiers may be persisted: documented.**
+- `MKMapItem.identifier` (iOS 18.0+), the symbol's own page: *"An identifier uniquely identifies a
+  place, such as a business or a landmark. You can persist an identifier and use it later to recall
+  information about place."* ([doc](https://developer.apple.com/documentation/mapkit/mkmapitem/identifier-swift.property))
+- Apple's sample code *Interacting with nearby points of interest*, section "Persist and retrieve
+  map items": the app stores the places a person looked at **as identifiers** in a SwiftData model
+  named `VisitedPlace`, across launches, and turns them back into map items with `MKMapItemRequest`
+  ([doc](https://developer.apple.com/documentation/mapkit/interacting-with-nearby-points-of-interest)).
+  It stores no name. That is Carodo's phase 1b design.
+- A DTS engineer quoted the same sentence on the forums, June 2025
+  ([thread 790983](https://developer.apple.com/forums/thread/790983)).
+- ADPLA Attachment 6 §2.5 allows storing what is permitted "in the MapKit … Documentation". So the
+  review's **question 2 is answered by the documentation**: `places.poi_id` and
+  `fuel_logs.station_poi_id` kept for good are permitted. Recorded in the review (§2) and TD-2.
 
-So: send all three (forums post, feedback reports, one Program Support message), expect the forums
-and the feedback reports to matter most, and keep shipping on the conservative design meanwhile.
+**The license is not interpreted on the forums.**
+- A developer asked whether names, ids and coordinates from Apple Maps may be stored permanently in
+  a user's library; nine months later Apple staff replied only: *"Please review the Apple Developer
+  Program License Agreement … If you have any questions about how to interpret this Agreement,
+  please consult your legal counsel."* ([thread 708672](https://developer.apple.com/forums/thread/708672), March 2023).
+- The same question about storing geocoded coordinates got no Apple reply
+  ([thread 114220](https://developer.apple.com/forums/thread/114220), 2019).
+- So a forums post that asks "may I store X under §2.5?" will get that answer. A post that asks
+  for **documentation** or a **technical fact** can be answered. §4 is written that way.
 
-## 2. The questions
+**Geocoding: the documentation sets usage rules, not a storage limit.** The `CLGeocoder` overview
+([doc](https://developer.apple.com/documentation/corelocation/clgeocoder)), "Tips for Using a
+Geocoder Object":
+- *"Send at most one geocoding request for any one user action."*
+- *"If the user performs multiple actions that involve geocoding the same location, reuse the
+  results from the initial geocoding request instead of starting individual requests for each
+  action."* (reuse is encouraged; how long is not said)
+- *"In a typical situation, you should not send more than one geocoding request per minute"* (for a
+  moving user's own location).
+- *"Do not start a geocoding request at a time when the user will not see the results immediately.
+  For example, do not start a request if your application is inactive or in the background."*
+- No page read says how long a result may be kept; `MKReverseGeocodingRequest` (iOS 26) says
+  nothing either. Questions A2 and A3 stay open.
+- **A finding for Carodo, not a question:** after a drive ends, `DriveFlow.confirmFinished` runs
+  `enrichJourneys` (names the ends, `PlaceNameCache.request`; place detection's searches). An Auto
+  Mode drive can end with the app in the background, so lookups can start then, against the last
+  rule. Recorded as TD-43.
 
-Grouped by what they unblock. "Today" is what Carodo does while there is no answer.
+**Apple's own app, for the framing.** Maps' *Visited Places* (iOS 26) keeps the places a person has
+been, on the device and end-to-end encrypted across their devices, for 3 months, a year or forever
+([Apple Support](https://support.apple.com/guide/personal-safety/ipsae6d4500b/web)). Apple's terms
+for its own app do not bind Carodo, but it shows the use Carodo serves (one person's own history,
+never shared) is one Apple builds itself. The drafts describe Carodo that way: personal, private,
+on the person's devices and their own iCloud only.
+
+## 2. Will asking change anything?
+
+- **Documentation (Feedback Assistant):** the strongest lever, and the one that helps every
+  developer. §2.5 permits what the MapKit documentation permits; the identifier sentence above is
+  exactly that kind of permission. Asking for the same for geocoding results is a concrete,
+  general ask.
+- **Developer Forums:** good for technical facts (error codes, identifier lifetime) and to make a
+  documentation gap visible; never for a reading of the license.
+- **Program Support / legal:** the only route to a written permission. Expect "consult your counsel"
+  or silence. Send it once, do not wait for it.
+- **App Review:** decides a submitted build; a TestFlight external review of the export (TD-41) is
+  also an answer.
+
+Carodo keeps shipping on the conservative design meanwhile (identifiers for good, Apple's names 7
+days, no Apple map leaving the app until B1 is settled).
+
+## 3. Questions still open
 
 ### A. Storing and caching Map Data (TD-2)
 
-| # | Question | Why it matters | Today |
+| # | Question | Status | Today |
 |---|---|---|---|
-| A1 | Does WWDC25 session 204's "Identifiers can be persisted and shared" count as permission under §2.5 to store `MKMapItem.Identifier` values permanently (on the device and in the user's iCloud)? Could the MapKit documentation say so? | Places and fill-ups keep only the identifier for good | Stored (phase 1b); review question 2 |
-| A2 | Is a reverse-geocoding result from `CLGeocoder` (Core Location) "Map Data provided through the Apple Maps Service"? | Decides whether the address cache falls under §2.5 at all | Treated as Map Data: 7 days at most |
-| A3 | What does "temporary and limited" mean in practice: is 7 days, in `Library/Caches` (not backed up, cleared by the system), acceptable? Is there a maximum? | The lifetime of both caches | 7 days (owner, 2026-11-16) |
-| A4 | When the user picks a POI from a list and confirms or edits its name in their own app data (a saved place, a fuel station), is that name still Map Data, or the user's own content? | Whether a confirmed name may be stored and synced | Stored only when typed or confirmed in an editor (D1); a bare pick keeps the identifier |
-| A5 | Is a coarse administrative name derived from a result (a province, a ward, an ISO 3166-2 code) still Map Data when stored as the app's own label? | A lifetime "provinces driven" on the Passport | Not stored; the Passport shows none (TD-40, phase 2 uses OpenStreetMap) |
-| A6 | Does §2.4 ("display the corresponding map with the address result") apply to a place name in a list or a title on a screen with no map? | Journey titles in the list, the fuel history | Shown without a map (open) |
+| A1 | May `MKMapItem.Identifier` be stored permanently? | **Answered by the documentation** (§1). Not asked | Stored (phase 1b) |
+| A2 | Is a `CLGeocoder` / `MKReverseGeocodingRequest` result "Map Data" under Attachment 6? | Open | Treated as Map Data |
+| A3 | How long may a geocoding result be reused ("temporary and limited")? Is 7 days in `Library/Caches` acceptable? | Open; the docs encourage reuse without a limit | 7 days |
+| A4 | When a person confirms or edits a POI's name as their own (a saved place, a station), is it still Map Data? | Open | Stored only when typed or confirmed (D1) |
+| A5 | Is a province or ward name, or an ISO 3166-2 code, derived from a result still Map Data when kept as the app's own label? | Open | Not kept (TD-40; phase 2, OpenStreetMap) |
+| A6 | Does §2.4 apply to a place name in a list or a title on a screen with no map? | Open | Shown without a map |
 
 ### B. Map imagery leaving the app (TD-41)
 
-| # | Question | Why it matters | Today |
+| # | Question | Status | Today |
 |---|---|---|---|
-| B1 | May a user export a video or an image of an Apple map (MapKit view or `MKMapSnapshotter`) showing their own recorded route, with the Apple Maps logo and Legal link in frame, and share it on social networks? | The replay video and the share card | Development builds only |
-| B2 | If yes, are there conditions (the logo's size and place, a Legal notice burned into the image, a length limit)? | How the export must look | Logo and Legal kept in frame |
+| B1 | May a person export a video or an image of an Apple map (MapKit view or `MKMapSnapshotter`) with their own recorded route, the Apple Maps logo and Legal in frame, and post it on social networks? | Open | Development builds only |
+| B2 | If yes, under which conditions (logo size and place, Legal notice in the image, length)? | Open | Logo and Legal kept in frame |
 
-Not for Apple: **O1**, checking that the ADPLA accepted in the developer account matches the public
-text read on 2026-11-09 and 2026-11-16. The owner does it in the account (TD-2).
+Not for Apple: **O1**, checking that the ADPLA accepted in the developer account matches the text
+read (TD-2). The owner does it in the account.
 
-## 3. Channels and drafts
+## 4. Channels and drafts
 
-Write each one in English, generic (no user data, no coordinates), and naming the clauses.
+English, no user data, no coordinates. Each opens with the same two lines of context:
 
-### 3.1 Apple Developer Forums (public; tags: MapKit, Core Location)
+> Carodo is a personal drive journal for iPhone: one person records their own drives and sees them
+> again. Everything stays on the person's device and in their own iCloud private database; nothing
+> is shared with other users or sent to our servers.
 
-Two threads, so each can be answered and found alone.
+### 4.1 Feedback Assistant (Developer Documentation → MapKit / Core Location), one report each
 
-> **Title:** Persisting MKMapItem.Identifier and caching geocoding results — what does ADPLA Attachment 6 §2.5 allow?
+- **FB-1 (A2, A3):** "The `MKMapItem.identifier` page says an identifier can be persisted. Please
+  document the same for geocoding results (`CLGeocoder`, `MKReverseGeocodingRequest`): may an app
+  reuse a result it received, and for how long, for example to show a place name in a person's own
+  history? The `CLGeocoder` overview asks apps to reuse results but does not say how long."
+- **FB-2 (A4):** "Please document whether a place name a person picks from MapKit results and then
+  confirms or edits as their own label (for a saved place in their own history) may be kept with
+  their data, as an identifier may."
+- **FB-3 (B1, B2):** "Please document whether an app may let a person export an image
+  (`MKMapSnapshotter`) or a video of an Apple map showing their own recorded route, with the Apple
+  Maps logo and Legal link in frame, to share it, and any conditions."
+
+### 4.2 Developer Forums (tags: MapKit, Core Location)
+
+Ask for documentation and facts, never for a reading of the license.
+
+> **Title:** How long can an app reuse a reverse-geocoding result? (documentation request)
 >
-> Attachment 6 §2.5 of the Apple Developer Program License Agreement says Map Data may not be cached
-> or stored "other than on a temporary and limited basis", unless permitted in writing or in the
-> MapKit Documentation. WWDC25 session 204 ("Go further with MapKit") says place identifiers "remain
-> valid over time" and "can be persisted and shared".
+> [context lines]
 >
-> 1. May an app store `MKMapItem.Identifier` values permanently (on device and in the user's iCloud
->    private database), and resolve the name with `MKMapItemRequest` when shown?
-> 2. Is a `CLGeocoder` / `MKReverseGeocodingRequest` result Map Data under §2.5, and is caching it for
->    up to 7 days in the app's Caches directory "temporary and limited"?
-> 3. When a user picks a point of interest and confirms or edits its name as their own (a saved
->    place), is that name still Map Data?
+> We name the start and end of each drive with reverse geocoding (`CLGeocoder`, and
+> `MKReverseGeocodingRequest` on iOS 26). The `CLGeocoder` overview asks apps to "reuse the results
+> from the initial geocoding request" rather than ask again, and `MKMapItem.identifier` says an
+> identifier "can be persisted". Is there documentation on how long a reverse-geocoding result may
+> be reused, as there is for identifiers? We keep results 7 days in the Caches directory today and
+> filed FB-xxxx asking for it to be documented.
+
+> **Title:** Exporting an image or video of an Apple map with the user's own route (documentation request)
 >
-> Could the MapKit documentation state these rules? Many apps that keep a history of places face the
-> same question.
-
-> **Title:** Exporting a video or image of an Apple map with the user's own route (ADPLA Attachment 6 §2.3)
+> [context lines]
 >
-> Our app lets a user export a short video (or an image via `MKMapSnapshotter`) of their own recorded
-> route drawn over an Apple map, with the Apple Maps logo and Legal link kept in frame, to share on
-> social networks. §2.3 forbids publicly displaying Map Data unless expressly permitted, and §3.3.3(F)
-> mentions overlaying a route the developer created on an Apple map. Is such a user export permitted,
-> and under which conditions?
+> A person can export a short video or an `MKMapSnapshotter` image of their own drive on an Apple
+> map, with the Apple Maps logo and Legal link in frame, to share it. Is there documentation or
+> Human Interface Guidelines guidance on exporting map imagery, and on how the logo and Legal must
+> appear? Filed as FB-xxxx.
 
-### 3.2 Feedback Assistant (one report each, category: Developer Documentation → MapKit)
+### 4.3 Apple Developer Program Support (developer.apple.com/contact)
 
-- **FB-1:** "Please state in the MapKit documentation whether `MKMapItem.Identifier` may be stored
-  permanently, as WWDC25 session 204 says, so it counts under ADPLA Attachment 6 §2.5."
-- **FB-2:** "Please state how long geocoding results (`CLGeocoder`, `MKReverseGeocodingRequest`) may
-  be cached under §2.5 ('temporary and limited'), and whether Core Location geocoding is Map Data."
-- **FB-3:** "Please document whether exporting `MKMapSnapshotter` images or recorded map video with
-  the logo and Legal link is permitted under §2.3."
+One message: the context lines, then A2–A6 and B1–B2 as a numbered list, each with what Carodo does
+today, asking for a written answer or a referral to the right contact (MapKit or legal). Expect
+"consult your counsel"; a written yes is the only answer that counts as §2.5's "permitted in
+writing".
 
-### 3.3 Apple Developer Program Support (developer.apple.com/contact, "Program Membership" or legal)
-
-One message holding A1–A6 and B1–B2 as a numbered list, asking for a written answer or a referral
-to the right contact. Expect "consult your counsel"; send it anyway: a written yes is the only
-answer that counts as §2.5's "permitted in writing".
-
-## 4. Answers
+## 5. Answers
 
 | Date | Channel | Questions | Answer (quoted, with link) | What it changes |
 |---|---|---|---|---|
-| — | — | — | Not sent yet | — |
+| 2026-11-16 | Documentation (`MKMapItem.identifier`; sample *Interacting with nearby points of interest*) | A1 | "You can persist an identifier and use it later to recall information about place." | Identifiers kept for good are permitted (§2.5, MapKit Documentation); review question 2 closed |

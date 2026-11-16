@@ -34,8 +34,10 @@ iOS 18.0. `MKPointsOfInterestRequestMaxRadius` exists since iOS 14.
 
 1. Whether a `CLGeocoder` (Core Location) result is "Map Data provided through the Apple Maps Service". The terms name no
    API. The two APIs share one backend (DTS said so on the forums), so the safe reading is yes.
-2. Whether "Identifiers can be persisted" in a WWDC session counts as "MapKit Documentation" or "permitted in writing"
-   under §2.5.
+2. ~~Whether "Identifiers can be persisted" in a WWDC session counts as "MapKit Documentation" or "permitted in writing"
+   under §2.5.~~ **Answered (2026-11-16):** the MapKit documentation itself says it (`MKMapItem.identifier`: "You can
+   persist an identifier and use it later to recall information about place"; the sample code *Interacting with nearby
+   points of interest* stores visited places by identifier). See [apple-questions.md](apple-questions.md) §1.
 3. Whether the name and coordinates of a POI that **the person picks and saves themselves** (a fill-up's station name)
    are Map Data or data the person entered. The terms have no exception for this.
 4. What "temporary and limited" means: whether a cache kept until the system clears it (Caches) counts as temporary; a
