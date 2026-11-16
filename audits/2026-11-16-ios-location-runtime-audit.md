@@ -23,7 +23,10 @@ MotionPermissionManager}.swift`, `Core/Tracking/TrackingModeController.swift`,
 ViewModels/FeedViewModel}.swift`, `Features/Onboarding/Map/JourneyMapLayer.swift`,
 `Core/Persistence/GRDBJourneyRepository.swift`, `project.yml`.
 
-**Status (2026-11-16):** written, waiting for the owner's review. Nothing is fixed yet.
+**Status (2026-11-16):** F1–F4 fixed by the location runtime work
+([`../plans/location-runtime.md`](../plans/location-runtime.md)): carodo-ios `567a787` (F1, the
+bearing of F3) and `9ccaa95` (F2, F4, `GapHealing` of F3) on `refactor/location-runtime`, not yet
+merged; the drive on an iPhone is PV-26. I1 and I2 are backlog ideas.
 
 ## 1. Summary
 
