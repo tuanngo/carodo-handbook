@@ -1,6 +1,7 @@
 # Apple points of interest kept by Carodo — phase 1b: audit, plan and brief
 
-Status: **plan, waiting for the owner's decisions** (2026-11-16). No code yet. This follows phase 1
+Status: **built and merged** (2026-11-16), carodo-ios `0fc5c50`, merged in `ef650f0`. Owner's decisions: D1–D5 as recommended (D2: B now, and send C
+anyway). What it leaves open: TD-42. This follows phase 1
 of [`../audits/2026-11-16-ios-geocoded-cells-audit.md`](../audits/2026-11-16-ios-geocoded-cells-audit.md)
 (carodo-ios `dd58a24`: Apple's addresses kept a week at most, outside the database) and covers rows 6
 and 7 of [`apple-maps-data-review.md`](apple-maps-data-review.md) (TD-2). It must land before

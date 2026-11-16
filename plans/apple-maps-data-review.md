@@ -50,13 +50,13 @@ depends on the interpretation (section 4).
 
 | # | Data | Apple source | Where it is kept, for how long | Where it shows | Clauses concerned |
 |---|---|---|---|---|---|
-| 1 | `geocoded_cells`: ward, district, province, street, POI, country per ~110 m cell | `CLGeocoder` | SQLite on the device, **permanent**, not synced | The source of rows 2–5 | §2.5, §2.2 (a derived database?) |
+| 1 | Address parts per ~110 m cell: ward, district, province, street, country (was `geocoded_cells`) | `CLGeocoder` | Since carodo-ios `dd58a24` (2026-11-16): `PlaceNameCache`, memory and `Library/Caches`, **7 days at most**, not synced, not in a backup; no table holds them (was SQLite, permanent) | The source of rows 2–5 | §2.5, §2.2 (a derived database?) |
 | 2 | Journey titles ("P. Tân Mỹ → …") | from 1 | Derived when read; `trips.start_cell`/`end_cell` are the keys | Journeys list, detail (with a map), widget? | §2.4 when there is no map |
 | 3 | `trips.narrative`: a summary sentence holding place names | from 1, through the on-device model | SQLite, permanent; not synced | Journey detail | §2.5 (a derived form), §2.3 |
 | 4 | Provinces Crossed, Passport (provinces driven through) | from 1 | Derived; the provinces sit in the cache | Detail, Passport (possibly with no map) | §2.4, question 5 |
 | 5 | The area on the Feed (`DriveArea`, ISO 3166-2, opt-in) | from 1 | Sent to the backend on publish (in the contract, not wired yet) | Seen by others, no map | §2.4, question 5, §1.2 |
-| 6 | `fuel_logs.station_name` + coordinates (ADR 0017) | `MKLocalPointsOfInterestRequest` | SQLite + iCloud (`FuelLog`, encrypted), permanent | Fill-up list, vehicle detail | §2.5, question 3 |
-| 7 | `places.poi_category` (and the name, if taken from a suggestion) | MapKit | SQLite + iCloud (`Place`) | Places, Passport | §2.5 (minor) |
+| 6 | A picked station: `fuel_logs.station_poi_id` only (phase 1b, 2026-11-16; was `station_name` + the station's coordinates, ADR 0017). Its name: `POINameCache`, 7 days at most, asked by `MKMapItemRequest`. The position kept is the device's own fix; a typed name is the person's | `MKLocalPointsOfInterestRequest`, `MKMapItemRequest` | The identifier: SQLite + iCloud (`FuelLog`, encrypted), permanent; the name 7 days in Caches | Fill-up list, vehicle detail, a drive's fill-ups | Identifier: question 2; the name: §2.5 met by the 7 days; §2.4 (no map) |
+| 7 | A place's point of interest: `places.poi_id` only (phase 1b, 2026-11-16; `poi_category` dropped, `name` is only the person's own: typed or confirmed in the editor, D1). Name and category: `POINameCache`, 7 days at most | MapKit | The identifier: SQLite + iCloud (`Place`), permanent; the name and category 7 days in Caches | Map markers, stop cards, a place's page | Identifier: question 2; a confirmed name: question 3 (owner D1: the person's) |
 | 8 | `trip_gaps.route`, lead-in: the road Apple draws across lost GPS | `MKDirections` | SQLite, permanent; goes into the display route (KL-3), which syncs to iCloud and **to the backend when shared** (the trimmed route) | Detail map, share page (not built) | §2.5, §2.2, §2.4 (what map does the web page draw?) |
 | 9 | Map snapshot images for the list and the Passport | `MKMapSnapshotter` | `Caches/JourneyMaps/*.png`, the system may clear it | Journeys list, Passport | §2.5 (imagery; arguably temporary and for performance, §2.5(b)) |
 | 10 | Share card / link preview image | a snapshot or drawn by Carodo | Shared outside; the preview is uploaded to the backend (spec, not built) | Messaging apps, web | §2.3 "publicly display", §2.1 the logo on the image |
@@ -67,8 +67,8 @@ depends on the interpretation (section 4).
 - Row 1: move from a permanent cache to a bounded one (for example deleted after N days), or store a reduced result Carodo
   produces itself (a province name as Carodo's own label) if that is confirmed to be allowed. Review Provinces Crossed and
   the titles at the same time.
-- Rows 6 and 7: store the place identifier (iOS 18+), with the name being what the person confirms or edits; or ask
-  Apple.
+- Rows 6 and 7: done in phase 1b (2026-11-16, `plans/apple-poi-data-phase-1b.md`): the identifier is stored, the name is
+  what the person typed or confirmed, Apple's names 7 days at most. Asking Apple in writing still to be sent (owner D2).
 - Row 8: a route Apple drew never reaches the backend (the share page uses only recorded GPS points), unless it is shown
   to be allowed.
 - Row 10: keep the logo and legal notice on every image with an Apple map background; the preview image draws the route

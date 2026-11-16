@@ -200,3 +200,19 @@ Lessons already paid for that L5 gathers, beside the entries below:
 - Guidance: after adding a Swift file, run `xcodegen generate` and check `project.pbxproj` names it; after adding tests, check the total test count went up (the xcresult summary), never just the exit code: `-only-testing` on an unknown class exits 0.
 - Why it matters: a test that never runs reads as a passing test in a completion report.
 - Rule now in: nowhere yet
+
+### mapkit-unknown-identifier-error-code
+- applies_when: mapping an `MKError` from `MKMapItemRequest(mapItemIdentifier:)` (or another MapKit
+  lookup by identifier) to "nothing there" versus "try again later"
+- area: carodo-ios Core/Location · found: 2026-11-16, carodo-ios `0fc5c50` · severity: medium
+- Context: the search's mapping (`MapKitPOISearch.reason`) reads only `placemarkNotFound` as an empty
+  answer. Reused for the identifier lookup, an identifier Apple does not know (it returns
+  `MKErrorDomain` code 5, `directionsNotFound`, on the iOS 18.0 and 27 simulators) read as offline:
+  never cached as "none", the place asked again after every one-minute pause, the loop the plan
+  forbade. The unit tests with a fake lookup could not see it; one live call did.
+- Guidance: check the real error of each MapKit request type once, live, before mapping it; keep
+  the mapping per request type, not shared with the search's.
+- Why it matters: a wrong "retry later" spends the MapKit budget on answers that never change and
+  can throttle every MapKit screen of the app.
+- Rule now in: carodo-ios `CarodoTests/MapKitPOINameLookupLiveTests.swift` (opt-in,
+  `CARODO_LIVE_MAPKIT=1`), the comment in `Core/Location/POINameLookup.swift`
