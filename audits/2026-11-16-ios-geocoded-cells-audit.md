@@ -21,8 +21,10 @@ This file keeps apart **Today** (what the code does, with its file), **Proposed*
 **Status (2026-11-16):** phase 1 is built and merged into `carodo-ios` `main` (`dd58a24`), after
 a self-review that fixed three cases: a file sealed before the first unlock is kept, the Journeys
 list re-reads titles only, and a place's page asks its one address now. The device checks are
-still pending (TD-40). Phase 1b (Apple's points of interest and fuel stations, kept for good today)
-is planned in [`../plans/apple-poi-data-phase-1b.md`](../plans/apple-poi-data-phase-1b.md). The Settings question was
+still pending (TD-40). Phase 1b (Apple's points of interest and fuel stations) is built and merged
+(`0fc5c50`, merge `ef650f0`; [`../plans/apple-poi-data-phase-1b.md`](../plans/apple-poi-data-phase-1b.md);
+open: TD-42). Apple is asked only while the app is on screen (`408f6a3`, merge `b143467`; TD-43).
+Phase 1 and 1b are done in code; they close when the device checks of TD-40, TD-42 and TD-43 pass. The Settings question was
 settled as Developer only: Developer → Clear place names (`docs/specs/developer-mode.md`). Phase 2
 has not started. What phase 1 leaves open is TD-40.
 
@@ -273,7 +275,7 @@ CDN can drop path and IP from its logs, or only shorten their retention.
 - Every size above is an order-of-magnitude estimate.
 - OSM's completeness in November 2026 (the thread's figures date from 2025).
 - Whether the visits page shows an Apple map.
-- Whether `MKReverseGeocodingRequest`'s fields hold the street the cards use (`PlaceArea`).
+- Whether `MKReverseGeocodingRequest`'s fields hold the street the cards use (`PlaceArea`). Partly checked 2026-11-16 (iOS 27 simulator): the ward is `addressRepresentations.cityName`, the street only inside `shortAddress`, no province field (TD-36).
 - Apple's throttle on `CLGeocoder` (no published figure; ADPLA §2.7).
 - ADPLA O1: that the agreement accepted in the developer account matches the public text (TD-2).
 
