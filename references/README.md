@@ -16,8 +16,8 @@ a spec or an ADR in the repository it binds, in our own words.
 - **Code follows its licence.** MIT: copy only with the copyright and licence notice kept.
   GPL or no licence: ideas only, never code. Adding a repo as a package is a new dependency and
   needs the owner's approval first. Details: [`repos/ios.md`](repos/ios.md#licence-rules--read-before-copying-anything).
-- **Clone outside the Carodo repos**, e.g. `~/code/refs/<name>`, so foreign code never lands in
-  our history by accident.
+- **Clone outside the Carodo repos**, in `~/code/oss/swift/<name>` (iOS; `~/code/oss/<name>` for
+  others), so foreign code never lands in our history by accident.
 - **Apps are described in words, not copied.** Screenshots can show accounts, places and routes;
   they stay in the ignored `screens/` folder. Note the pattern and the reason in `apps/<app>.md`,
   never their artwork, copy or brand.

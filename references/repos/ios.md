@@ -1,8 +1,8 @@
 # iOS open-source repos
 
 Repos worth reading while building Carodo. Checked 2026-10-31 (stars, licence and last push change;
-recheck before relying on one). Clone them **outside** the Carodo repos, e.g. `~/code/refs/<name>`,
-so their code never lands in our history by accident.
+recheck before relying on one). Clones live **outside** the Carodo repos, in `~/code/oss/swift/<name>` (all of the repos below are
+cloned there, 2026-11-16), so their code never lands in our history by accident.
 
 ## Licence rules — read before copying anything
 
