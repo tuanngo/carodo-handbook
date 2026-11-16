@@ -13,4 +13,5 @@ caught in review instead of found again in the next audit.
 | Audit | Repo | Cases | State |
 |---|---|---|---|
 | [2026-11-07 iOS source audit](2026-11-07-ios-source-audit.md) | `carodo-ios` | 7 | All fixed and committed; device checks pending |
+| [2026-11-16 `geocoded_cells` audit](2026-11-16-ios-geocoded-cells-audit.md) | `carodo-ios` | TD-2 row 1, TD-36, TD-6 | Phase 1 built (carodo-ios dd58a24); phase 2 (OSM) not started |
 | [2026-11-07 backend source audit](../plans/backend-source-audit.md) | `carodo-app` | 6 | Open (still in `plans/`) |
