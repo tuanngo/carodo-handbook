@@ -84,7 +84,8 @@ opens Developer without the fog section; the Geofency section (below the fold) w
 - TD-53 (sample data built at every launch): Release can no longer build sample data at all (no
   `Sample*` symbol in the binary since `b41df51`). Close it after one live-launch trace confirms
   `SampleJourneyRepository.init` is gone in Debug too.
-- Release still compiles QA-only code that answers nothing there: `DebugLaunchArguments`
-  (Features/Developer, parsed through `LaunchFlag`, so inert) and the `carodo-debug` software
-  attestation (`SoftwareAttestKey`, `AppAttestFormats`; `attestKey()` never picks it in Release).
-  Dead weight, not a leak; candidates for `+Debug` names in a later pass.
+- The `carodo-debug` software attestation is Debug only since carodo-ios `93c3df7`
+  (`SoftwareAttestKey+Debug.swift`). `DebugLaunchArguments` stays compiled in Release (inert: it reads
+  `LaunchFlag`): `MainTabView` and `DriveFlow` read 30+ of its fields in both builds, so a Release twin
+  would copy them all. It goes with the next step, the QA hooks out of the production views
+  (31 files read `LaunchFlag`; `JourneyDetailView` 10, `ReplayView` 6, `AppState` 6).
