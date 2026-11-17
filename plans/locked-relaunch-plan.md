@@ -139,5 +139,7 @@ reading the launch options instead.
   `LaunchContextTests`, `TrackingLogFieldsTests`, `TrackingHealthTests`, `DiagnosticsLogFormatTests`.
 - [x] Docs: `docs/tracking.md` (Was Carodo running?), `docs/operations/device-testing.md`.
 - [x] `task lint`, `task warnings` (none), `task test` (2,487, 0 failures).
-- [ ] Device: an Auto Mode drive with Carodo swiped away shows `launched … by=location`; a tap
-  launch shows no `by=`. Until then the change waits for the owner's review, uncommitted.
+- [x] Committed on the owner's word: carodo-ios `62692ce`, with the log grouping in `a0caf56`
+  (one line per moment; the doubled region exit).
+- [ ] Device: an Auto Mode drive with Carodo swiped away shows `launched … by=location` and one
+  `mode to=detecting woke=leftParking`; a tap launch shows no `by=`.
