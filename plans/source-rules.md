@@ -6,7 +6,7 @@ the split of `Core/Domain` goes with this work. `carodo-ios` at `c2e7d33` (tests
 `d15db19`; `Core/Extensions` and `Core/Storage` dissolved, `c2e7d33`). After approval this becomes a
 step-by-step plan; no code before that ([`../AGENT_WORKFLOW.md`](../AGENT_WORKFLOW.md)).
 
-**Status (2026-11-17):** approved by the owner with D1 (by subject) and D2 (R4's never-awaiting case); plan [`source-rules-plan.md`](source-rules-plan.md). **Built:** carodo-ios `d00f412` (reader and rules) and `ca729d5` (Domain by subject) on `refactor/source-rules`, not merged; review pending. Section 2's "not named at all" was wrong by one: Diagnostics asked `CLLocationManager.locationServicesEnabled()`, now in `Core/Location`.
+**Status (2026-11-17):** approved by the owner with D1 (by subject) and D2 (R4's never-awaiting case); plan [`source-rules-plan.md`](source-rules-plan.md). **Built:** carodo-ios `d00f412` (reader and rules) and `ca729d5` (Domain by subject) on `refactor/source-rules`; review fixes `244d9f2` (a string or a backticked keyword is never structure, balance also counts brackets and `#if`, R4 names the repository defaults one by one); merged into `main` as `b1ce357` (2,471 tests, 0 failures). Done. From here the rules stay lean: carodo-ios `AGENTS.md`, Conventions (`f531950`). Section 2's "not named at all" was wrong by one: Diagnostics asked `CLLocationManager.locationServicesEnabled()`, now in `Core/Location`.
 
 ## 1. Why
 
