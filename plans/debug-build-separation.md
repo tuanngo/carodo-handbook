@@ -1,8 +1,7 @@
 # Debug and Release, kept apart
 
-**Status:** in progress. Previews, sample data and the QA launch flags are out of Release (done,
-2026-11-17). Left: the build behaviours still under `#if DEBUG`, Developer's fog and Geofency tools,
-and a review of `DependencyContainer+Samples+Debug/Release`. Handoff for the next session below.
+**Status:** done in code (2026-11-17), waiting for the owner's review before commit. Previews,
+sample data, the QA launch flags and the Debug-only tools are out of Release.
 
 ## Goal (owner, 2026-11-17)
 
@@ -10,6 +9,10 @@ A Release build (TestFlight, the App Store) holds no preview, no sample data and
 build keeps them all for local work (previews, mockups, the simulator with `-carodo.*` flags). Code
 reads its production flow without `#if DEBUG`: the build system picks what each configuration
 compiles, not conditionals in the code.
+
+**Clarified (owner, 2026-11-17):** `#if DEBUG` is fine in production code when it sits inside one
+small function whose only job is to say how this build behaves; what must not happen is `#if DEBUG`
+scattered through views and flows, or sample and preview code reaching Release.
 
 ## What is done (carodo-ios, `main`, not pushed)
 
@@ -49,89 +52,29 @@ Measured: Release `__TEXT` 14.64 MB → 14.46 MB (−180 KB); `#if DEBUG` from ~
   `xcrun simctl launch <UDID> app.carodo.ios -carodo.sampleData YES …`, `devicectl … process launch`.
   A value fixed per build goes through xcconfig (`Configs/Local.xcconfig`) into Info.plist.
 
-## Handoff: the next session
+## Decisions and the last step (owner, 2026-11-17; uncommitted in carodo-ios)
 
-```text
-Outcome:
-  No `#if DEBUG` left in carodo-ios outside the +Debug/+Release pairs, and DependencyContainer's
-  sample containers reviewed and settled.
+1. **Build behaviour keeps `#if DEBUG`**, each already one small function: `Configuration.current`,
+   `apiBaseURL`, `BackendService.attestKey()`, `DatabaseManager.migrator`, `TrackingLogProfile.atLaunch`,
+   `DeveloperAccess.currentBuild()`. No `BuildFlavor` pair.
+2. **Footprint fog sliders deleted**: the owner chose 70 % (Light) and 60 % (Dark); `MapTuning.DebugKey`,
+   the `@AppStorage` overrides in `MapAtlasView` and the five catalog strings went with them.
+   **Geofency import** stays, Debug only: `GeofencyImportSection+Debug/+Release`, and
+   `GeofencyImport`, `ZipEntry`, `GeofencyImportModel` renamed `+Debug` (their only reader).
+3. **Samples in one place:** `Core/PreviewData/DependencyContainer+Samples.swift` holds `Stores.sample`,
+   `SampleCommunityRepository.qa`, `FeedSharingActions.sample` and the QA containers
+   (`sampleContainer`, sample and showcase journals). `SampleContainer.swift` and the App/ pair are
+   gone; `live()` reads it in one `#if DEBUG` line, and `poiSearch(defaults:)` (private) picks
+   `SamplePOISearch` the same way. `fixedFeedActions` is an init parameter (`let`). `journalSeed`
+   stays a settable `var`: the showcase's seed task holds the container it seeds, so it is set
+   after creation. `unsaved()` stays shared with the sample journal. `ArchitectureTests` names both
+   files as the composition root (`compositionRoot`).
 
-Existing behaviour (files read):
-  `#if DEBUG` remains in (as of 53b1d18):
-  - Build behaviour:
-    Carodo/Configuration/Configuration.swift:18, :38   environment and backend URL
-    Carodo/Core/Networking/BackendService.swift:30     App Attest: software key in Debug
-    Carodo/Core/Persistence/DatabaseManager.swift:50   erase the database on a schema change
-    Carodo/Core/Diagnostics/TrackingLog.swift:574      the log profile at launch
-    Carodo/Core/Diagnostics/DeveloperAccess.swift:32   Developer access
-  - Developer tools:
-    Carodo/DesignSystem/MapTuning.swift:59             fog keys (`MapTuning.DebugKey`)
-    Carodo/Features/Developer/Views/DeveloperView.swift:20, :54, :64   fog sliders, Geofency import
-    Carodo/Features/Map/Views/MapAtlasView.swift:62, :363              the map reads the fog sliders
-  DependencyContainer+Samples (Carodo/App):
-    +Debug: sampleContainer(defaults:) for -carodo.sampleData / sampleJournal / showcaseJournal,
-    samplePOISearch(defaults:) for -carodo.debugSamplePlaces, and the sample and showcase journals.
-    +Release: both return nil.
-
-Owner decisions needed:
-  1. Build behaviour: one `BuildFlavor` pair (`BuildFlavor+Debug/+Release`, `isDebug` constant) the
-     five call sites read, or a pair per concern? Recommendation: a pair per concern where the Debug
-     side carries code (App Attest's software key, the schema reset), a constant where it is a value
-     (the log profile, Developer access); the backend URL stays with xcconfig/Info.plist.
-  2. Footprint fog sliders: delete them (MapTuning's comment says they go once the values are
-     chosen) or move them to a +Debug file? Geofency import: keep as a +Debug Developer section?
-  3. DependencyContainer+Samples (review points below): keep in Carodo/App, or move the Debug half
-     into Core/PreviewData beside SampleContainer.swift?
-
-Review points for DependencyContainer+Samples:
-  - It widened `unsaved(_:isStorageUnavailable:)`, `inMemory()`, `journalSeed` and
-    `fixedFeedActions` from private to internal so the extension can reach them. Check nothing else
-    starts using them; `journalSeed` and `fixedFeedActions` are QA-only state on a production type.
-  - `sampleJournal(count:)` reuses `unsaved`, the production fallback for a database that cannot be
-    opened: one path, two purposes. Keep it, or give the sample journal its own builder.
-  - `Core/PreviewData/SampleContainer.swift` (`Stores.sample`, `SampleCommunityRepository.qa`,
-    `FeedSharingActions.sample`) and `DependencyContainer+Samples+Debug.swift` do the same job for
-    previews and for QA launches: one file may be enough (PreviewData is already Debug-only, so the
-    Debug half needs no `+Debug` name there; the Release stub would stay in Carodo/App).
-  - `ArchitectureTests` (one-lookup-owner rules, lines ~173 and ~198) now exempt the prefix
-    `Carodo/App/DependencyContainer`, so both Samples files may create Apple Maps lookups (the
-    showcase journal names places). Moving the file means moving that exemption.
-  - `inMemory()` ends in `preconditionFailure` when the schema cannot be created in memory (a
-    broken build, which the migrator tests catch); the owner accepted no sample fallback.
-
-Acceptance criteria:
-  - `grep -rn "#if DEBUG" Carodo CarodoShared CarodoWidgets` prints nothing (or only what the owner
-    keeps, named in this plan).
-  - Debug behaves as today: schema reset, software App Attest key, developer log profile, the local
-    backend URL; Release as today.
-  - `task lint`, `task warnings`, `task test`, `task release-check` pass; `strings` on the Release
-    binary finds no `carodo.debug` and no fog key.
-
-Non-goals:
-  Renaming the `-carodo.debug…` flags (docs and habits use them); Swift packages or new targets for
-  the Debug code (P6, and the folder exclusion already does it).
-
-Relevant files/docs:
-  carodo-ios: project.yml (Debug/Release EXCLUDED_SOURCE_FILE_NAMES), Taskfile.yml (release-check),
-  Carodo/Configuration/LaunchFlag*.swift, Carodo/App/DependencyContainer*.swift,
-  Carodo/Core/PreviewData/SampleContainer.swift, AGENTS.md ("A preview or a mockup", "A screen state
-  to check on the simulator"), docs/operations/setup.md#qa-launch-arguments-debug,
-  docs/architecture.md (the Previews/PreviewData row).
-
-Constraints:
-  project.yml changes need the owner's approval (P6). Before the first TestFlight build the schema
-  reset must stay Debug-only (invariant 6). App Attest: Release never gets the software key (P7).
-
-Validation commands/device checks:
-  task generate && task lint && task warnings && task test && task release-check
-  Simulator (by UDID): -carodo.sampleData YES -carodo.hasCompletedOnboarding YES plus a flag per
-  converted hook. A Debug install on the iPhone after the build-behaviour change: the schema reset
-  still asks CONFIRM=erase (`task device`), App Attest still attests with the software key.
-
-Do not:
-  Bring `#if DEBUG` back into a view or a view model; give LaunchFlag raw values; put a sample type
-  in a production path (the Release build fails, by design).
-```
+Result: `#if DEBUG` in 6 build-behaviour functions and 2 in `DependencyContainer` (`live()`,
+`poiSearch`), none in a view. `task lint`, `task warnings`, `task test` (2497, 0 failures),
+`task release-check` pass. Release strings: no `carodo.debug` flag; `footprintFogLight/Dark` remain as
+`MapTuning`'s production property names. Simulator: `-carodo.sampleData YES -carodo.debugOpenDeveloper YES`
+opens Developer without the fog section; the Geofency section (below the fold) was not seen.
 
 ## Seen on the way, not fixed
 
@@ -141,3 +84,7 @@ Do not:
 - TD-53 (sample data built at every launch): Release can no longer build sample data at all (no
   `Sample*` symbol in the binary since `b41df51`). Close it after one live-launch trace confirms
   `SampleJourneyRepository.init` is gone in Debug too.
+- Release still compiles QA-only code that answers nothing there: `DebugLaunchArguments`
+  (Features/Developer, parsed through `LaunchFlag`, so inert) and the `carodo-debug` software
+  attestation (`SoftwareAttestKey`, `AppAttestFormats`; `attestKey()` never picks it in Release).
+  Dead weight, not a leak; candidates for `+Debug` names in a later pass.
