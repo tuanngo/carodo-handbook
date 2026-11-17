@@ -1,6 +1,6 @@
 # Debug and Release, kept apart
 
-**Status:** done in code (2026-11-17), waiting for the owner's review before commit. Previews,
+**Status:** done and committed (2026-11-17: carodo-ios `53b1d18`, `8d6541d`, `93c3df7`). Previews,
 sample data, the QA launch flags and the Debug-only tools are out of Release.
 
 ## Goal (owner, 2026-11-17)
@@ -14,7 +14,7 @@ compiles, not conditionals in the code.
 small function whose only job is to say how this build behaves; what must not happen is `#if DEBUG`
 scattered through views and flows, or sample and preview code reaching Release.
 
-## What is done (carodo-ios, `main`, not pushed)
+## What is done (carodo-ios, `main`)
 
 | Commit | Outcome |
 |---|---|
@@ -52,7 +52,7 @@ Measured: Release `__TEXT` 14.64 MB → 14.46 MB (−180 KB); `#if DEBUG` from ~
   `xcrun simctl launch <UDID> app.carodo.ios -carodo.sampleData YES …`, `devicectl … process launch`.
   A value fixed per build goes through xcconfig (`Configs/Local.xcconfig`) into Info.plist.
 
-## Decisions and the last step (owner, 2026-11-17; uncommitted in carodo-ios)
+## Decisions and the last step (owner, 2026-11-17)
 
 1. **Build behaviour keeps `#if DEBUG`**, each already one small function: `Configuration.current`,
    `apiBaseURL`, `BackendService.attestKey()`, `DatabaseManager.migrator`, `TrackingLogProfile.atLaunch`,
@@ -81,9 +81,8 @@ opens Developer without the fog section; the Geofency section (below the fold) w
 - The first launch after `simctl install` (straight after `task test` on the same simulator) showed
   Onboarding although `-carodo.hasCompletedOnboarding YES` was passed; a second launch was right.
   Seen with the Garage pilot too, so not caused by `LaunchFlag`. Not investigated.
-- TD-53 (sample data built at every launch): Release can no longer build sample data at all (no
-  `Sample*` symbol in the binary since `b41df51`). Close it after one live-launch trace confirms
-  `SampleJourneyRepository.init` is gone in Debug too.
+- TD-53 (sample data built at every launch): closed 2026-11-17, confirmed in Debug under lldb
+  (technical-debt.md).
 - The `carodo-debug` software attestation is Debug only since carodo-ios `93c3df7`
   (`SoftwareAttestKey+Debug.swift`). `DebugLaunchArguments` stays compiled in Release (inert: it reads
   `LaunchFlag`): `MainTabView` and `DriveFlow` read 30+ of its fields in both builds, so a Release twin
