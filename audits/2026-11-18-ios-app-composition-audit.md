@@ -14,8 +14,16 @@ Sources read: `App/{DependencyContainer, +Live, +Connect, +Recovery, +Maintenanc
 (composition-root rules), `carodo-ios/docs/architecture.md` (Sensors, Map lookups),
 `plans/enrichment-scheduler.md`. Reference apps in `~/code/oss/swift` (section 3).
 
-**Status (2026-11-18):** D1–D4 approved as recommended (owner). Step 1 is enrichment-scheduler
-slice 2 (its section 2.5); steps 2–4 not started.
+**Status (2026-11-18):** D1–D4 approved as recommended (owner). Step 1 done as enrichment-scheduler
+slice 2 (carodo-ios `16efbd7`). Step 2 done (carodo-ios, see below); steps 3–4 not started.
+
+Step 2 as built, against F2's proposal: `DriveSessionManager.Inputs` (six readers), the battery's
+network and the tracking mode's place regions are given in `init`; `CarodoApp.wireCallbacks`
+moved into `+Connect` (`wireCallbacks(appState:)`, called by `connect`). Three differences, each
+because the value needs `AppState`, which `live()` does not take: `autoMode` stays a `var` built in
+`connect`; `DriveActivityController`'s four readers stay in `connect` (two read `AppState`, the
+four are kept together); `Inputs` fields stay optional with a nil default, so tests set only what
+they read (a missing reader in the container is caught by review, not the compiler).
 
 ## 1. Summary
 
