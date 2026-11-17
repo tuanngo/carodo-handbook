@@ -102,8 +102,8 @@ into an in-memory journal at launch, through the app's real trip store; nothing 
 
 ```sh
 xcrun simctl launch $U app.carodo.ios -carodo.hasCompletedOnboarding YES \
-  -carodo.showcaseJournal ~/code/carodo/carodo-handbook/showcase -carodo.showcaseNow YES \
-  -carodo.debugTab journeys                                  # add e.g. -carodo.debugOpenJourney 4 -carodo.debugOpenReplay YES
+  -carodo.showcaseJournal ~/code/carodo/carodo-handbook/showcase -carodo.showcaseNow YES
+axe tap --label Journeys --wait-timeout 30 --udid $U        # then a drive, then "Replay drive" (AXe)
 ```
 
 Newest first: 0 Prenn, 1 Ngoạn Mục, 2 the expressway, 3 Hải Vân, 4 Mã Pí Lèng. Their ends are named
@@ -123,9 +123,9 @@ xcrun simctl openurl $U carodo://trip/start              # tap Open (or tap Star
 python3 showcase/sim_drive.py prenn --udid $U            # plays the route; the app ends the drive ~5 min after arrival
 ```
 
-Then open what it recorded with the app's DEBUG launch arguments (carodo-ios
-`docs/operations/setup.md`), for example `-carodo.debugTab journeys -carodo.debugOpenJourney 0`
-with `-carodo.debugOpenReplay YES -carodo.debugReplayAt 0.55` or `-carodo.debugOpenShareCard YES`.
+Then open what it recorded by taps with AXe (carodo-ios `docs/operations/setup.md`, Reaching a
+screen with AXe): Journeys, the drive, then Replay or Share. Launch arguments only choose what the
+app is built with; no screen opens by a flag.
 
 First run (2026-11-15, Prenn, `--profile`): the drive saved and ended by itself; detail, Replay and
 the share card drew the pass correctly; 17 restarts of the scenario jumped ahead, so the app kept
