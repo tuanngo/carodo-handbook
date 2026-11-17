@@ -17,7 +17,7 @@ Sources read: `App/{DependencyContainer, +Live, +Connect, +Recovery, +Maintenanc
 **Status (2026-11-18):** D1–D4 approved as recommended (owner). Step 1 done as enrichment-scheduler
 slice 2 (carodo-ios `16efbd7`). Step 2 done (carodo-ios `c4ed342`, see below). Step 3 done:
 `DriveDiagnostics` (`d7ee4bc`), `JournalUpkeep` (`4ecd269`), `TripReconciliation` (`e240d9e`).
-Step 4 (F3, F4) not started.
+Step 4 (F3, F4) not started: its handoff is [`../plans/app-shell-split.md`](../plans/app-shell-split.md).
 
 Step 3 as built: `LaunchReconciliation` is named `TripReconciliation`, since it also runs after each
 saved drive and on return to the app. The launch's facts (cause, origin, waited) are the argument of
