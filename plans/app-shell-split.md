@@ -1,7 +1,8 @@
 # App shell split — `MainTabView` and `AppState` (composition audit step 4)
 
-**Status:** handoff written 2026-11-18; **not started**, waiting for the owner's go and D1–D3
-below. Step 4 of [`../audits/2026-11-18-ios-app-composition-audit.md`](../audits/2026-11-18-ios-app-composition-audit.md)
+**Status:** handoff written 2026-11-18; **ready to start**: D1 and D3 approved, D2 deferred
+(owner, 2026-11-18; the deferral is a comment on `AppState`, carodo-ios). Slices 1, 2 and 4 are
+in scope; slice 3 is not. Step 4 of [`../audits/2026-11-18-ios-app-composition-audit.md`](../audits/2026-11-18-ios-app-composition-audit.md)
 (findings F3, F4; the audit's D3 approved "F3 after F1, F4 only if still wanted"). Steps 1–3 are
 done (carodo-ios `16efbd7`, `c4ed342`, `d7ee4bc`, `4ecd269`, `e240d9e`).
 
@@ -93,11 +94,10 @@ Do not:
 
 ## Owner decisions (with a recommendation)
 
-- **D1: the names** `AppDestination` and `FloatingDriveControls`, both in `App/`. Recommend yes.
-- **D2: do slice 3 (preferences) now.** Recommend **later**: `AppState` reads well today, and
-  every feature touches it; do it when `AppState` next grows.
-- **D3: do slice 4 (requests) now.** Recommend yes, small and it removes three event-as-state
-  pairs; it goes with slice 1 or 2, not alone.
+- **D1: the names** `AppDestination` and `FloatingDriveControls`, both in `App/`. **Approved.**
+- **D2: slice 3 (preferences).** **Deferred** (owner): split when `AppState` grows; the doc comment
+  on `AppState` says so. Not part of this task.
+- **D3: slice 4 (requests).** **Approved**; it goes with slice 1 or 2, not alone.
 
 ## Left open after steps 1–3 (already recorded)
 
