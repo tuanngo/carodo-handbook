@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Live Activity Identity</title>
+<!-- Mockup for carodo-handbook/plans/live-activity.md: how the Lock Screen card says "Carodo" at a
+     glance. Rendered to ../drive/live-activity-identity.png by render.sh. No real place or route. -->
+<style>
+  :root { --charcoal:#242321; --live:#373430; --copper:#BD8053; --copperL:#D09264; --ivory:#F3EEE5; --stone:#A49E95; --page:#F3EEE5; --ink:#242321; --muted:#77736D; }
+  * { box-sizing:border-box; }
+  body { margin:0; padding:40px 44px 56px; background:var(--page); color:var(--ink); font:16px/1.4 -apple-system,"SF Pro Text",system-ui,sans-serif; width:1800px; }
+  h1 { font-size:30px; margin:0 0 6px; } .lead { color:var(--muted); max-width:1150px; margin:0 0 6px; }
+  h2 { font-size:14px; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); margin:34px 0 12px; }
+  .grid { display:grid; grid-template-columns:repeat(4, 402px); gap:22px 30px; }
+  .cell b.t { display:block; font-size:15.5px; margin-bottom:8px; }
+  .cell small { display:block; color:var(--muted); font-size:13.5px; margin-top:9px; line-height:1.35; }
+  /* Busy photo wallpapers, like a real Lock Screen. */
+  .lock { width:402px; border-radius:38px; padding:16px 12px; position:relative; overflow:hidden; display:flex; flex-direction:column; gap:10px; }
+  .w1 { background: radial-gradient(circle at 20% 30%, #b8e05a 0 22%, transparent 40%), radial-gradient(circle at 80% 20%, #f1c9a8 0 18%, transparent 38%), radial-gradient(circle at 70% 80%, #3a5f9e 0 20%, transparent 42%), linear-gradient(135deg,#7a8f4a,#c48f6a 50%,#2b3b5a); }
+  .w2 { background: radial-gradient(circle at 25% 75%, #f6f1e7 0 25%, transparent 45%), radial-gradient(circle at 75% 25%, #e9d3b4 0 20%, transparent 40%), linear-gradient(160deg,#efe6d8,#cdbca2 55%,#9c8a72); }
+  .w3 { background: radial-gradient(circle at 30% 30%, #2a3442 0 30%, transparent 50%), linear-gradient(160deg,#1a1f26,#3b4652 55%,#141820); }
+  /* Another app's card, for scale: the system glass. */
+  .other { border-radius:26px; padding:12px 16px; background:rgba(40,60,30,.35); backdrop-filter:blur(18px) saturate(1.4); -webkit-backdrop-filter:blur(18px) saturate(1.4); color:#fff; border:.5px solid rgba(255,255,255,.18); }
+  .other .g { color:#c5ef5a; font-weight:700; }
+  .la { border-radius:26px; padding:14px 16px; color:var(--ivory); display:flex; flex-direction:column; gap:9px; position:relative; overflow:hidden; }
+  .row { display:flex; align-items:center; gap:9px; white-space:nowrap; }
+  .st { font-weight:700; font-size:17px; } .sub { color:var(--stone); font-size:14.5px; } .sp { flex:1; }
+  .lock .fig small { display:inline; margin-top:0; }
+  .fig b { font-size:27px; font-weight:700; font-variant-numeric:tabular-nums; } .fig small { color:var(--stone); font-size:14px; margin-left:3px; }
+  .cu { color:var(--copperL); }
+  svg.ic { width:19px; height:19px; flex:none; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+  img.mark { width:22px; height:22px; flex:none; display:block; }
+  img.mark.lg { width:26px; height:26px; }
+  /* A: built today. */
+  .A { background:var(--live); }
+  /* B: the in-app live panel: Charcoal, Copper hairline, the mark. */
+  .B { background:var(--live); box-shadow: inset 0 0 0 1px color-mix(in srgb,var(--copper) 60%,transparent); }
+  /* C: B with a warm Copper light at the top leading corner. */
+  .C { background: radial-gradient(120% 140% at 0% 0%, rgba(189,128,83,.30), rgba(189,128,83,.08) 45%, transparent 70%), var(--live);
+       box-shadow: inset 0 0 0 1px color-mix(in srgb,var(--copper) 60%,transparent); }
+  /* D: the system glass (no tint): the wallpaper shows through. */
+  .D { background:rgba(36,35,33,.42); backdrop-filter:blur(18px) saturate(1.3); -webkit-backdrop-filter:blur(18px) saturate(1.3);
+       box-shadow: inset 0 0 0 1px color-mix(in srgb,var(--copper) 55%,transparent); }
+  ul.notes { color:var(--muted); font-size:14.5px; max-width:1250px; margin:8px 0 0; padding-left:20px; } ul.notes li { margin-bottom:5px; }
+  .pill { display:inline-block; padding:2px 8px; border-radius:8px; font-size:12px; font-weight:700; background:var(--copper); color:var(--charcoal); margin-left:6px; vertical-align:2px; }
+</style>
+</head>
+<body>
+<h1>Live Activity · does it read as Carodo?</h1>
+<p class="lead">iOS shows no app icon or name on a Live Activity: the card has to say "Carodo" itself. Four looks of the same
+"Live" frame over three Lock Screen photos, under another app's card (system glass, green) for scale.</p>
+
+<h2>Live</h2>
+<div class="grid" id="live"></div>
+<h2>Ready (just after Start, before the car leaves)</h2>
+<div class="grid" id="ready"></div>
+
+<ul class="notes">
+  <li><b>A · today</b>: Charcoal, a generic waveform. Clear, but nothing says Carodo; beside another app's card it reads as "some app".</li>
+  <li><b>B · the mark + Copper hairline</b>: the in-app live panel's own look (Charcoal, Copper hairline) and the Carodo mark leading. Same contrast as today on any photo.</li>
+  <li><b>C · B + a warm Copper light</b><span class="pill">recommended</span>: a soft Copper glow from the top leading corner, under the mark. A static gradient, drawn once: no cost to the battery. Copper stays an accent, never a fill.</li>
+  <li><b>D · system glass</b>: the photo shows through like the other app. Looks native, but contrast changes with every wallpaper (Copper and Stone text go under 4.5:1 on a light photo), and it reads like everyone else's card.</li>
+</ul>
+
+<script>
+const mark = (lg) => `<img class="mark ${lg ? 'lg' : ''}" src="../../brand/svg/carodo-mark-small-on-dark.svg" alt="">`;
+const wave = '<svg class="ic cu" viewBox="0 0 24 24"><path d="M3 12h2M7 8v8M11 5v14M15 9v6M19 11v2"/></svg>';
+const waveGrey = '<svg class="ic" style="color:var(--stone)" viewBox="0 0 24 24"><path d="M3 12h2M7 8v8M11 5v14M15 9v6M19 11v2"/></svg>';
+const flat = '<svg class="ic" style="color:var(--stone)" viewBox="0 0 24 24"><path d="M3 12h18"/></svg>';
+const car = '<svg class="ic" style="width:16px;height:16px;color:var(--stone)" viewBox="0 0 24 24"><path d="M4 16v-3l2-5h12l2 5v3M4 16h16M6.5 16v2M17.5 16v2M5 12h14"/></svg>';
+const other = `<div class="other"><div class="row"><span class="g">● Driving</span><span class="sp"></span><b>0:12</b></div></div>`;
+
+const liveCard = (v) => {
+  const lead = v === 'A' ? wave : mark();
+  const status = v === 'A' ? '' : `<span class="cu" style="display:inline-flex">${wave}</span>`;
+  return `<div class="la ${v}">
+    <div class="row">${lead}<span class="st">Live</span>${status}<span class="sp"></span><span class="sub row" style="gap:5px">${car}My car</span></div>
+    <div class="row" style="gap:26px;align-items:flex-end">
+      <span class="fig"><b>12:48</b></span><span class="fig"><b>6.1</b><small>km</small></span></div>
+  </div>`;
+};
+const readyCard = (v) => {
+  const lead = v === 'A' ? waveGrey : mark();
+  return `<div class="la ${v}"><div class="row">${lead}<span class="st">Ready</span><span class="sub">· Waiting to move</span><span class="sp"></span><span class="sub row" style="gap:5px">${car}My car</span></div></div>`;
+};
+const titles = { A: 'A · today', B: 'B · mark + hairline', C: 'C · B + warm Copper light', D: 'D · system glass' };
+const walls = ['w1', 'w2', 'w3'];
+const cell = (v, card) => `<div class="cell"><b class="t">${titles[v]}</b>
+  ${walls.map(w => `<div class="lock ${w}" style="margin-bottom:10px">${other}${card(v)}</div>`).join('')}</div>`;
+document.getElementById('live').innerHTML = ['A', 'B', 'C', 'D'].map(v => cell(v, liveCard)).join('');
+document.getElementById('ready').innerHTML = ['A', 'B', 'C', 'D'].map(v => `<div class="cell"><b class="t">${titles[v]}</b><div class="lock w1">${other}${readyCard(v)}</div></div>`).join('');
+</script>
+</body>
+</html>

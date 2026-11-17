@@ -2,9 +2,9 @@
   "about": "Synthetic showcase drives on public roads (plans/showcase-drives.md). Waypoints are public places (OpenStreetMap / Nominatim); start times are local (time_zone) and fixed (D5); seeds make the generated fixes deterministic. Not recorded drives. Stops stay under 5 min: past StopDetector's 300 s grace the app ends the drive there. A waypoint with \"via\": false only marks a stop; the route is not forced through it.",
   "vehicle": {
     "kind": "car",
-    "name": "Mazda CX-5",
-    "make": "Mazda",
-    "model": "CX-5",
+    "name": "Kia Sportage",
+    "make": "Kia",
+    "model": "Sportage",
     "body_style": "suv",
     "color": "copper"
   },
