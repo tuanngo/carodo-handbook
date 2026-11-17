@@ -124,3 +124,20 @@ git commit -m "fix(launch): a relaunch in a locked iphone starts auto mode and s
 
 - [ ] **Step 7: Handbook commit**: the PV row and the spec's status, `docs(plans): locked relaunch …`.
 - [ ] **Step 8: Report** and wait: merging `fix/locked-relaunch` into `main` and `task device` are the owner's call; the device check (spec section 7) is what proves the cause.
+
+### Task 5: `by=location` instead of `state=` (after the 2026-11-17 drive)
+
+The drive showed `state=` cannot tell the person from iOS: three launches by hand read
+`background` at `didFinishLaunching` (field test 2026-11-17, owner-confirmed). The owner approved
+reading the launch options instead.
+
+- [x] `LaunchCauseCapture` (renamed from `LaunchStateCapture`): takes
+  `UIApplication.LaunchOptionsKey.location` from `didFinishLaunchingNotification`'s `userInfo`,
+  once; `TrackingLogEntry.LaunchCause` (`location`) replaces `LaunchState`; the line logs
+  `by=location` or nothing (`by` already a shared key).
+- [x] Tests: `LaunchCauseCaptureTests` (location key, no key, taken once); the `launched` samples in
+  `LaunchContextTests`, `TrackingLogFieldsTests`, `TrackingHealthTests`, `DiagnosticsLogFormatTests`.
+- [x] Docs: `docs/tracking.md` (Was Carodo running?), `docs/operations/device-testing.md`.
+- [x] `task lint`, `task warnings` (none), `task test` (2,487, 0 failures).
+- [ ] Device: an Auto Mode drive with Carodo swiped away shows `launched … by=location`; a tap
+  launch shows no `by=`. Until then the change waits for the owner's review, uncommitted.

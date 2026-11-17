@@ -73,4 +73,23 @@ few hundred metres of the parking spot (the first metres are missed by design, d
 
 ## Result
 
-(to fill in after the drive)
+Read by the agent on 2026-11-17 from `drive-data/carodo-20261117-120206-…sqlite` (pulled 12:02).
+Driven: drive A only (Auto Mode, Carodo swiped away, iPhone locked, owner leaving about 11:45).
+Drive B and the restart-without-unlock case were not run.
+
+| # | Seen | Verdict |
+|---|---|---|
+| A1 | 11:49:34 `woke reason=geofence region=parking`, `leftParking`; 11:49:35 `launched recovered=0 discarded=0 state=background … sinceLastS=449 lastMode=standby`, **no** `waited`/`store=` | Pass on what matters: iOS relaunched Carodo in the locked iPhone and the services started at once (the gate's assumption holds after the first unlock). But see A4: `state=background` does not prove it was iOS |
+| A2 | `mode to=detecting`, 11:49:52 `detection end=confirmed windowS=17 … conf=0.49`, `driveStarted trigger=auto` | Pass |
+| A3 | 11:58:29 `autoFinished reason=walkedAway conf=0.80`, `mode to=standby`, `geofence set region=parking source=drive`; trip `completed`, `end_reason=walked_away` | Pass |
+| A4 | 12:01:45 `app foreground`, no second `launched` (the process stayed) | Pass for this step, but **`state=` fails as a signal**: the three launches before leaving (11:35:06, 11:39:45, 11:40:31) read `state=background`, and each has the shape of a tap launch (an `app background` follows seconds later with no `app foreground`, exactly like the old build's tap launches at 07:22:36 and 10:34:33, which read `state=active`). `UIApplication.applicationState` at `didFinishLaunching` reads `.background` for a person's launch too in a scene-based app: the reviewer's I1 in a new form. The owner confirmed all three were opens by hand (step 2), Carodo then closed before the drive |
+| B1 | not driven | — |
+
+Journal: drive A is in `trips` (`start_trigger=auto`), 3.03 km, 8 min 50 s, started 11:49:48. Core
+Motion dates the departure at 11:48:38, so about 70 s of driving before the relaunch and the first
+fix are missing (`fromParkedM=460`): the first metres missed by design, made longer here because the
+parking circle was set from a home fix 160 m off (`woke … parked=1 distM=160` all morning).
+
+Outcome: the fix works on the device (A1–A3). PV-31 stays Open: `state=` cannot tell the person from
+iOS (fix needed, e.g. the `location` launch option or whether a scene became active), Drive B
+(`shortcut result=started`) and the restart case are still unproven.
