@@ -15,4 +15,5 @@ caught in review instead of found again in the next audit.
 | [2026-11-07 iOS source audit](2026-11-07-ios-source-audit.md) | `carodo-ios` | 7 | All fixed and committed; device checks pending |
 | [2026-11-16 `geocoded_cells` audit](2026-11-16-ios-geocoded-cells-audit.md) | `carodo-ios` | TD-2 row 1, TD-36, TD-6 | Phase 1 built (carodo-ios dd58a24); phase 2 (OSM) not started |
 | [2026-11-16 location and background audit](2026-11-16-ios-location-runtime-audit.md) | `carodo-ios` | 4 findings, 2 ideas | Written; waiting for the owner's review |
+| [2026-11-18 app composition audit](2026-11-18-ios-app-composition-audit.md) | `carodo-ios` | 4 findings, 1 idea | D1–D4 approved; step 1 is the enrichment scheduler's slice 2, steps 2–4 not started |
 | [2026-11-07 backend source audit](../plans/backend-source-audit.md) | `carodo-app` | 6 | Open (still in `plans/`) |
