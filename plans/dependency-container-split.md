@@ -1,6 +1,6 @@
 # DependencyContainer split
 
-**Status:** not started (brief written 2026-11-17). Runs beside
+**Status:** done 2026-11-17 (carodo-ios `25469ef`, merged into main). Option A approved; open: TD-55 (gate as a type), PV-32 (recovery on a device). Runs beside
 [`qa-hooks-out-of-views.md`](qa-hooks-out-of-views.md) (separate worktrees, file boundary below).
 
 ## Why (owner, 2026-11-17)
@@ -88,3 +88,87 @@ Do not:
   Touch the views' QA hooks (the other session's files); change behaviour while moving; commit
   another session's change (stage own paths only).
 ```
+
+## Plan (approved by the owner 2026-11-17: the cut, option A, the QA functions)
+
+Worktree `../carodo-ios-container-split`, branch `refactor/container-split`, from carodo-ios 93c3df7.
+
+### Audit (what the code does today)
+
+Read: `Carodo/App/DependencyContainer.swift` (1,215 lines, whole), `Core/PreviewData/DependencyContainer+Samples.swift`
+(150), `App/DriveStarts.swift` (77, already an `extension DependencyContainer`), `CarodoTests/Rules/ArchitectureTests.swift`
+and `Support/SourceTree.excluding` (a plain `hasPrefix`, so `Carodo/App/DependencyContainer+X.swift` is covered),
+`project.yml` (`*+Debug.swift` / `*+Release.swift` excludes), `docs/architecture.md`, `docs/operations/setup.md` (line 109).
+
+- **Swift constraint that shapes the cut:** stored properties cannot live in an extension, and `private` reaches only
+  the same file. So every stored property stays in `DependencyContainer.swift`, and each `private` member that an
+  extension in another file uses must become internal. There is no "these files only" access level in Swift.
+- **Sizes today (approx.):** properties + `Stores` 158, `init` 71, `live()` 111, Feed wiring 95, `poiSearch`/`unsaved`/
+  `inMemory` 36, `connect` 146, tracking mode + map data + flush 36, lifecycle 28, reconcile + recovery 90, joinWait +
+  settleHeld 64, trip report 21, backup + erase + gate 52, motion/dynamics/ride logs 90, milestones + new roads 49,
+  enrich/match/heal/narrate/name/provinces 110, `Logger.persistence` + environment keys 38.
+- **QA reads: 8 `LaunchFlag` reads at 5 sites** (the brief said 7): `journeyPointServices` (2), `live()` feed mock (1),
+  `connectFeed` mock seeding (3), `poiSearch(defaults:)` (1, inside its `#if DEBUG`), `connect` restore backup (1);
+  plus `sampleContainer` in `live()`'s `#if DEBUG` and the `journalSeed` wait in `connect`. Release answers nothing.
+- **Misplaced doc comments** (found while reading): the flush comment sits on `resumeMapDataLookups` (~633), the
+  `enrichJourneys` comment on `joinWait` (~785) and on `badgeLedger` (~1015), the ride comment on
+  `logDrivingDynamics` (~958). Moving re-attaches each to its member; no wording change.
+- **Docs disagree with the brief:** `docs/architecture.md` has no `App/` row; the App/ line is in `AGENTS.md`
+  (Architecture tree, and Git's shared-file list names `DependencyContainer.swift`).
+- **The data-work gate** (`isErasingLocalData`, `activeDataWork`, `dataWorkWaiters`, `dataWorkFinished()`) is used by
+  13 members that would land in 6 files: it is the main reason for the widened list below.
+
+### Proposed cut (extensions in `Carodo/App/`, no new type)
+
+| File | Holds | ~Lines |
+|---|---|---|
+| `DependencyContainer.swift` | class: every stored property (incl. `fixedFeedActions`, `launchReconciliation`, `lifecycleLogging`, moved up), `journeyPointServices`, `provinceSource`, `Stores`, `init`, `deinit`; `Logger.persistence`; environment keys | 285 |
+| `+Live.swift` | `live()`, `feedMockURL` (its only user), `poiSearch(defaults:)`, `unsaved`, `inMemory` | 160 |
+| `+Feed.swift` | `feedActions`, `latestCarDrive`, `weatherLookup`, `connectFeed`, the mock seeding | 100 |
+| `+Connect.swift` | `connect(appState:)` (services, Live Activity, Auto Mode), `updateTrackingMode`, the restore-backup and journal-seed hooks | 175 |
+| `+Recovery.swift` | `reconcileAtLaunch`, `recoverUnfinishedTrips`, `joinWait`, `settleHeldTrips` | 160 |
+| `+Maintenance.swift` | `resumeMapDataLookups`, `purgeExpiredMapData`, `badgeLedger`, `recordMilestones`, `countNewRoads`, `enrichJourneys`, `matchPoints`, `healGaps`, `narrateJourneys`, `namePlaces`, `findProvincesCrossed` | 175 |
+| `+Diagnostics.swift` | `logAppLifecycle`, `tripReportFile`, `logMotion`, `logDrivingDynamics`, `dynamicsEntry`, `logRide` | 135 |
+| `+LocalData.swift` | `flushForBackground`, `backupService`, `canEraseLocalData`, `eraseLocalData`, `dataWorkFinished` | 80 |
+
+Differs from the brief's cut: `+Launch` is split into `+Connect` (wiring, ~175) and `+Recovery` (reconciliation, ~160):
+together they were ~330, at the 350 limit, and they are different readers (the device check names recovery alone).
+`+Data` is named `+LocalData` (it is the local data's lifetime: flush, backup, erase). Each file opens with a doc
+comment naming its concern. `DriveStarts.swift` stays as it is (outside the allowed scope).
+
+### Access widened (`private` → internal, or `private(set)` → internal setter)
+
+20 members, each with a doc line "internal for the container's own extensions": the gate `isErasingLocalData`,
+`activeDataWork`, `dataWorkWaiters`, `dataWorkFinished()`; maintenance state `isEnriching`, `narrationSkips`,
+`newRoadsTask`, `newRoadsRequested`, `newRoadCounter`; sensors `motionActivity`, `motionFollow`; `launchReconciliation`,
+`lifecycleLogging`; `localDataStore`, `backupStore`; setters of `cloudSync`, `feedBackend` (set in `live()`),
+`autoMode` (`connect`), `feedPublisher` (`connectFeed`); and `connectFeed(appState:)` (called from `connect`).
+Stay private, moved with their only user: `feedMockURL`, `poiSearch(defaults:)`, `weatherLookup`, `dynamicsEntry`,
+`logRide`, `recoverUnfinishedTrips`, `findProvincesCrossed` (fileprivate → private), instance `poiSearch`.
+The report shows `grep` proving none of the 20 is used outside `Carodo/App/DependencyContainer*`.
+
+### Owner decisions
+
+1. **The cut:** the table above (8 files). Recommendation: approve it.
+2. **Widened access:** (A) the 20 members above, moves only. (B) one small type for the gate (`LocalDataWork`:
+   is-erasing, a count, waiters; begin, end, drain), which keeps the gate's 4 members private and makes erase's
+   contract readable, at the cost of 13 call sites rewritten (not moves). Recommendation: **A now**; B recorded as a
+   technical-debt candidate, decided apart because it touches erase.
+3. **QA reads:** no `+QA+Debug` file. The one-line reads stay where they are (`live()`, `journeyPointServices`,
+   `poiSearch(defaults:)` with its existing `#if DEBUG`). The three blocks in the middle of a flow become small
+   functions in their concern's file, called from the same spot: `restoreDebugBackup(appState:)` and
+   `awaitJournalSeed(appState:)` in `+Connect`, `seedFeedMock(server:publisher:)` in `+Feed`. Recommendation: approve.
+
+### Docs
+
+`AGENTS.md`: the App/ line in Architecture (DependencyContainer split by concern, `+Live`, `+Feed`, …) and the Git
+shared-file list (`DependencyContainer*.swift`). `docs/architecture.md`: one line after "The composition root owns"
+naming the files. `docs/operations/setup.md` line 109 stays true (`DependencyContainer.live()`). Member-level
+references (`DependencyContainer.flushForBackground`, `.enrichJourneys`, …) stay valid: names do not change.
+
+### Tests and validation
+
+No test changes expected (every member keeps its name and signature). `task generate && task lint && task warnings &&
+task test && task release-check`; `wc -l Carodo/App/DependencyContainer*.swift` (each ≤ ~350). Simulator by UDID: a
+normal launch and `-carodo.sampleData YES` reach the Map. **Device check still required:** a Debug install launches
+and recovers an unfinished drive. One commit: `refactor(app): dependency container split by concern`.
