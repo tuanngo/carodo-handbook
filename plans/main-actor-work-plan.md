@@ -18,8 +18,8 @@ CloudKit (`CKSyncEngine`), XCTest, Instruments (`xctrace`), `task` shortcuts.
 request"), then `carodo-ios/docs/architecture.md#concurrency`.
 
 **Status (2026-11-17):** Tasks 1–6 built and merged (carodo-ios `7d56640`, `main` at `3a11d86`;
-2,427 tests pass there). Task 7, the measurement on an iPhone, is not done: PV-27 in
-`technical-debt.md`. Found on the way: `PassportViewModel` could show an older milestones read
+2,427 tests pass there). Task 7, the measurement on an iPhone, passed on 2026-11-17: 25–28 ms of summary work left the
+main thread during Split and Merge Drives, no hang either side (PV-27 in `technical-debt.md`). Found on the way: `PassportViewModel` could show an older milestones read
 that answered last; a request counter now drops it (`PassportViewModelTests`).
 
 ## Global Constraints
