@@ -1,6 +1,6 @@
 # Drive start: keep the detection window's way out
 
-Status: **approved** (owner, 2026-11-18: D1–D4 as recommended; D5 answered). Slice 1 in progress.
+Status: **approved** (owner, 2026-11-18: D1–D4 as recommended; D5 answered). Slice 1 done (carodo-ios `3de889d`, shadow); slice 2 waits for two or three drives read from the log.
 
 ## 1. Problem
 
