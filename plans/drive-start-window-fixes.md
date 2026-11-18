@@ -1,6 +1,6 @@
 # Drive start: keep the detection window's way out
 
-Status: **plan, waiting for the owner's approval** (2026-11-18). No code before it.
+Status: **approved** (owner, 2026-11-18: D1–D4 as recommended; D5 answered). Slice 1 in progress.
 
 ## 1. Problem
 
@@ -96,9 +96,9 @@ fix whenever B2 reached the window's start.
   is worse than metres missing (the lead-in still draws them).
 - **D4 — slice 3 (backtracking lead-in)**: recommend **later**, after slice 2 shows how much lead-in
   is left to draw.
-- **D5 — what "about 500 m lost" was** (map, share card, replay, distance): one line from the
-  owner. If it is the share card or the replay video, slice 2 is the fix; the lead-in never shows
-  there.
+- **D5 — what "about 500 m lost" was.** Answered (owner, 2026-11-18): the journey showed a late
+  start, then seemed to correct itself: the lead-in drawn by the pass after the save. Slice 2
+  keeps real fixes where the lead-in now invents a road and a time.
 
 ## 5. Scope and non-goals
 
