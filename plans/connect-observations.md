@@ -1,6 +1,6 @@
 # The outputs of `connect()`: observe what is state, keep what is ordered
 
-Status: **Approved D1–D4 (owner, 2026-11-18); built on carodo-ios branch `feat/connect-observations` (d473b1d), not merged: waiting for the device check PV-35.** Slice 2 of [min-ios-26.md](min-ios-26.md):
+Status: **Approved D1–D4 (owner, 2026-11-18); built on carodo-ios branch `feat/connect-observations` (d473b1d), merged into `main` at 4890359 after a re-audit and a merge of `main` (owner, 2026-11-18: lint, 0 warnings, 2,555 tests pass); the device check PV-35 is still owed.** Slice 2 of [min-ios-26.md](min-ios-26.md):
 with the floor at iOS 26, `Observations` (Swift 6.2, the `Observation` module) is available. This plan says
 which of the wiring in `App/DependencyContainer+Connect.swift` becomes "the receiver follows the source"
 (OutRun's `observeRecording(of:)`), and which stays a closure on purpose.
