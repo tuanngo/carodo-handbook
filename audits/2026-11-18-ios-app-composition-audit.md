@@ -53,7 +53,7 @@ the size itself is not the problem, the roles are.
 | F2 | Services are completed after `init` by 23 closure assignments, in two places | Medium | Confirmed |
 | F3 | `MainTabView` is tab bar, navigation, floating controls and model factory at once | Low | Confirmed |
 | F4 | `AppState` mixes preferences, one-shot requests and change signals | Low | Confirmed |
-| I1 | One launch state the root view switches on | Idea | — |
+| I1 | One launch state the root view switches on | Idea | Considered, not done |
 
 ## 2. Findings
 
@@ -160,6 +160,28 @@ Today the launch is spread over `AppLaunch` (container nil before the first unlo
 `isStorageUnavailable`, `launchReconciliation` and `CarodoApp.launch`. OutRun's root switches on
 one `initializing / needsSetup / initialized / failed` status. Worth considering only after F1
 (`LaunchReconciliation` would own the state); not proposed now.
+
+**Considered 2026-11-18, not done (owner).** OutRun's root holds the screen until its core is
+ready; Carodo starts its services in `CarodoApp.init`, before any view and often with none (a
+background relaunch), and no screen waits on reconciliation (P1). The four states are four facts
+with different lifetimes, each already in its place:
+
+| OutRun | Carodo | Lives |
+|---|---|---|
+| `initializing` | `AppLaunch.container == nil`, only before the first unlock since a restart | the process |
+| `needsSetup` | `AppState.hasCompletedOnboarding` (`RootView`) | persisted, apart from the services |
+| `initialized` | the container exists | the process |
+| `failed` | no state: an unsaved journal in memory, `DependencyContainer.isStorageUnavailable` | the process |
+
+One enum would map them back and forth and remove nothing; `AppLaunch` is already the two-state
+form, and `TripReconciliation` does not own it.
+
+What I1 did surface: `isStorageUnavailable` is read only by the finish banner (`DriveFlow`), so
+when the database cannot be opened every other screen reads the empty journal in memory and says
+"no drives yet" (Unknown is not zero). Rare per device (disk full, a damaged file; the locked
+store is `AppLaunch`'s and no longer reaches it), but a failing migration after the first
+TestFlight build would hit every updated device at once. To decide with the pre-TestFlight
+migration review (carodo-ios invariant 6), not as part of I1.
 
 ## 3. What the reference apps do
 
