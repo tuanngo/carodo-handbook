@@ -1,8 +1,9 @@
 # App shell split — `MainTabView` and `AppState` (composition audit step 4)
 
-**Status:** handoff written 2026-11-18; **ready to start**: D1 and D3 approved, D2 deferred
-(owner, 2026-11-18; the deferral is a comment on `AppState`, carodo-ios). Slices 1, 2 and 4 are
-in scope; slice 3 is not. Step 4 of [`../audits/2026-11-18-ios-app-composition-audit.md`](../audits/2026-11-18-ios-app-composition-audit.md)
+**Status:** done 2026-11-18 (carodo-ios `4563a22` slice 1, `744bc20` slices 2 and 4; slice 3
+deferred, D2). `MainTabView` 802 → 522 lines: the ~500 the brief named needed ~25 more lines
+out; what is left is the tabs, the sheets and the drive's top-level wiring, as the outcome asks.
+Step 4 of [`../audits/2026-11-18-ios-app-composition-audit.md`](../audits/2026-11-18-ios-app-composition-audit.md)
 (findings F3, F4; the audit's D3 approved "F3 after F1, F4 only if still wanted"). Steps 1–3 are
 done (carodo-ios `16efbd7`, `c4ed342`, `d7ee4bc`, `4ecd269`, `e240d9e`).
 
