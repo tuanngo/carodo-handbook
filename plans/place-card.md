@@ -133,6 +133,22 @@ No schema, API, permission or dependency change.
 - Journey Detail's callouts share the oversize-on-first-open bug (`CalloutHost` measured before the
   view is in a window); fixed when that map gets the card or a measured host.
 
+## Polish v2 (2026-11-19, accepted; carodo-ios `92db6ef`, `c8e1f7d` on `feat/map-look`)
+
+Mockup [`design/mockups/journeys/place-card-v2.png`](../design/mockups/journeys/place-card-v2.png)
+(source `design/mockups/source/place-card-v2.html`). Approved by the owner:
+
+- Nothing boxed inside the sheet: figures flat between hairlines, visits as rows with hairlines,
+  Details (address, coordinates, radius) as label and value rows.
+- The card and the group list open at medium however short, drag to large; one presentation for
+  both (an item sheet closed and opened again between them, and the card came up at full height).
+- Visit row: day and time on one line, "From … · km" under it; "All N visits" beside the title.
+- A selection tick when a place or a group is chosen (owner, on the iPhone: the tap felt dead).
+- A group splits in one tap: the map zooms straight to its members (1 km floor), and lists them
+  without leaving its zoom when no zoom would split them (owner: two places took several taps).
+- Later: the route glyph in a visit row (the owner: the row needs only the drive's facts for now);
+  the visits page's map header is its own step.
+
 ## Handoff: Save place and Edit place (2026-11-19, not built)
 
 Left for a new session. Analysis and a recommendation, for the owner to decide.

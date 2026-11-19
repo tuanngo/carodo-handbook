@@ -1,0 +1,270 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Place card v2 — one surface, no cards inside</title>
+<style>
+  :root { --charcoal:#242321; --copper:#BD8053; --ivory:#F3EEE5; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:#1a1917; color:var(--ivory); font-family:-apple-system,"SF Pro Text",system-ui,sans-serif; padding:44px 40px 60px; width:2310px; }
+  h1 { font-size:30px; margin:0 0 6px; font-weight:700; }
+  h2 { font-size:22px; margin:52px 0 6px; font-weight:650; }
+  p.lead { margin:0 0 18px; color:#b9b3a8; font-size:15px; max-width:1700px; line-height:1.45; }
+  .row { display:flex; gap:34px; align-items:flex-start; }
+  figure { margin:0; flex:none; }
+  figcaption { font-size:13.5px; color:#b9b3a8; margin-top:10px; line-height:1.45; width:393px; }
+  figcaption b { color:var(--ivory); font-weight:650; }
+  .tag { display:inline-block; font-size:11px; font-weight:700; letter-spacing:.5px; padding:2px 7px; border-radius:6px; margin-right:6px; }
+  .tag.rec { background:var(--copper); color:var(--charcoal); }
+  .tag.alt { background:#3a3835; color:#cfc9be; }
+  .notes { font-size:14.5px; color:#cfc9be; line-height:1.55; max-width:1700px; margin:22px 0 0; padding-left:20px; }
+  .notes b { color:var(--ivory); }
+  code { font-size:13px; color:#e3c7ad; }
+
+  .phone { position:relative; width:393px; height:852px; overflow:hidden; border-radius:44px; border:1px solid #3a3835; }
+  .phone.light { --bg:243,238,229; --card:251,248,242; --stroke:222,214,201; --text:36,35,33; --text2:119,115,109; --accent:150,94,54; --map:236,233,222; --road:255,255,255; --road2:214,208,195; --water:178,207,222; --green:214,226,196; }
+  .phone.dark  { --bg:30,29,27; --card:40,38,35; --stroke:78,74,68; --text:243,238,229; --text2:164,158,149; --accent:208,146,100; --map:38,52,55; --road:70,84,88; --road2:56,68,71; --water:24,38,52; --green:40,60,52; }
+  .phone { background:rgb(var(--map)); color:rgb(var(--text)); }
+  .phone.page { background:rgb(var(--bg)); }
+  svg.map { position:absolute; left:0; top:0; width:393px; height:852px; }
+  .status { position:absolute; top:0; left:0; right:0; height:54px; padding:18px 34px 0; font-weight:650; font-size:16px; display:flex; justify-content:space-between; z-index:5; }
+  .status i { font-style:normal; font-size:12px; letter-spacing:1px; padding-top:2px; }
+  .status.onmap { color:#fff; text-shadow:0 1px 3px rgba(0,0,0,.35); }
+  .round { position:absolute; width:44px; height:44px; border-radius:50%; background:rgba(var(--card),.92); border:.5px solid rgba(var(--stroke),.8); display:flex; align-items:center; justify-content:center; box-shadow:0 2px 8px rgba(0,0,0,.12); z-index:6; }
+  .round svg { width:20px; height:20px; stroke:rgb(var(--accent)); fill:none; stroke-width:1.9; stroke-linecap:round; stroke-linejoin:round; }
+  .controls { position:absolute; right:16px; top:76px; width:44px; border-radius:22px; background:rgba(var(--card),.92); border:.5px solid rgba(var(--stroke),.8); z-index:4; }
+  .controls div { height:44px; display:flex; align-items:center; justify-content:center; font-size:14px; font-weight:700; }
+  .controls svg { width:19px; height:19px; stroke:rgb(var(--text)); fill:none; stroke-width:1.7; stroke-linecap:round; stroke-linejoin:round; }
+
+  .pin { position:absolute; transform:translate(-50%,-50%); z-index:3; }
+  .disc { width:24px; height:24px; border-radius:50%; background:rgb(var(--card)); border:1.5px solid rgba(189,128,83,.55); display:flex; align-items:center; justify-content:center; box-shadow:0 1px 4px rgba(0,0,0,.18); }
+  .disc svg { width:13px; height:13px; }
+  .disc.sel { width:40px; height:40px; border-width:2.5px; border-color:var(--copper); box-shadow:0 0 0 6px rgba(189,128,83,.22), 0 3px 10px rgba(0,0,0,.25); }
+  .disc.sel svg { width:20px; height:20px; }
+  .cluster { width:30px; height:30px; border-radius:50%; background:rgb(var(--card)); border:2px solid var(--copper); color:rgb(var(--accent)); font-weight:700; font-size:13px; display:flex; align-items:center; justify-content:center; }
+  .cluster.sel { box-shadow:0 0 0 6px rgba(189,128,83,.22); }
+  .label { position:absolute; left:50%; top:100%; transform:translateX(-50%); margin-top:3px; white-space:nowrap; font-size:11px; font-weight:600; text-shadow:0 0 3px rgb(var(--map)),0 0 3px rgb(var(--map)),0 0 3px rgb(var(--map)); text-align:center; line-height:1.2; }
+  .label small { display:block; font-weight:500; color:rgb(var(--text2)); font-size:10px; }
+
+  /* The sheet: the system's floating glass sheet, inset at medium, full width at large. */
+  .sheet { position:absolute; z-index:5; background:rgba(var(--card),.97); box-shadow:0 -6px 30px rgba(0,0,0,.16); padding:8px 20px 40px; overflow:hidden; }
+  .sheet.medium { left:8px; right:8px; bottom:8px; border-radius:38px; }
+  .sheet.large { left:0; right:0; bottom:0; border-radius:30px 30px 0 0; }
+  .grab { width:36px; height:5px; border-radius:3px; background:rgba(var(--text2),.35); margin:0 auto 14px; }
+  .fade { position:absolute; left:0; right:0; bottom:0; height:60px; background:linear-gradient(rgba(var(--card),0),rgba(var(--card),1)); }
+  .icon { width:46px; height:46px; border-radius:13px; background:var(--copper); display:flex; align-items:center; justify-content:center; flex:none; }
+  .icon svg { width:25px; height:25px; }
+  .icon.gray { background:#8f8a82; }
+  .shead { display:flex; gap:12px; align-items:flex-start; }
+  .shead .t { flex:1; min-width:0; }
+  .shead .t b { display:block; font-size:23px; font-weight:700; letter-spacing:-.4px; line-height:1.15; }
+  .shead .t span { display:block; font-size:14.5px; color:rgb(var(--text2)); margin-top:3px; line-height:1.3; }
+  .shead .t em { font-style:normal; color:rgb(var(--accent)); font-weight:600; }
+  .x { width:32px; height:32px; border-radius:50%; background:rgba(var(--text2),.16); display:flex; align-items:center; justify-content:center; flex:none; }
+  .x svg { width:12px; height:12px; stroke:rgb(var(--text2)); stroke-width:2.6; fill:none; stroke-linecap:round; }
+
+  .stats { display:flex; margin:16px 0 0; border-top:.5px solid rgba(var(--stroke),.95); border-bottom:.5px solid rgba(var(--stroke),.95); }
+  .stats div { flex:1; padding:10px 0 11px; } .stats div + div { border-left:.5px solid rgba(var(--stroke),.95); padding-left:12px; }
+  .stats small { display:block; font-size:12px; color:rgb(var(--text2)); font-weight:600; }
+  .stats b { display:block; font-size:19px; font-weight:650; margin-top:2px; font-variant-numeric:tabular-nums; }
+  .stats b span { font-weight:500; color:rgb(var(--text2)); font-size:15px; }
+
+  .sech { display:flex; justify-content:space-between; align-items:baseline; margin:18px 0 2px; }
+  .sech b { font-size:17px; font-weight:700; }
+  .sech span { font-size:15px; font-weight:600; color:rgb(var(--accent)); display:flex; align-items:center; gap:3px; }
+  .visit { display:flex; gap:12px; align-items:center; padding:9px 0 0; }
+  .visit .glyph { width:38px; height:38px; border-radius:10px; background:rgba(189,128,83,.14); flex:none; display:flex; align-items:center; justify-content:center; margin-bottom:9px; }
+  .visit .glyph svg { width:26px; height:26px; stroke:var(--copper); fill:none; stroke-width:2.2; stroke-linecap:round; }
+  .visit .vt { flex:1; min-width:0; display:flex; align-items:center; gap:8px; padding-bottom:9px; border-bottom:.5px solid rgba(var(--stroke),.95); }
+  .visit:last-of-type .vt { border-bottom:none; }
+  .visit .vt > div { flex:1; min-width:0; }
+  .visit .vt b { display:block; font-size:15.5px; font-weight:600; font-variant-numeric:tabular-nums; }
+  .visit .vt span { display:block; font-size:13.5px; color:rgb(var(--text2)); font-variant-numeric:tabular-nums; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .chev { width:14px; height:14px; stroke:rgb(var(--text2)); fill:none; stroke-width:2.2; flex:none; opacity:.7; }
+  .sech .chev { stroke:rgb(var(--accent)); opacity:1; width:12px; height:12px; }
+
+  .actions { display:flex; gap:10px; margin-top:16px; }
+  .actions div { flex:1; height:46px; border-radius:14px; background:rgba(189,128,83,.14); display:flex; align-items:center; justify-content:center; gap:7px; font-size:14.5px; font-weight:600; color:rgb(var(--accent)); }
+  .actions svg { width:16px; height:16px; stroke:currentColor; fill:none; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+
+  .det { display:flex; gap:16px; padding:11px 0; border-bottom:.5px solid rgba(var(--stroke),.95); font-size:15px; }
+  .det:last-child { border-bottom:none; }
+  .det small { font-size:15px; color:rgb(var(--text2)); flex:none; }
+  .det div { flex:1; text-align:right; line-height:1.35; }
+  .det div.mono { font-variant-numeric:tabular-nums; }
+
+  /* Group list rows */
+  .grow { display:flex; gap:12px; align-items:center; padding:10px 0 0; }
+  .grow .icon { width:40px; height:40px; border-radius:50%; margin-bottom:10px; }
+  .grow .icon svg { width:20px; height:20px; }
+  .grow .gt { flex:1; min-width:0; padding-bottom:10px; border-bottom:.5px solid rgba(var(--stroke),.95); display:flex; align-items:center; gap:8px; }
+  .grow:last-child .gt { border-bottom:none; }
+  .grow .gt > div { flex:1; min-width:0; }
+  .grow b { display:block; font-size:16.5px; font-weight:600; }
+  .grow span { display:block; font-size:13.5px; color:rgb(var(--text2)); margin-top:1px; }
+  .grow span em { font-style:normal; color:rgb(var(--accent)); font-weight:600; }
+  .ghead { display:flex; align-items:center; justify-content:space-between; margin-bottom:4px; }
+  .ghead b { font-size:23px; font-weight:700; letter-spacing:-.4px; }
+
+  /* Today (for comparison) */
+  .old { position:absolute; left:8px; right:8px; bottom:8px; z-index:5; border-radius:38px; background:rgba(var(--card),.97); padding:8px 16px 24px; }
+  .oc { background:rgba(255,255,255,.75); border:.5px solid rgba(var(--stroke),.95); border-radius:18px; }
+  .ostats { display:flex; padding:12px 0; text-align:center; margin-top:14px; }
+  .ostats div { flex:1; } .ostats div+div { border-left:.5px solid rgba(var(--stroke),.95); }
+  .ostats i { display:block; font-style:normal; color:var(--copper); font-size:18px; }
+  .ostats b { display:block; font-size:19px; } .ostats small { font-size:11.5px; color:rgb(var(--text2)); }
+  .obtn { flex:1; height:44px; border-radius:22px; background:rgba(189,128,83,.2); color:rgb(var(--accent)); font-weight:600; font-size:14px; display:flex; align-items:center; justify-content:center; }
+
+  /* Visits page with a map header (reached from Journeys: no map behind it) */
+  .hero { position:absolute; left:0; right:0; top:0; height:300px; overflow:hidden; }
+  .hero svg.map { top:-260px; }
+  .hero .shade { position:absolute; left:0; right:0; bottom:0; height:150px; background:linear-gradient(rgba(0,0,0,0),rgba(0,0,0,.62)); }
+  .hero .ht { position:absolute; left:20px; right:20px; bottom:16px; color:#fff; }
+  .hero .ht b { display:block; font-size:26px; font-weight:700; letter-spacing:-.4px; line-height:1.15; }
+  .hero .ht span { display:block; font-size:14.5px; opacity:.9; margin-top:3px; }
+  .hero .ht em { font-style:normal; font-weight:650; color:#f0c49f; }
+  .pagebody { position:absolute; left:0; right:0; top:300px; bottom:0; padding:0 20px; }
+  .bubble { position:absolute; z-index:7; background:#e9c46a; color:#242321; font-size:12px; font-weight:600; padding:6px 9px; border-radius:8px; max-width:190px; line-height:1.3; box-shadow:0 3px 10px rgba(0,0,0,.3); }
+</style>
+</head>
+<body>
+<h1>Place card v2: one surface, nothing boxed inside</h1>
+<p class="lead"><b style="color:var(--ivory)">Polish of the card chosen 2026-11-19 (C)</b>, after the owner's first look on the iPhone: the card opened as short as its content, read hard, said too little, and boxed every part (figures, visits, address) in a card of its own. v2 opens at a medium height and can be dragged to the top; the figures, the visits and the details sit on the sheet's own ground, apart only by space and hairlines, as Apple Maps' place sheets do. On the Map the card has no map of its own (the real map is right above it); the visits page reached from Journeys, with no map behind it, gets a map header instead. Synthetic places and drives.</p>
+
+<h2>The card on the Map</h2>
+<div class="row" id="card"></div>
+<ul class="notes">
+  <li><b>One rule for the whole sheet:</b> what is read sits flat on the sheet; nothing is boxed. Sections are apart by space, rows by a hairline that starts at the text. The visit rows stay tappable without a box: each has its route's glyph on the left and a chevron on the right, as Apple's Recents.</li>
+  <li><b>Height:</b> the card opens at medium (about half the screen) and drags to the top; the group list opens at medium too, however few its rows (a short list read hard on the iPhone; owner, 2026-11-19), and grows to the top when its rows need it. Content past the fold scrolls. Only the Map's two sheets change; forms keep fitting their content (<code>FittedSheetContent</code>).</li>
+  <li><b>Header:</b> a larger title; the line under it says what the place is in Copper, then the area and province. An unnamed stop: the area is the title, "A place you stopped" the line.</li>
+  <li><b>Figures</b> in the order the app has today (Latest · Visits · First): a small label above, the value under it, hairlines above and below.</li>
+  <li><b>Latest visits:</b> date and time on one line ("Tue 11 Nov · 07:42"), "From … · km" on the next, cut to one line (the drive shows it whole). "All 4" moves beside the section's title; the row of its own goes. The route glyph is the Journeys glyph (<code>RouteGlyph</code>) of that drive; it needs the drive's simplified route, read with the visits.</li>
+  <li><b>Details</b> in place of the last card: Address, Coordinates, Radius as label and value rows.</li>
+  <li><b>Dragged to the top</b> the sheet stops under the status bar's height plus a strip of the map, so the selected marker stays in view; the card lists every visit there.</li>
+</ul>
+
+<h2>The group list, Dark, Vietnamese, the visits page</h2>
+<div class="row" id="more"></div>
+<ul class="notes">
+  <li><b>The group list</b> has the card's header: a large title on the left, a round close button on the right (not a "Close" text button in a bar). Each row says what the place is, its area, and its visits ("4 visits · last 11 Nov"); a place no drive ended at says so in its line.</li>
+  <li><b>The visits page from Journeys</b> (<code>PlaceVisitsView</code>) has no map behind it, so it opens with a map header: a still image of the place (a map snapshot through <code>Core/MapLookup</code>, cached), its name and kind over the image's foot. The rest is the card's content, so the place reads the same wherever it is opened. A live map is not used there: a map nobody pans is a still image.</li>
+  <li><b>Not in this pass:</b> Save place and Edit place (decided after the polish), the drive's duration in a visit row (needs the drive's moving time read with the visits; add if cheap), duplicates of one detected place (detection).</li>
+</ul>
+
+<script>
+const ICONS = {
+  cup: '<path d="M4 8h12v5a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5zM16 9h1.5a2.5 2.5 0 0 1 0 5H16M6 3c0 1.5 1 1.5 1 3M10 3c0 1.5 1 1.5 1 3"/>',
+  fuel: '<path d="M4 21V5a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v16M3 21h12M5 9h8M14 9l3 2v7a1.5 1.5 0 0 0 3 0v-9l-3-3"/>',
+  rest: '<circle cx="12" cy="5" r="2"/><path d="M12 8v6M9 21l3-7 3 7M8 11h8"/>',
+  pin: '<path d="M12 3v11"/><circle cx="12" cy="5.5" r="2.5"/><path d="M12 14l-.5 7"/>',
+  fork: '<path d="M7 3v8M5 3v5a2 2 0 0 0 4 0V3M7 11v10M16 3c-2 0-3 3-3 6s1 3 3 3v9"/>',
+};
+const ic = (n, c='#fff', w=2.1) => `<svg viewBox="0 0 24 24" style="fill:none;stroke:${c};stroke-width:${w};stroke-linecap:round;stroke-linejoin:round">${ICONS[n]}</svg>`;
+const chev = '<svg class="chev" viewBox="0 0 16 16"><path d="M6 3l5 5-5 5"/></svg>';
+const close = '<div class="x"><svg viewBox="0 0 12 12"><path d="M2 2l8 8M10 2l-8 8"/></svg></div>';
+const edit = '<svg viewBox="0 0 16 16"><path d="M3 13l1-3 7-7 2 2-7 7z"/></svg>';
+const search = '<svg viewBox="0 0 16 16"><circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5L14 14"/></svg>';
+const G = ['M4 22 C 9 12, 15 18, 22 4','M3 17 C 9 20, 12 6, 23 8','M5 4 C 7 14, 18 10, 21 22','M4 12 C 10 4, 14 22, 22 13'];
+const glyph = i => `<div class="glyph"><svg viewBox="0 0 26 26"><path d="${G[i%4]}"/></svg></div>`;
+
+function map(dy=0) {
+  return `<svg class="map" viewBox="0 ${dy} 393 852" preserveAspectRatio="none">
+    <path d="M-20 300 C 80 260, 150 330, 240 300 S 380 250, 420 280 L 420 340 C 330 320, 260 380, 170 360 S 40 330, -20 360z" fill="rgb(var(--water))" opacity=".9"/>
+    <path d="M250 40 h150 v120 h-150z M20 560 h120 v90 h-120z" fill="rgb(var(--green))"/>
+    <g stroke="rgb(var(--road2))" stroke-width="2" fill="none"><path d="M0 140 L393 190 M0 470 L393 430 M60 0 L120 852 M300 0 L260 852 M0 640 L393 700 M180 0 L210 852"/></g>
+    <g stroke="rgb(var(--road))" stroke-width="7" fill="none" stroke-linecap="round">
+      <path d="M-10 520 C 100 500, 160 420, 230 410 S 360 380, 410 360"/><path d="M150 -10 C 160 120, 140 260, 170 420 S 200 700, 190 870"/></g>
+    <path d="M-10 520 C 100 500, 160 420, 230 410 S 360 380, 410 360" stroke="#BD8053" stroke-width="3" fill="none" opacity=".9"/>
+    <path d="M150 -10 C 160 120, 140 260, 170 420 S 200 700, 190 870" stroke="#BD8053" stroke-width="3" fill="none" opacity=".9"/>
+  </svg>`;
+}
+const chrome = (o={}) => `<div class="status"><span>09:41</span><i>●●● ᯤ ▮</i></div>
+  ${o.noControls?'':`<div class="round" style="left:16px;top:66px"><svg viewBox="0 0 24 24"><path d="M12 3l9 5-9 5-9-5zM3 13l9 5 9-5M3 17.5l9 5 9-5"/></svg></div>
+  <div class="controls" style="top:66px"><div><svg viewBox="0 0 24 24"><path d="M3 6l6-3 6 3 6-3v15l-6 3-6-3-6 3z M9 3v15 M15 6v15"/></svg></div><div>3D</div><div><svg viewBox="0 0 24 24"><path d="M21 3L3 10.5l7.5 3L14 21z"/></svg></div></div>`}`;
+const marker = (x,y,icon,o={}) => `<div class="pin" style="left:${x}px;top:${y}px"><div class="disc ${o.sel?'sel':''}">${ic(icon,'#BD8053',2.3)}</div>${o.label?`<div class="label">${o.label}</div>`:''}</div>`;
+const cluster = (x,y,n,label,sel) => `<div class="pin" style="left:${x}px;top:${y}px"><div class="cluster ${sel?'sel':''}">${n}</div>${label?`<div class="label">${label}</div>`:''}</div>`;
+
+const EN = { latest:'Latest', visits:'Visits', first:'First', lv:'Latest visits', all:n=>`All ${n}`, rename:'Rename', nearby:'Find Nearby Places', details:'Details', addr:'Address', coord:'Coordinates', radius:'Radius' };
+const VI = { latest:'Gần nhất', visits:'Lần ghé', first:'Lần đầu', lv:'Những lần ghé gần đây', all:n=>`Cả ${n}`, rename:'Đổi tên', nearby:'Tìm địa điểm gần đây', details:'Chi tiết', addr:'Địa chỉ', coord:'Toạ độ', radius:'Bán kính' };
+
+const cafe = { icon:'cup', name:'Quán nước mía Tư Hùng', kind:'Café', area:'X. Xuân Hòa, Đồng Nai',
+  stats:[['11','Nov'],['4',''],['19','Oct']],
+  visits:[['Tue 11 Nov · 07:42','From Home · 42 km'],['Sat 1 Nov · 16:10','From Trạm dừng Phan Thiết Dầu Giây · 168 km'],['Sun 19 Oct · 08:05','From Home · 41 km'],['Sun 5 Oct · 09:30','From Home · 42 km']],
+  shown:3, addr:'Quốc lộ 1, X. Xuân Hòa<br>Đồng Nai, Vietnam', coord:'10.94211° N, 107.38120° E', radius:'60 m' };
+
+function content(o, t, opts={}) {
+  const vs = o.visits.slice(0, opts.all ? o.visits.length : o.shown);
+  return `<div class="stats">
+      <div><small>${t.latest}</small><b>${o.stats[0][0]} <span>${o.stats[0][1]}</span></b></div>
+      <div><small>${t.visits}</small><b>${o.stats[1][0]}</b></div>
+      <div><small>${t.first}</small><b>${o.stats[2][0]} <span>${o.stats[2][1]}</span></b></div></div>
+    <div class="sech"><b>${t.lv}</b>${!opts.all && o.visits.length > o.shown ? `<span>${t.all(o.visits.length)}${chev}</span>` : ''}</div>
+    ${vs.map((v,i)=>`<div class="visit">${glyph(i)}<div class="vt"><div><b>${v[0]}</b><span>${v[1]}</span></div>${chev}</div></div>`).join('')}
+    ${opts.noActions?'':`<div class="actions"><div>${search}${t.nearby}</div><div>${edit}${t.rename}</div></div>`}
+    <div class="sech" style="margin-top:22px"><b>${t.details}</b></div>
+    <div class="det"><small>${t.addr}</small><div>${o.addr}</div></div>
+    <div class="det"><small>${t.coord}</small><div class="mono" style="color:rgb(var(--accent))">${o.coord}</div></div>
+    <div class="det"><small>${t.radius}</small><div>${o.radius}</div></div>`;
+}
+function card(o, t, size, opts={}) {
+  const top = size === 'large' ? 150 : 400;
+  return `<div class="sheet ${size}" style="top:${top}px">
+    <div class="grab"></div>
+    <div class="shead"><div class="icon ${o.gray?'gray':''}">${ic(o.icon)}</div>
+      <div class="t"><b>${o.name}</b><span>${o.kind?`<em>${o.kind}</em> · `:''}${o.area}</span></div>${close}</div>
+    ${content(o, t, opts)}
+    <div class="fade"></div></div>`;
+}
+const phone = (cls, inner) => `<div class="phone ${cls}">${inner}</div>`;
+const fig = (html, cap) => `<figure>${html}<figcaption>${cap}</figcaption></figure>`;
+const mapPhone = (cls, inner, sel={x:200,y:230}) => phone(cls, map() + chrome() + marker(90,120,'fuel') + cluster(320,330,2) + marker(sel.x, sel.y, 'cup', {sel:true, label:'Quán nước mía Tư Hùng'}) + inner);
+
+// Today, as built (for comparison)
+const today = phone('light', map() + chrome() + marker(200,230,'pin',{sel:true}) + `<div class="old" style="top:404px">
+  <div class="grab" style="width:36px;height:5px;border-radius:3px;background:rgba(119,115,109,.35);margin:0 auto 12px"></div>
+  <div class="shead"><div class="icon" style="background:#8a5a37">${ic('pin')}</div><div class="t"><b style="font-size:21px">X. Hàm Thuận Bắc</b><span>A place you stopped</span></div>${close}</div>
+  <div class="oc ostats"><div><i>↺</i><b>30 <small>Oct</small></b><small>Latest</small></div><div><i>⚲</i><b>1</b><small>Visits</small></div><div><i>⚑</i><b>30 <small>Oct</small></b><small>First</small></div></div>
+  <div style="font-size:14px;font-weight:600;color:rgb(var(--text2));margin:14px 4px 6px">Latest visits</div>
+  <div class="oc" style="padding:12px 14px;display:flex;gap:8px"><div style="flex:1"><b style="font-size:16px">Fri, 30 Oct</b><div style="font-size:14px;color:rgb(var(--text2))">From Trạm Dừng Nghỉ Phan Thiết Dầu Dây Km47+500 · 77,2 km</div></div><span style="color:rgb(var(--text2))">11:30 ›</span></div>
+  <div style="display:flex;gap:10px;margin-top:12px"><div class="obtn">Find Nearby Places</div><div class="obtn">Rename</div></div>
+  <div class="oc" style="padding:12px 14px;margin-top:12px;font-size:14px">X. Hàm Thuận Bắc, Lâm Đồng<div style="font-size:12px;color:rgb(var(--text2))">11,11591° N, 108,15627° E<br>25 m radius</div></div>
+</div>`);
+
+const medium = mapPhone('light', card(cafe, EN, 'medium'));
+const large = phone('light', map(140) + chrome({noControls:true}) + marker(200,95,'cup',{sel:true}) + card(cafe, EN, 'large', {all:true}) +
+  `<div class="bubble" style="left:236px;top:76px">A strip of the map stays: the marker in view</div>`);
+
+document.getElementById('card').innerHTML =
+  fig(today, '<span class="tag alt">TODAY</span><b>As built, for comparison.</b> As tall as its content; figures, the visit and the address each boxed in a card; the time apart from its date; the origin wraps.') +
+  fig(medium, '<span class="tag rec">V2 · MEDIUM</span><b>Opens at medium.</b> Header, figures flat between hairlines, the three latest visits as rows with their glyph, "All 4" beside the section title; the actions and Details below the fold, a scroll away.') +
+  fig(large, '<span class="tag rec">V2 · DRAGGED UP</span><b>Every visit, then the actions and Details.</b> The sheet stops below a strip of the map, the selected marker still in view.');
+
+// Group list
+const group = phone('light', map() + chrome() + cluster(200,230,3,'Quán nước mía Tư Hùng<small>+2 more</small>',true) + `<div class="sheet medium" style="top:400px">
+  <div class="grab"></div>
+  <div class="ghead"><b>3 places</b>${close}</div>
+  <div class="grow"><div class="icon">${ic('cup')}</div><div class="gt"><div><b>Quán nước mía Tư Hùng</b><span><em>Café</em> · X. Xuân Hòa</span><span>4 visits · last 11 Nov</span></div>${chev}</div></div>
+  <div class="grow"><div class="icon">${ic('rest')}</div><div class="gt"><div><b>Trạm dừng Phan Thiết Dầu Giây</b><span><em>Rest area</em> · X. Xuân Hòa</span><span>2 visits · last 3 Nov</span></div>${chev}</div></div>
+  <div class="grow"><div class="icon gray">${ic('pin')}</div><div class="gt"><div><b>X. Xuân Hòa</b><span>A place you stopped</span><span>No drive ended here yet</span></div>${chev}</div></div>
+</div>`);
+
+const dark = mapPhone('dark', card(cafe, EN, 'medium'));
+const viCafe = { ...cafe, kind:'Quán cà phê', stats:[['11','thg 11'],['4',''],['19','thg 10']],
+  visits:[['Th 3, 11 thg 11 · 07:42','Từ Nhà · 42 km'],['Th 7, 1 thg 11 · 16:10','Từ Trạm dừng Phan Thiết Dầu Giây · 168 km'],['CN, 19 thg 10 · 08:05','Từ Nhà · 41 km'],['CN, 5 thg 10 · 09:30','Từ Nhà · 42 km']],
+  addr:'Quốc lộ 1, X. Xuân Hòa<br>Đồng Nai, Việt Nam', coord:'10,94211° N, 107,38120° E' };
+const vi = mapPhone('light', card(viCafe, VI, 'medium'));
+
+const page = phone('light page', `<div class="hero">${map()}${marker(200,170+0,'cup',{sel:true})}<div class="shade"></div>
+    <div class="ht"><b>Quán nước mía Tư Hùng</b><span><em>Café</em> · X. Xuân Hòa, Đồng Nai</span></div></div>
+  <div class="status onmap"><span>09:41</span><i>●●● ᯤ ▮</i></div>
+  <div class="round" style="left:16px;top:58px"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></div>
+  <div class="pagebody">${content(cafe, EN, {all:true})}</div>`);
+
+document.getElementById('more').innerHTML =
+  fig(group, '<b>The group list, at medium.</b> As tall as the card, however few its rows. The card\'s header (title, round close); each row says what, where and its visits. Picking one opens its card.') +
+  fig(dark, '<b>Dark.</b> The same sheet on the dark map; hairlines and the glyph tint carry the structure.') +
+  fig(vi, '<b>Vietnamese.</b> Copy is a draft for the strings pass; a long origin is cut to one line.') +
+  fig(page, '<span class="tag rec">VISITS PAGE</span><b>From Journeys: a map header.</b> A still map of the place (snapshot, cached), its name over the image; below, the card\'s content.');
+</script>
+</body>
+</html>

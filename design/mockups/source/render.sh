@@ -21,6 +21,7 @@ shot share-card.html 2260 3840 share/share-card.png
 shot journey-experience.html 2280 6900 journeys/journey-experience-v2.png
 shot route-ends.html 1800 1800 journeys/route-ends.png
 shot place-card.html 2310 2600 journeys/place-card.png
+shot place-card-v2.html 2310 2640 journeys/place-card-v2.png
 shot passport-feed-headers.html 1880 5960 passport/passport-feed-headers.png
 shot live-activity.html 1800 2150 drive/live-activity.png
 shot live-activity-identity.html 1800 1330 drive/live-activity-identity.png
