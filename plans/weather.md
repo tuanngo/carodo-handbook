@@ -196,3 +196,120 @@ decision later), syncing weather, storing any Apple figure for good.
 
 Schema (`trip_weather`, `weather` kind), a cache and the Feed tag's meaning are contracts (P6):
 nothing is built before these are approved.
+
+## 7. Slice 2 plan: the weather line on Journey detail
+
+Status: **approved (owner, 2026-11-19): S1, S2, S4, S5, S6 as recommended; S3 approved with the
+owner's wording below.** Starts after PV-39 (the device check of slice 1).
+
+### Today (files read)
+
+| What | Where | How it behaves |
+|---|---|---|
+| The story's order | `Features/Journeys/Views/Detail/JourneyDetailView.swift` `story` | Identity, `JourneySummarySection` (tags, distance, time, speed), the trimmed line, the route timeline (the preview ends there), Journey Context, the Feed switch, Along the way, Driving Pace, elevation, milestones, drive logs, memories |
+| Loading | `JourneyDetailViewModel.load()` | Reads the journey, the track, places; secondary reads (provinces, commute, merge candidates) fall back to hiding their section; the provinces are cached with the analysis (`JourneyDetailCache`) |
+| Weather service | `Core/Recording/TripWeather.swift` | `facts(forJourney:)`: the stored facts, else looked up now and stored. Nothing reads one drive's figures from the cache yet |
+| Attribution | `Features/Feed/Views/WeatherAttribution.swift` | Apple's mark (from `WeatherService.attribution`, light or dark) and "Other data sources"; Feed strings (`Feed.weatherMark`, `Feed.weatherSources`) |
+| Units | `AppState.distanceUnit` (km or mi) | No temperature setting; `Measurement<UnitTemperature>` follows the region (°C in Vietnam, °F in the US) |
+| Spec | `docs/specs/journey-detail.md#the-story-top-to-bottom` | No weather today; "Summary" says weather is never in the written summary (ADR 0012 keeps that) |
+
+### Proposal
+
+- **One quiet line under the figures** (after `JourneySummarySection`, before the trimmed line),
+  an SF Symbol of the sky and one sentence, then the temperature when the cache has it:
+  `🌧 Rain at the start, dry by the end · 31° → 28°`. No card: a fact of the drive, like the trimmed line.
+  Hidden when the drive has no facts (not looked up, offline, a Personal Team build).
+- **The sentence, from the stored facts only** (`JourneyWeatherLine`, pure, tested; S3 as the owner
+  wrote it, 2026-11-19). A memory of the drive, never a forecast: no "soon", "expected", "seems".
+
+  | Facts | English | Vietnamese |
+  |---|---|---|
+  | rain `all` | Rain all the way | Mưa suốt đường |
+  | rain `part`, start rainy, end not | Rain at the start, dry by the end | Mưa lúc đi, tạnh lúc tới |
+  | rain `part`, start not, end rainy | No rain at the start, rain by the end | Không mưa lúc đi, mưa lúc tới |
+  | rain `part`, both ends dry | Rain on the way | Gặp mưa trên đường |
+  | rain `none`, clear | Clear | Trời quang |
+  | rain `none`, cloudy | Cloudy | Nhiều mây |
+  | rain `none`, cloudy then clear | Clouds cleared | Mây tan, trời quang |
+  | rain `none`, clear then cloudy | Clear, then cloudy | Trời quang, rồi nhiều mây |
+  | rain `none`, fog at an end | Fog | Sương mù |
+  | rain `none`, snow at an end | Snow | Tuyết |
+
+  **Heavy rain in the sentence, only where the facts place it.** `start_sky` and `end_sky` say
+  whether an end was `heavy_rain` or `storm`; `heavy_rain` with neither end heavy means a point in
+  between (the points are the start, the hours, the end):
+  - heavy at the start, end dry → "Heavy rain at the start, dry by the end" / "Mưa to lúc đi, tạnh lúc tới";
+  - heavy at the end, start dry → "No rain at the start, heavy rain by the end" / "Không mưa lúc đi, mưa to lúc tới";
+  - heavy between, both ends dry → "Heavy rain on the way" / "Mưa to giữa đường";
+  - rain `all` with a heavy point → "Rain all the way · heavy at times" / "Mưa suốt đường · có lúc mưa to";
+  - any other heavy case (rain at both ends, heavy at one) → the rain sentence and "· heavy rain" /
+    "· mưa to".
+
+  **One extra at most**, the first that applies and is not already said: heavy rain → low visibility
+  ("· poor visibility" / "· tầm nhìn kém") → strong wind ("· strong wind" / "· gió mạnh"). "Sương
+  mù · tầm nhìn kém" is allowed (fog and visibility are two facts).
+
+  **Not said yet:** "Sunny at the start, rain by the end" / "Nắng lúc đi, mưa lúc tới" needs a clear
+  sky **in daylight** at the start; `trip_weather` keeps no daylight, so the fallback "Không mưa lúc
+  đi, mưa lúc tới" is used. "No rain" is never written as "sunny". Adding a daylight fact is a later
+  rules version (a schema change, the owner's call), not part of slice 2.
+
+  The line wraps at xxxLarge, never cut. The sentence is never stored: facts only, worded on screen.
+- **Temperature from the cache only:** the start's and the end's readings (`WeatherHourCache`), one
+  value when they round to the same degree, formatted by `Measurement` for the region (S2). An
+  expired entry is asked again on open, at screen priority (the gate keeps 3 a minute for screens),
+  at most two requests; offline or refused, the temperature hides and the sentence stays.
+- **A drive the pass has not reached** is looked up on open (`TripWeather.facts`), as the Feed
+  does; the line appears when the answer comes (`.task`, its result checked against the journey
+  still shown).
+- **Attribution:** Apple Weather's mark and "Other data sources" at the end of the story while the
+  line shows (S4). `WeatherAttribution` moves to `DesignSystem/` (it is used by two features), its
+  strings to `Common`.
+- **Model:** `JourneyDetailViewModel` gets `weather: JourneyWeatherLine?`, loaded after the track
+  (the points come from the track it already read); `DependencyContainer` hands it `tripWeather`.
+  `TripWeather` gains `endReadings(of fixes:)`: the start's and end's readings from the cache,
+  asked when missing. Not cached with the analysis: facts change when the pass answers.
+- **The Simulator** cannot sign WeatherKit: a DEBUG launch flag `-carodo.debugWeather rain|clear`
+  makes the composition root build a fixed `SampleWeatherLookup` (`Core/PreviewData`), so the line
+  can be reached by taps for screenshots (S5). No hook in a view or a model.
+
+### Acceptance criteria
+
+- A drive with facts shows the line under its figures in the preview state of the sheet; one
+  without shows nothing and leaves no gap.
+- The temperature shows only from a fresh cache entry or an answer now; offline with an expired
+  entry the sentence shows alone; never "0°".
+- Opening a drive with fresh cache entries sends no request; an expired one at most two.
+- The attribution shows at the end of the story whenever the line shows, light and dark.
+- VoiceOver reads the line as one sentence ("Weather: rain all the way, 31 to 28 degrees").
+- xxxLarge: the line wraps, never cut; Vietnamese checked at xxxLarge.
+- Tests: every row of the sentence table, the extras, one temperature vs two, the hidden cases;
+  `endReadings` asking only what is missing.
+
+### Non-goals
+
+The weather on the route timeline's start and end, the Map, share cards, the narrative, a Journeys
+filter "Rain", badges; a temperature unit setting.
+
+### Files and docs
+
+`Features/Journeys/ViewModels/Detail/` (`JourneyWeatherLine`, the view model),
+`Features/Journeys/Views/Detail/` (the line), `DesignSystem/` (attribution moved),
+`Core/Recording/TripWeather.swift`, `Core/PreviewData/` and `App/DependencyContainer*` (S5),
+`Resources/Localization/Journeys.xcstrings` and `Common.xcstrings`;
+`docs/specs/journey-detail.md` (the story's order, the line), `docs/specs/feed.md` (attribution's
+home), `docs/operations/setup.md` (the launch flag), `docs/privacy.md` (a screen may ask).
+
+### Owner decisions
+
+- **S1 Where the line goes:** (a) under the figures, in the preview; (b) its own small card after
+  Along the way. *Recommended (a)*: it is a fact of the drive, read at a glance like the distance.
+- **S2 Temperature unit:** (a) the region's (°C in Vietnam, °F in the US); (b) follow km/mi.
+  *Recommended (a)*: what the phone shows in its own Weather app.
+- **S3 The sentences:** approved with the owner's wording (2026-11-19), as in the table above.
+- **S4 Attribution at the end of the story** (as the Feed) rather than beside the line.
+  *Recommended*: one quiet mark, not a logo in the summary.
+- **S5 The DEBUG launch flag** for the Simulator. *Recommended*: the only way to show the line
+  without WeatherKit on the Simulator, and it follows the QA rule (the composition root chooses).
+- **S6 Ask on open** for a drive with no facts or an expired temperature. *Recommended*: at most a
+  few requests at screen priority; without it an old drive shows nothing until a pass reaches it.
