@@ -1,10 +1,7 @@
 # Weather on a drive
 
-Status: Draft (2026-11-03), for the owner's review. Blocked on the paid Apple Developer account:
-WeatherKit is a capability of the paid program, and the app builds with a Personal Team today
-(`carodo-ios/Configs/Local.xcconfig`). Builds on carodo-ios `docs/specs/journeys.md` (Detail),
-`docs/specs/share.md`, `docs/privacy.md`; invariants P1, P5, P6. Replaces the "Weather chip and
-weather tile" row of `drive-recording.md`, Deferred.
+Status: Draft (2026-11-03). **Storage and sync superseded by [`../plans/weather.md`](../plans/weather.md)** (2026-11-19): WeatherKit's terms forbid keeping Apple's figures beyond a limited cache, so only
+Carodo's derived facts are stored and nothing is synced. The purpose and display below still hold.
 
 ## Purpose
 
