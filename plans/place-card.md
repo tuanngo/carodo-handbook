@@ -1,6 +1,6 @@
 # Place card: names on the Map, the card, its visits
 
-Status: Approved (2026-11-19). Steps 1 and 2 done on `feat/map-look` (carodo-ios `d213e19` names, `177a558` card; simulator only); step 3, Rename, next. The card's figures come from the visits page already read (no `firstAt` was needed); Save place and Edit place move to step 3 (the place editor is the Places feature's, opened through `AppRoute`). Mockup:
+Status: Approved (2026-11-19). Steps 1–3 done on `feat/map-look` (carodo-ios `d213e19` names, `70ee211` card, `0a21202` naming from the card; simulator only). The card's figures come from the visits page already read (no `firstAt` was needed). After the owner's first look (2026-11-19): the card fits its content on the sheet's own glass ground, says "A place you stopped" and where the place is when Apple named nothing, and one sheet serves the group list and the card. Step 3 gives the card Find Nearby Places and Rename. Open: Save place (a detected place made a saved one) and Edit place, which touch how two places on one spot are kept; the owner decides.
 [`design/mockups/journeys/place-card.png`](../design/mockups/journeys/place-card.png) (source
 `design/mockups/source/place-card.html`). Follows `map-layers-legibility.md` step 4 (the Places
 switch, carodo-ios `55edceb` on `feat/map-look`); built on that branch or on main once merged.
