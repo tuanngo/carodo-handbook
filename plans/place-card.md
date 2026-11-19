@@ -194,7 +194,7 @@ syncs it as any place edit (check the conflict rule for a row whose `source` cha
 visits (each end goes to the smallest circle holding it). Worth a look at merging detected places
 that overlap, in the detection code, not the Map.
 
-## Step 5 plan: Save place and Edit place (2026-11-19, accepted; carodo-ios `9cb3ca2` on `feat/save-place`)
+## Step 5 plan: Save place and Edit place (2026-11-19, accepted; carodo-ios `7230737` on `feat/save-place`)
 
 **Changed at approval (owner):** the editor works on the Map itself, not in a sheet over the card:
 the card becomes the Places editor's panel (`PlaceEditorPanel`, shared with Settings), and the Map's
@@ -250,5 +250,7 @@ One commit: `feat(places): save a detected place from its card, edit a saved one
 **Also at review (owner):** Other is Copper with its point of interest's symbol, as its detected
 marker was: a solid Copper disc for a place kept, the neutral disc for one found. Saved places read
 Apple's name and category from the cache where shown (`PlaceRepository.named`), never asking for
-them. Debt left: TD-77 (journal and timeline symbols), TD-78 (3D lost, keyboard over the pin);
+them. Audit before merge: right failure lines (open, delete), a drive going live ends the edit, the tilt
+and heading put back, the card's actions as small bordered capsules like the fuel log's Add. Debt
+left: TD-77 (journal and timeline symbols), TD-78 (keyboard over the pin);
 device check PV-41.
