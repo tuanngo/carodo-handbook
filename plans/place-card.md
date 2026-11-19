@@ -1,6 +1,6 @@
 # Place card: names on the Map, the card, its visits
 
-Status: Approved (2026-11-19). Mockup:
+Status: Approved (2026-11-19). Steps 1 and 2 done on `feat/map-look` (carodo-ios `d213e19` names, `177a558` card; simulator only); step 3, Rename, next. The card's figures come from the visits page already read (no `firstAt` was needed); Save place and Edit place move to step 3 (the place editor is the Places feature's, opened through `AppRoute`). Mockup:
 [`design/mockups/journeys/place-card.png`](../design/mockups/journeys/place-card.png) (source
 `design/mockups/source/place-card.html`). Follows `map-layers-legibility.md` step 4 (the Places
 switch, carodo-ios `55edceb` on `feat/map-look`); built on that branch or on main once merged.
