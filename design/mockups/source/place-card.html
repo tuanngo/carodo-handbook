@@ -1,0 +1,246 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Place card — a place on the Map and its visits</title>
+<style>
+  :root { --charcoal:#242321; --copper:#BD8053; --ivory:#F3EEE5; --stone:#77736D; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:#1a1917; color:var(--ivory); font-family:-apple-system,"SF Pro Text",system-ui,sans-serif; padding:44px 40px 60px; width:2310px; }
+  h1 { font-size:30px; margin:0 0 6px; font-weight:700; }
+  h2 { font-size:22px; margin:52px 0 6px; font-weight:650; }
+  p.lead { margin:0 0 18px; color:#b9b3a8; font-size:15px; max-width:1640px; line-height:1.45; }
+  .row { display:flex; gap:34px; align-items:flex-start; }
+  figure { margin:0; flex:none; }
+  figcaption { font-size:13.5px; color:#b9b3a8; margin-top:10px; line-height:1.45; width:393px; }
+  figcaption b { color:var(--ivory); font-weight:650; }
+  .tag { display:inline-block; font-size:11px; font-weight:700; letter-spacing:.5px; padding:2px 7px; border-radius:6px; margin-right:6px; }
+  .tag.rec { background:var(--copper); color:var(--charcoal); }
+  .tag.alt { background:#3a3835; color:#cfc9be; }
+  .notes { font-size:14.5px; color:#cfc9be; line-height:1.55; max-width:1640px; margin:22px 0 0; padding-left:20px; }
+  .notes b { color:var(--ivory); }
+
+  .phone { position:relative; width:393px; height:852px; overflow:hidden; border-radius:44px; border:1px solid #3a3835; }
+  .phone.light { --bg:243,238,229; --elev:250,247,241; --card:255,252,247; --stroke:222,214,201; --text:36,35,33; --text2:119,115,109; --accent:150,94,54; --map:236,233,222; --road:255,255,255; --road2:214,208,195; --water:178,207,222; --green:214,226,196; }
+  .phone.dark  { --bg:36,35,33; --elev:46,44,41; --card:44,42,39; --stroke:78,74,68; --text:243,238,229; --text2:164,158,149; --accent:208,146,100; --map:38,52,55; --road:70,84,88; --road2:56,68,71; --water:24,38,52; --green:40,60,52; }
+  .phone { background:rgb(var(--map)); color:rgb(var(--text)); }
+  .phone svg.map { position:absolute; inset:0; }
+  .status { position:absolute; top:0; left:0; right:0; height:54px; padding:18px 34px 0; font-weight:650; font-size:16px; display:flex; justify-content:space-between; z-index:5; }
+  .status i { font-style:normal; font-size:12px; letter-spacing:1px; padding-top:2px; }
+  .round { position:absolute; width:44px; height:44px; border-radius:50%; background:rgba(var(--elev),.92); border:.5px solid rgba(var(--stroke),.8); display:flex; align-items:center; justify-content:center; box-shadow:0 2px 8px rgba(0,0,0,.12); z-index:4; }
+  .round svg { width:20px; height:20px; stroke:rgb(var(--accent)); fill:none; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }
+  .controls { position:absolute; right:16px; top:76px; width:44px; border-radius:22px; background:rgba(var(--elev),.92); border:.5px solid rgba(var(--stroke),.8); z-index:4; }
+  .controls div { height:44px; display:flex; align-items:center; justify-content:center; font-size:14px; font-weight:700; color:rgb(var(--text)); }
+  .controls svg { width:19px; height:19px; stroke:rgb(var(--text)); fill:none; stroke-width:1.7; stroke-linecap:round; stroke-linejoin:round; }
+
+  .bar { position:absolute; left:16px; right:16px; bottom:28px; display:flex; gap:12px; align-items:center; z-index:6; }
+  .tabs { flex:1; height:58px; border-radius:29px; background:rgba(var(--elev),.94); border:.5px solid rgba(var(--stroke),.8); box-shadow:0 6px 18px rgba(0,0,0,.10); display:flex; justify-content:space-around; align-items:center; font-size:10.5px; font-weight:600; color:rgb(var(--text2)); }
+  .tabs div { text-align:center; } .tabs div.on { color:rgb(var(--accent)); }
+  .tabs svg { display:block; margin:0 auto 2px; width:22px; height:22px; stroke:currentColor; fill:none; stroke-width:1.7; stroke-linejoin:round; stroke-linecap:round; }
+  .start { width:58px; height:58px; border-radius:50%; background:var(--copper); display:flex; align-items:center; justify-content:center; box-shadow:0 6px 18px rgba(0,0,0,.18); }
+  .start svg { width:24px; height:24px; fill:var(--charcoal); }
+
+  /* Markers */
+  .pin { position:absolute; transform:translate(-50%,-50%); z-index:3; }
+  .disc { width:24px; height:24px; border-radius:50%; background:rgb(var(--card)); border:1.5px solid rgba(189,128,83,.55); display:flex; align-items:center; justify-content:center; box-shadow:0 1px 4px rgba(0,0,0,.18); }
+  .disc svg { width:13px; height:13px; fill:var(--copper); }
+  .disc.saved { background:var(--copper); border:2px solid #fff; width:28px; height:28px; }
+  .disc.saved svg { fill:#fff; }
+  .disc.sel { width:38px; height:38px; border-width:2.5px; border-color:var(--copper); box-shadow:0 0 0 6px rgba(189,128,83,.22), 0 3px 10px rgba(0,0,0,.25); }
+  .disc.sel svg { width:19px; height:19px; }
+  .cluster { width:30px; height:30px; border-radius:50%; background:rgb(var(--card)); border:2px solid var(--copper); color:rgb(var(--accent)); font-weight:700; font-size:13px; display:flex; align-items:center; justify-content:center; }
+  .label { position:absolute; left:50%; top:100%; transform:translateX(-50%); margin-top:3px; white-space:nowrap; font-size:11px; font-weight:600; color:rgb(var(--text)); text-shadow:0 0 3px rgb(var(--map)),0 0 3px rgb(var(--map)),0 0 3px rgb(var(--map)); text-align:center; line-height:1.2; }
+  .label small { display:block; font-weight:500; color:rgb(var(--text2)); font-size:10px; }
+
+  /* Callout (A) */
+  .callout { position:absolute; z-index:5; background:rgb(var(--card)); border-radius:16px; box-shadow:0 8px 26px rgba(0,0,0,.20); padding:12px 12px 12px 12px; display:flex; gap:10px; align-items:center; }
+  .callout:after { content:""; position:absolute; left:50%; bottom:-7px; width:14px; height:14px; background:rgb(var(--card)); transform:translateX(-50%) rotate(45deg); border-radius:2px; }
+  .icon { width:34px; height:34px; border-radius:9px; background:var(--copper); display:flex; align-items:center; justify-content:center; flex:none; }
+  .icon svg { width:19px; height:19px; fill:#fff; }
+  .icon.role-home { background:#C77B48; } .icon.pin { position:static; transform:none; background:#8f8a82; }
+  .ctext b { display:block; font-size:16px; font-weight:650; }
+  .ctext span { display:block; font-size:12.5px; color:rgb(var(--text2)); margin-top:1px; }
+  .ctext em { font-style:normal; color:rgb(var(--accent)); font-weight:600; }
+  .chev { width:16px; height:16px; stroke:rgb(var(--text2)); fill:none; stroke-width:2.2; flex:none; }
+
+  /* Place card (B) */
+  .sheet { position:absolute; left:0; right:0; bottom:0; z-index:5; background:rgb(var(--card)); border-radius:26px 26px 0 0; box-shadow:0 -8px 30px rgba(0,0,0,.18); padding:8px 18px 40px; }
+  .sheet.tall { top:118px; }
+  .grab { width:36px; height:5px; border-radius:3px; background:rgba(var(--text2),.35); margin:0 auto 12px; }
+  .shead { display:flex; gap:12px; align-items:flex-start; }
+  .shead .icon { width:44px; height:44px; border-radius:12px; }
+  .shead .icon svg { width:24px; height:24px; }
+  .shead .t { flex:1; min-width:0; }
+  .shead .t b { display:block; font-size:21px; font-weight:700; letter-spacing:-.3px; line-height:1.15; }
+  .shead .t span { display:block; font-size:14px; color:rgb(var(--text2)); margin-top:3px; }
+  .shead .t span em { font-style:normal; color:rgb(var(--accent)); font-weight:600; }
+  .x { width:30px; height:30px; border-radius:50%; background:rgba(var(--text2),.16); display:flex; align-items:center; justify-content:center; flex:none; }
+  .x svg { width:12px; height:12px; stroke:rgb(var(--text2)); stroke-width:2.6; fill:none; stroke-linecap:round; }
+  .badge { display:inline-flex; gap:4px; align-items:center; font-size:12px; font-weight:600; color:rgb(var(--text2)); background:rgba(var(--text2),.12); border-radius:8px; padding:3px 8px; margin-top:8px; }
+  .badge svg { width:12px; height:12px; stroke:currentColor; fill:none; stroke-width:2; }
+  .stats { display:flex; margin:16px 0 4px; border-top:.5px solid rgba(var(--stroke),.9); border-bottom:.5px solid rgba(var(--stroke),.9); }
+  .stats div { flex:1; padding:11px 0; } .stats div + div { border-left:.5px solid rgba(var(--stroke),.9); padding-left:12px; }
+  .stats small { display:block; font-size:11.5px; color:rgb(var(--text2)); font-weight:600; }
+  .stats b { display:block; font-size:18px; font-weight:650; margin-top:2px; font-variant-numeric:tabular-nums; }
+  .sec { font-size:13px; font-weight:650; color:rgb(var(--text2)); margin:16px 0 2px; }
+  .visit { display:flex; gap:12px; align-items:center; padding:10px 0; border-bottom:.5px solid rgba(var(--stroke),.7); }
+  .visit .glyph { width:40px; height:40px; border-radius:10px; background:rgba(var(--text2),.10); flex:none; display:flex; align-items:center; justify-content:center; }
+  .visit .glyph svg { width:30px; height:30px; stroke:var(--copper); fill:none; stroke-width:2; stroke-linecap:round; }
+  .visit .vt { flex:1; }
+  .visit .vt b { display:block; font-size:15px; font-weight:600; }
+  .visit .vt span { display:block; font-size:13px; color:rgb(var(--text2)); font-variant-numeric:tabular-nums; }
+  .all { margin-top:12px; font-size:15px; font-weight:600; color:rgb(var(--accent)); display:flex; justify-content:space-between; align-items:center; }
+  .actions { display:flex; gap:10px; margin-top:16px; }
+  .actions div { flex:1; height:44px; border-radius:12px; background:rgba(var(--text2),.12); display:flex; align-items:center; justify-content:center; gap:6px; font-size:14px; font-weight:600; color:rgb(var(--accent)); }
+  .actions svg { width:16px; height:16px; stroke:currentColor; fill:none; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+  .note { font-size:12.5px; color:rgb(var(--text2)); margin-top:10px; line-height:1.4; }
+  .bubble { position:absolute; z-index:7; background:#e9c46a; color:#242321; font-size:12px; font-weight:600; padding:6px 9px; border-radius:8px; max-width:200px; line-height:1.3; box-shadow:0 3px 10px rgba(0,0,0,.3); }
+</style>
+</head>
+<body>
+<h1>Place card: a place on the Map, its visits, its journeys</h1>
+<p class="lead"><b style="color:var(--ivory)">Chosen 2026-11-19: C</b> (names under the markers, a tap opens the place card); figures Visits · Last · First; three latest visits; a detected place can be renamed, its name the person's own; Open in Maps later (nice to have). Tapping a place on the Map today opens MapKit's callout with hosted SwiftUI lines. It opens oversized on the first tap (blank space above the title; reproduced on the simulator 2026-11-19), names a place only through Apple's point of interest or the cached area, and reaches the drives only through a button to the visits page. Places will be used to find a stop again, so the place deserves a surface of its own. Three directions, then the states of the recommended one. Synthetic places and drives.</p>
+
+<h2>Directions</h2>
+<div class="row" id="directions"></div>
+<ul class="notes">
+  <li><b>A keeps MapKit's callout</b>, made compact (name, what it is · area, visits) and sized right; the whole callout opens the visits page. Cheapest, but the callout stays MapKit's: it covers the map around the place, sizes hosted views late, and holds no list.</li>
+  <li><b>B replaces the callout with a place card</b> (recommended): a sheet over the map at a medium height, the marker enlarged and the map slid so it stays above the card. The card is the place: name, what it is, address, three figures, its latest visits (each opens that journey's Journey Detail), all visits, and Save as a place for a detected one. Dragged up, it is the visits page itself: one surface, not a callout then a page. Our own SwiftUI: no hosted-view sizing, Dynamic Type and VoiceOver as every sheet.</li>
+  <li><b>C is B plus names on the map</b>: past street level (about 3 km across) each detected place carries its name under the marker, and a group says "+2 more", as the reference shows. Finding a stop again is reading the map; a tap is still the card. Labels cost MapKit collisions: they follow the same <code>displayPriority</code> as the markers (saved, visited often, once).</li>
+</ul>
+
+<h2>States of the place card</h2>
+<div class="row" id="states"></div>
+<ul class="notes">
+  <li><b>What it is</b> comes from Apple's point-of-interest category (<code>MKPointOfInterestCategory</code>) when Apple matched the place to a point of interest; Carodo maps 13 of Apple's categories to a symbol and a name today, the others draw a pin with no kind. Apple's answer is never stored, only cached (a week), so offline with nothing cached the card says what Carodo knows itself.</li>
+  <li><b>Offline</b> the card is the same card, never MapKit's default: the name falls back to the cached area, else "A place you stopped"; the figures and the visits come from the device and are always there. Nothing waits on the network.</li>
+  <li><b>A saved place</b> shows its role's colour and symbol, Private area when it is private, and Edit instead of Save. Its visits list its journeys the same way.</li>
+  <li><b>Rename (owner, 2026-11-19, a):</b> a detected place stays detected with the person's own name (<code>places.name</code>), which wins over Apple's and shows offline. The field starts empty, Apple's name only its placeholder; saving Apple's name unchanged stores nothing (Apple Map Data is cached 7 days, never stored). Clearing it returns to Apple's name, the area, or "A place you stopped".</li><li><b>Decided 2026-11-19:</b> C; figures Visits · Last · First; three latest visits; Open in Maps later.</li>
+</ul>
+
+<script>
+const ICONS = {
+  cup: '<path d="M4 8h12v5a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5zM16 9h1.5a2.5 2.5 0 0 1 0 5H16M6 3c0 1.5 1 1.5 1 3M10 3c0 1.5 1 1.5 1 3"/>',
+  fork: '<path d="M7 3v8M5 3v5a2 2 0 0 0 4 0V3M7 11v10M16 3c-2 0-3 3-3 6s1 3 3 3v9"/>',
+  fuel: '<path d="M4 21V5a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v16M3 21h12M5 9h8M14 9l3 2v7a1.5 1.5 0 0 0 3 0v-9l-3-3"/>',
+  home: '<path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/>',
+  pin: '<path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.4" fill="#fff"/>',
+  bed: '<path d="M3 18V7M3 13h18v5M21 13a3 3 0 0 0-3-3h-7v3M7 11.5a1.5 1.5 0 1 0 0-.01"/>',
+};
+const fillIcon = n => `<svg viewBox="0 0 24 24" style="fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;color:#fff">${ICONS[n]}</svg>`;
+const discIcon = n => `<svg viewBox="0 0 24 24" style="fill:none;stroke:#BD8053;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round">${ICONS[n]}</svg>`;
+const savedIcon = n => `<svg viewBox="0 0 24 24" style="fill:none;stroke:#fff;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round">${ICONS[n]}</svg>`;
+
+function map() {
+  return `<svg class="map" viewBox="0 0 393 852" preserveAspectRatio="none">
+    <path d="M-20 300 C 80 260, 150 330, 240 300 S 380 250, 420 280 L 420 340 C 330 320, 260 380, 170 360 S 40 330, -20 360z" fill="rgb(var(--water))" opacity=".9"/>
+    <path d="M250 40 h150 v120 h-150z M20 560 h120 v90 h-120z" fill="rgb(var(--green))"/>
+    <g stroke="rgb(var(--road2))" stroke-width="2" fill="none">
+      <path d="M0 140 L393 190 M0 470 L393 430 M60 0 L120 852 M300 0 L260 852 M0 640 L393 700 M180 0 L210 852"/>
+    </g>
+    <g stroke="rgb(var(--road))" stroke-width="7" fill="none" stroke-linecap="round">
+      <path d="M-10 520 C 100 500, 160 420, 230 410 S 360 380, 410 360"/>
+      <path d="M150 -10 C 160 120, 140 260, 170 420 S 200 700, 190 870"/>
+    </g>
+    <path d="M-10 520 C 100 500, 160 420, 230 410 S 360 380, 410 360" stroke="#BD8053" stroke-width="3" fill="none" opacity=".9"/>
+    <path d="M150 -10 C 160 120, 140 260, 170 420 S 200 700, 190 870" stroke="#BD8053" stroke-width="3" fill="none" opacity=".9"/>
+  </svg>`;
+}
+function chrome(opts={}) {
+  return `<div class="status"><span>09:41</span><i>●●● ᯤ ▮</i></div>
+  <div class="round" style="left:16px;top:76px"><svg viewBox="0 0 24 24"><path d="M12 3l9 5-9 5-9-5zM3 13l9 5 9-5M3 17.5l9 5 9-5"/></svg></div>
+  <div class="controls"><div><svg viewBox="0 0 24 24"><path d="M3 6l6-3 6 3 6-3v15l-6 3-6-3-6 3z M9 3v15 M15 6v15"/></svg></div><div>3D</div><div><svg viewBox="0 0 24 24"><path d="M21 3L3 10.5l7.5 3L14 21z"/></svg></div></div>
+  ${opts.noBar ? '' : `<div class="bar"><div class="tabs">
+    <div class="on"><svg viewBox="0 0 24 24"><path d="M3 6l6-3 6 3 6-3v15l-6 3-6-3-6 3z"/></svg>${opts.vi?'Bản đồ':'Map'}</div>
+    <div><svg viewBox="0 0 24 24"><circle cx="6" cy="6" r="2"/><circle cx="18" cy="18" r="2"/><path d="M8 6h6a4 4 0 0 1 0 8h-4a4 4 0 0 0 0 8"/></svg>${opts.vi?'Hành trình':'Journeys'}</div>
+    <div><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/></svg>Passport</div>
+    <div><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.5"/><path d="M3 20c0-3 3-5 6-5s6 2 6 5M15 20c0-2 1.5-4 4-4"/></svg>${opts.vi?'Bảng tin':'Feed'}</div>
+  </div><div class="start"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="#242321" stroke-width="2.4"/><circle cx="12" cy="12" r="2.4"/></svg></div></div>`}`;
+}
+const marker = (x,y,icon,o={}) => `<div class="pin" style="left:${x}px;top:${y}px"><div class="disc ${o.saved?'saved':''} ${o.sel?'sel':''}">${o.saved?savedIcon(icon):discIcon(icon)}</div>${o.label?`<div class="label">${o.label}</div>`:''}</div>`;
+const cluster = (x,y,n,label) => `<div class="pin" style="left:${x}px;top:${y}px"><div class="cluster">${n}</div>${label?`<div class="label">${label}</div>`:''}</div>`;
+const glyph = d => `<div class="glyph"><svg viewBox="0 0 30 30"><path d="${d}"/></svg></div>`;
+const G = ['M5 24 C 10 14, 16 20, 25 6','M4 20 C 10 22, 14 8, 26 10','M6 6 C 8 16, 20 12, 24 24'];
+const close = '<div class="x"><svg viewBox="0 0 12 12"><path d="M2 2l8 8M10 2l-8 8"/></svg></div>';
+const lock = '<svg viewBox="0 0 12 12"><rect x="2" y="5.5" width="8" height="5" rx="1"/><path d="M4 5.5V4a2 2 0 0 1 4 0v1.5"/></svg>';
+
+function card(o) {
+  const t = o.t;
+  return `<div class="sheet ${o.tall?'tall':''}">
+    <div class="grab"></div>
+    <div class="shead"><div class="icon ${o.iconClass||''}">${fillIcon(o.icon)}</div>
+      <div class="t"><b>${o.name}</b><span>${o.kind?`<em>${o.kind}</em> · `:''}${o.area||''}</span>${o.badge?`<div class="badge">${lock}${o.badge}</div>`:''}</div>${close}</div>
+    <div class="stats">${o.stats.map(([k,v])=>`<div><small>${k}</small><b>${v}</b></div>`).join('')}</div>
+    <div class="sec">${t.latest}</div>
+    ${o.visits.map((v,i)=>`<div class="visit">${glyph(G[i%3])}<div class="vt"><b>${v[0]}</b><span>${v[1]}</span></div><svg class="chev" viewBox="0 0 16 16"><path d="M6 3l5 5-5 5"/></svg></div>`).join('')}
+    ${o.all?`<div class="all"><span>${o.all}</span><svg class="chev" viewBox="0 0 16 16" style="stroke:rgb(var(--accent))"><path d="M6 3l5 5-5 5"/></svg></div>`:''}
+    <div class="actions">${o.actions.map(a=>`<div>${a}</div>`).join('')}</div>
+    ${o.note?`<div class="note">${o.note}</div>`:''}
+  </div>`;
+}
+const EN = { latest:'Latest visits' };
+const VI = { latest:'Những lần ghé gần đây' };
+const plus = '<svg viewBox="0 0 16 16"><path d="M8 3v10M3 8h10"/></svg>';
+const edit = '<svg viewBox="0 0 16 16"><path d="M3 13l1-3 7-7 2 2-7 7z"/></svg>';
+const maps = '<svg viewBox="0 0 16 16"><path d="M14 2L2 7l5 2 2 5z"/></svg>';
+const hide = '<svg viewBox="0 0 16 16"><path d="M2 8s2.5-4 6-4 6 4 6 4-2.5 4-6 4-6-4-6-4zM3 13L13 3"/></svg>';
+
+const cafe = {
+  icon:'cup', name:'Quán nước mía Tư Hùng', kind:'Café', area:'X. Xuân Hòa, Đồng Nai',
+  stats:[['Visits','4'],['Last','11 Nov'],['First','19 Oct']],
+  visits:[['Tue 11 Nov · 07:42','From Home · 42 km · 58 min'],['Sat 1 Nov · 16:10','From Phan Thiết · 168 km'],['Sun 19 Oct · 08:05','From Home · 41 km']],
+  all:'All 4 visits', actions:[edit+'Rename', plus+'Save place'], t:EN };
+
+function phone(cls, inner) { return `<div class="phone ${cls}">${map()}${inner}</div>`; }
+function fig(html, cap) { return `<figure>${html}<figcaption>${cap}</figcaption></figure>`; }
+
+// Directions
+const A = phone('light', chrome() + marker(170,560,'fuel') + marker(230,410,'cup',{sel:true}) + cluster(110,250,3) + marker(300,640,'fork') +
+  `<div class="callout" style="left:62px;top:318px;width:290px"><div class="icon">${fillIcon('cup')}</div><div class="ctext" style="flex:1"><b>Quán nước mía Tư Hùng</b><span><em>Café</em> · X. Xuân Hòa</span><span>Visited 4 times · last 11 Nov</span></div><svg class="chev" viewBox="0 0 16 16"><path d="M6 3l5 5-5 5"/></svg></div>`);
+const B = phone('light', chrome({noBar:true}) + marker(110,150,'fuel') + cluster(300,110,3) + marker(200,250,'cup',{sel:true}) + card(cafe));
+const C = phone('light', chrome() +
+  marker(230,410,'cup',{label:'Quán nước mía Tư Hùng'}) + marker(170,560,'fuel',{label:'Petrolimex 12'}) +
+  cluster(110,250,3,'Trạm dừng Cam Lâm<small>+2 more</small>') + marker(300,640,'fork',{label:'Cơm tấm Bà Tư'}) +
+  marker(150,700,'pin',{label:'A place you stopped'}) + marker(330,200,'home',{saved:true,label:'Home'}));
+document.getElementById('directions').innerHTML =
+  fig(A, '<span class="tag alt">A · NOT CHOSEN</span><b>MapKit callout, fixed.</b> Compact: name, what it is · area, visits; the whole callout opens the visits page. The marker stays where it is.') +
+  fig(B, '<span class="tag alt">B · THE CARD OF C</span><b>Place card.</b> The tapped marker grows and the map slides it above the card. Three figures, the latest three visits (each opens Journey Detail), all visits, Save place. The floating bar hides under the card as under any sheet.') +
+  fig(C, '<span class="tag rec">C · CHOSEN</span><b>Names on the map, then B.</b> At street level each place carries its name, a group its first name and "+2 more"; an unnamed stop says what it is. A tap opens the card of B.');
+
+// States
+const offline = phone('light', chrome({noBar:true}) + marker(200,250,'pin',{sel:true}) + card({
+  icon:'pin', iconClass:'pin', name:'A place you stopped', kind:'', area:'X. Xuân Hòa, Đồng Nai',
+  stats:[['Visits','2'],['Last','3 Nov'],['First','16 Oct']],
+  visits:[['Mon 3 Nov · 12:20','From Home · 38 km'],['Thu 16 Oct · 18:02','From Work · 12 km']],
+  all:null, actions:[edit+'Rename', plus+'Save place'], t:EN,
+  note:'Offline, Apple not asked: named by the cached area, else "A place you stopped". Figures and visits are the device\'s own.' }));
+const saved = phone('light', chrome({noBar:true}) + marker(200,250,'home',{saved:true,sel:true}) + card({
+  icon:'home', iconClass:'role-home', name:'Home', kind:'Home', area:'P. Tân Mỹ, Quận 7', badge:'Private area',
+  stats:[['Arrivals','212'],['Last','Today'],['First','2 Mar']],
+  visits:[['Today · 18:31','From Work · 14 km · 32 min'],['Yesterday · 19:02','From Quán nước mía · 44 km'],['Mon 17 Nov · 18:12','From Work · 14 km']],
+  all:'All 212 arrivals', actions:[edit+'Edit place'], t:EN }));
+const tall = phone('dark', chrome({noBar:true}) + card({...cafe, tall:true,
+  visits:[...cafe.visits, ['Sun 5 Oct · 09:30','From Home · 42 km · 1 h 02']], all:null,
+  note:'Dragged up, the card is the visits page: every visit, newest first, each opening its Journey Detail.' }));
+const vi = phone('light', chrome({noBar:true, vi:true}) + marker(200,250,'cup',{sel:true}) + card({
+  icon:'cup', name:'Quán nước mía Tư Hùng', kind:'Quán cà phê', area:'X. Xuân Hòa, Đồng Nai',
+  stats:[['Số lần ghé','4'],['Gần nhất','11 thg 11'],['Lần đầu','19 thg 10']],
+  visits:[['Th 3, 11 thg 11 · 07:42','Từ Nhà · 42 km · 58 phút'],['Th 7, 1 thg 11 · 16:10','Từ Phan Thiết · 168 km'],['CN, 19 thg 10 · 08:05','Từ Nhà · 41 km']],
+  all:'Cả 4 lần ghé', actions:[edit+'Đổi tên', plus+'Lưu địa điểm'], t:VI }));
+const rename = phone('light', chrome({noBar:true}) + marker(200,250,'cup',{sel:true}) + `<div class="sheet" style="top:330px">
+    <div class="grab"></div>
+    <div class="shead"><div class="icon">${fillIcon('cup')}</div><div class="t"><b>Rename</b><span><em>Café</em> · X. Xuân Hòa, Đồng Nai</span></div>${close}</div>
+    <div style="margin-top:18px;height:48px;border-radius:12px;background:rgba(var(--text2),.10);border:1.5px solid var(--copper);display:flex;align-items:center;padding:0 14px;font-size:17px;color:rgba(var(--text2),.75)">Quán nước mía Tư Hùng<span style="width:2px;height:22px;background:var(--copper);margin-right:2px;order:-1"></span></div>
+    <div class="note">Your name for this place. It stays on this iPhone and in your iCloud, and shows when you are offline.</div>
+    <div class="actions"><div style="background:var(--copper);color:#242321">Save</div></div>
+    <div class="note">Empty field: Apple's name is only the placeholder. Saving it unchanged keeps nothing; clearing a name returns to Apple's.</div>
+  </div>`);
+document.getElementById('states').innerHTML =
+  fig(offline, '<b>Offline, or Apple knows no point of interest there.</b> A pin, the cached area as its line.') +
+  fig(saved, '<b>A saved place.</b> Its role\'s colour and symbol, Private area, Edit place; "Arrivals" for Home.') +
+  fig(tall, '<b>Dark, dragged up.</b> The full list in the card: the visits page and the card are one surface.') +
+  fig(vi, '<b>Vietnamese.</b> Copy is a draft for the strings pass.') +
+  fig(rename, '<b>Rename a detected place.</b> In place on the card: one field, Save. It stays a detected place.');
+</script>
+</body>
+</html>

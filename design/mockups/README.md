@@ -30,6 +30,7 @@ These boards are retained as explorations; their presence does not establish app
 - [Vehicle editor concept](garage/vehicle-editor.png)
 - [Journey experience concept](journeys/journey-experience.png)
 - [Journey Experience V2: Explore, Day, Route Glyph](journeys/journey-experience-v2.png) (2026-11-14, `plans/journey-experience.md`; source `source/journey-experience.html`)
+- [Place card: names on the Map, the card, its visits](journeys/place-card.png) (2026-11-19, `plans/place-card.md`; source `source/place-card.html`): A callout fixed, B card, C names on the map then the card; **C chosen**, figures Visits · Last · First, Rename for a detected place
 - [Route ends: one mark everywhere](journeys/route-ends.png) (2026-11-14, `plans/journey-experience-02a-route-glyph.md` D32; source `source/route-ends.html`)
 - [Journeys overview](journeys/journeys-overview.png)
 - [Along the Way route variations](journeys/along-the-way-route-variations.png)
