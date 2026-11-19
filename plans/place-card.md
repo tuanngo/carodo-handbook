@@ -194,7 +194,13 @@ syncs it as any place edit (check the conflict rule for a row whose `source` cha
 visits (each end goes to the smallest circle holding it). Worth a look at merging detected places
 that overlap, in the detection code, not the Map.
 
-## Step 5 plan: Save place and Edit place (2026-11-19, waiting for the owner's approval)
+## Step 5 plan: Save place and Edit place (2026-11-19, accepted; carodo-ios `9cb3ca2` on `feat/save-place`)
+
+**Changed at approval (owner):** the editor works on the Map itself, not in a sheet over the card:
+the card becomes the Places editor's panel (`PlaceEditorPanel`, shared with Settings), and the Map's
+own map is moved under a fixed pin (as in the Places editor, chosen over dragging the marker), the
+circle drawn in points from the map's scale, the map's controls hidden. Points 2 and 4 below are
+replaced by this; the rest stands.
 
 The owner chose the recommendation above: promote in place. Audited on `main` at `2a46cf0`.
 
@@ -240,3 +246,9 @@ Vietnamese, Dark; Settings → Places lists it. Device: leaving a promoted place
 
 **Where.** A worktree `feat/save-place` (`main` holds another session's uncommitted changes).
 One commit: `feat(places): save a detected place from its card, edit a saved one`.
+
+**Also at review (owner):** Other is Copper with its point of interest's symbol, as its detected
+marker was: a solid Copper disc for a place kept, the neutral disc for one found. Saved places read
+Apple's name and category from the cache where shown (`PlaceRepository.named`), never asking for
+them. Debt left: TD-77 (journal and timeline symbols), TD-78 (3D lost, keyboard over the pin);
+device check PV-41.
