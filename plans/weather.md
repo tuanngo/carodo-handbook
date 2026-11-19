@@ -200,7 +200,8 @@ nothing is built before these are approved.
 ## 7. Slice 2 plan: the weather line on Journey detail
 
 Status: **approved (owner, 2026-11-19): S1, S2, S4, S5, S6 as recommended; S3 approved with the
-owner's wording below; S7 (sun and UV facts) approved.** Starts after PV-39 (the device check of slice 1).
+owner's wording below; S7 (sun and UV facts) approved. Done 2026-11-19 (carodo-ios
+`fb6bfb6`); the column is `strong_sun`; the map's badge sits at the top right (owner).** Starts after PV-39 (the device check of slice 1).
 
 ### Today (files read)
 
