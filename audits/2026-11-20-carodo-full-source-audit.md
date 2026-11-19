@@ -22,6 +22,7 @@ failure), UIB-2 (`CarodoSurface.onError`, `.carodoDestructive`; screenshots Ligh
 xxxLarge), XC-8 for what moves (PlaceEditorView camera, the heading cone, the claim button, the share
 chips' tick, OdometerSheet on `rollingDigits`). Left: the XC-8 sites that only fade or change colour
 (RootView, JourneyDayView, MapStatusViews), which Reduce Motion allows.
+Group 3 (decisions before code, with recommendations): [`plans/audit-2026-11-20-group-3.md`](../plans/audit-2026-11-20-group-3.md).
 Everything else is open, waiting for the owner's pick.
 
 ## Summary
