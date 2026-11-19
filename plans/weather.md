@@ -200,7 +200,7 @@ nothing is built before these are approved.
 ## 7. Slice 2 plan: the weather line on Journey detail
 
 Status: **approved (owner, 2026-11-19): S1, S2, S4, S5, S6 as recommended; S3 approved with the
-owner's wording below.** Starts after PV-39 (the device check of slice 1).
+owner's wording below; S7 (sun and UV facts) approved.** Starts after PV-39 (the device check of slice 1).
 
 ### Today (files read)
 
@@ -249,10 +249,16 @@ owner's wording below.** Starts after PV-39 (the device check of slice 1).
   ("· poor visibility" / "· tầm nhìn kém") → strong wind ("· strong wind" / "· gió mạnh"). "Sương
   mù · tầm nhìn kém" is allowed (fog and visibility are two facts).
 
-  **Not said yet:** "Sunny at the start, rain by the end" / "Nắng lúc đi, mưa lúc tới" needs a clear
-  sky **in daylight** at the start; `trip_weather` keeps no daylight, so the fallback "Không mưa lúc
-  đi, mưa lúc tới" is used. "No rain" is never written as "sunny". Adding a daylight fact is a later
-  rules version (a schema change, the owner's call), not part of slice 2.
+  **Sun (owner, 2026-11-19, S7):** slice 2 starts by adding three facts to `trip_weather`
+  (`v1_initial`, rules version 2, cache file v2 with the UV index): `start_daylight`,
+  `end_daylight` (Apple's `isDaylight` at those hours) and `strong_sun` (a daylight point with UV
+  index 8 or more, WHO "very high"). "Sunny" / "Nắng" is said only for a clear sky in daylight with
+  UV 3 or more at that end ("Nắng lúc đi, mưa lúc tới"; a clear night stays "Trời quang"); "No
+  rain" is never written as "sunny". `strong_sun` is the last extra: "· harsh sun" / "· nắng gắt".
+  Extras in order: heavy rain → poor visibility → strong wind → harsh sun. The start's UV ≥ 3 needs
+  its own fact: `start_daylight` is stored as "daylight with UV 3 or more" (`start_sunlit`,
+  `end_sunlit`), so the stored columns are `start_sunlit`, `end_sunlit`, `strong_sun`. Tests on both
+  sides of UV 2/3 and 7/8, day and night.
 
   The line wraps at xxxLarge, never cut. The sentence is never stored: facts only, worded on screen.
 - **Temperature from the cache only:** the start's and the end's readings (`WeatherHourCache`), one
