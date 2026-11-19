@@ -160,3 +160,9 @@ Steps 1–7 done on the owner's iPhone (Debug, CloudKit Development); step 5 cov
 - Manage Storage shows the container as "ios" though its description is "Carodo": to look at on
   TestFlight.
 - Left open: PV-38 in technical-debt.md.
+
+## D1 follow-up: the iCloud page (2026-11-19)
+
+Approved by the owner on the iPhone: a head with the state, the last sync and the count of records
+in iCloud; Sync Now with the switch; alerts before turning off and before deleting (carodo-ios
+`23cb1af`). Colour (`a95afd9`): done is the system's green in icons only, switches stay copper.
