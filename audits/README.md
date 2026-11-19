@@ -16,4 +16,5 @@ caught in review instead of found again in the next audit.
 | [2026-11-16 `geocoded_cells` audit](2026-11-16-ios-geocoded-cells-audit.md) | `carodo-ios` | TD-2 row 1, TD-36, TD-6 | Phase 1 built (carodo-ios dd58a24); phase 2 (OSM) not started |
 | [2026-11-16 location and background audit](2026-11-16-ios-location-runtime-audit.md) | `carodo-ios` | 4 findings, 2 ideas | Written; waiting for the owner's review |
 | [2026-11-18 app composition audit](2026-11-18-ios-app-composition-audit.md) | `carodo-ios` | 4 findings, 1 idea | D1–D4 approved; steps 1–3 done, step 4 (F3, F4) not started |
+| [2026-11-20 full source audit](2026-11-20-carodo-full-source-audit.md) | `carodo-ios`, `carodo-app` | 1 High, 20 Medium, 59 Low | Groups 1 and 2 fixed (carodo-ios 5aae671, 8f4fef9); the rest open |
 | [2026-11-07 backend source audit](../plans/backend-source-audit.md) | `carodo-app` | 6 | Open (still in `plans/`) |
