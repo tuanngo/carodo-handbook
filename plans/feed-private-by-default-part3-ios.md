@@ -3,8 +3,7 @@
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this
 > plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-Status: **3a done 2026-11-19 on branch feat/feed-private (carodo-ios d9b72e8, d8212ad, e79d8da), not merged; final review and a run against local `task app:dev` still to do; 3b waits for the mockup.** Approved by the owner, 2026-11-19 (decisions 1–3 as recommended: 3a now, 3b after the mockup; "7d" chip; "Example" sample). Worktree `carodo-ios-feed-private`,
-branch `feat/feed-private` (from carodo-ios `61d8eb8`).
+Status: **3a done 2026-11-19 on branch `feat/feed-private` (carodo-ios d9b72e8, d8212ad, e79d8da, 08f381a), not merged.** Final review (fresh reviewer): 0 Critical, 2 Important fixed in 08f381a; the live round passes against local `task app:dev`. Open for the owner: the author may react before release? (backend 404 today), contract `Ago` "now" for a late drive, `localStartHour` narrowing the start. 3b waits for the mockup. Approved by the owner, 2026-11-19 (decisions 1–3 as recommended: 3a now, 3b after the mockup; "7d" chip; "Example" sample). Worktree `carodo-ios-feed-private`, branch `feat/feed-private` (from carodo-ios `61d8eb8`).
 
 **Goal:** the app sends what contract 0.29.0-draft asks (quarter-hour `endedAt`, whole minutes,
 100 m), publishes within the 7-day window, its mock server behaves like the backend, the Feed's
