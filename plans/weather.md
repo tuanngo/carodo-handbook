@@ -258,7 +258,9 @@ owner's wording below; S7 (sun and UV facts) approved.** Starts after PV-39 (the
   Extras in order: heavy rain → poor visibility → strong wind → harsh sun. The start's UV ≥ 3 needs
   its own fact: `start_daylight` is stored as "daylight with UV 3 or more" (`start_sunlit`,
   `end_sunlit`), so the stored columns are `start_sunlit`, `end_sunlit`, `strong_sun`. Tests on both
-  sides of UV 2/3 and 7/8, day and night.
+  sides of UV 2/3 and 7/8, day and night. No daylight column of its own (owner, 2026-11-19): a night drive is the
+  drive's local hour (`PartOfDay`), never the weather; a sun-based night, if ever wanted, is computed
+  on the device from the drive's time and place.
 
   The line wraps at xxxLarge, never cut. The sentence is never stored: facts only, worded on screen.
 - **Temperature from the cache only:** the start's and the end's readings (`WeatherHourCache`), one
