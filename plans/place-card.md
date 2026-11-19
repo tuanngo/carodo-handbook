@@ -132,3 +132,48 @@ No schema, API, permission or dependency change.
 
 - Journey Detail's callouts share the oversize-on-first-open bug (`CalloutHost` measured before the
   view is in a window); fixed when that map gets the card or a measured host.
+
+## Handoff: Save place and Edit place (2026-11-19, not built)
+
+Left for a new session. Analysis and a recommendation, for the owner to decide.
+
+**What exists.** `places.source` is `suggested`, `added` or `detected`; `name` is the person's own
+only. Rename (step 3) already gives a detected place a lasting name without making it saved. The
+place editor (`PlaceEditorView`, Places feature) edits radius, type (role or Private area), name and
+Private, and is opened only from Settings → Places. Every saved place's circle is an Auto Mode
+geofence: iOS watches 20 regions per app, one is the parking spot, so the **oldest 19** saved places
+are watched (carodo-ios `docs/tracking.md`, Place geofences).
+
+**Should a detected place be saveable from its card? Yes, but as a promotion, not a copy.**
+- Saving makes sense when the place has a role (Home, Work, School, Family) or must be private:
+  roles name drives ("Home → Work"), privacy hides route ends. A name alone no longer needs it
+  (Rename).
+- A copy (a new `added` row on the same spot) is the wrong shape: two circles on one spot, visits
+  go to the smaller one (`PlaceMatch`), the detected marker sits under the saved one, and the group
+  lists both. The duplicates seen in real data (three "X. Hàm Thuận Bắc") show the cost already.
+- **Recommended: promote in place.** The same row (same id, so its visits, journey titles and Apple
+  `poi_id` stay) changes `source` from `detected` to `added`, with the role, name, radius and
+  privacy chosen in the editor. Its marker becomes a saved marker on every layer, never grouped.
+- Cost to name to the owner: a promoted place takes a geofence slot. With the oldest 19 watched,
+  promoting many stops leaves new ones unwatched, never Home or Work if those were saved first. The
+  editor could say so past 19 (a line, not a block).
+- Detection must not re-detect a promoted spot: it already skips cells inside an existing place
+  (`docs/specs/places.md`, Finding frequent places); check that holds for a promoted row.
+
+**Edit place for a saved place:** the same editor on the existing row. No open question.
+
+**How to open the editor from the card** (a feature never shows another's views): a route the App
+layer resolves, e.g. `AppRoute.placeEditor(Place.ID)` pushed on the Map tab's stack, or the
+`AnyView` builder pattern already used for Find Nearby (`AppDestination.Models.placeNearbySheet`).
+The editor needs a "promote" entry: `PlaceEditorModel(existing:)` with a detected place, saving it
+as `added` with the same id. Persistence: a change of `source` on one row, no schema change; iCloud
+syncs it as any place edit (check the conflict rule for a row whose `source` changed on one device).
+
+**Decisions for the owner:**
+1. Promote in place (recommended) or copy.
+2. Which entry: the card's "Save place" for a detected place only, "Edit" for a saved one.
+3. Whether the editor warns past 19 watched places.
+
+**Also seen, separate from the card:** several detected places on one spot, all but one with no
+visits (each end goes to the smallest circle holding it). Worth a look at merging detected places
+that overlap, in the detection code, not the Map.
