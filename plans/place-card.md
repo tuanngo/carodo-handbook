@@ -193,3 +193,50 @@ syncs it as any place edit (check the conflict rule for a row whose `source` cha
 **Also seen, separate from the card:** several detected places on one spot, all but one with no
 visits (each end goes to the smallest circle holding it). Worth a look at merging detected places
 that overlap, in the detection code, not the Map.
+
+## Step 5 plan: Save place and Edit place (2026-11-19, waiting for the owner's approval)
+
+The owner chose the recommendation above: promote in place. Audited on `main` at `2a46cf0`.
+
+**Audit.**
+- `docs/specs/places.md` already says it: a detected place "is the same row as any place: keeping
+  it, or giving it a role, makes it a saved place". Nothing builds it yet.
+- `PlaceEditorModel(existing:)` keeps `existing.source`, its hidden-circle offset and its radius.
+  A detected place's offset is **0** (`PlaceDetection.place`): promoted as private with it, the
+  hidden circle would sit on the real centre. A detected radius is 25–100 m; a saved one is 50 m
+  to 1 km.
+- `GRDBPlaceRepository.save` keeps `created_at`; `places()` orders by it and `PlaceRegion.watched`
+  takes the first 19. A place detected months ago and saved today would outrank Home saved last week.
+- `regionChanges()` reads `source`, so Auto Mode watches a promoted place at once. Marker ids are
+  the place id (`footprint.place:<uuid>`), the same before and after.
+- iCloud: a place is last-write-wins as any edit; `source` is a field like the others.
+
+**Proposal.**
+1. *Card, detected place:* **Save Place** (full width, `bookmark`) above Find Nearby and Rename.
+   *Card, saved place:* **Edit Place** (`pencil`) where those buttons are.
+2. Both open the Places editor in a sheet over the card, through an App-layer builder
+   (`AppDestination.Models.placeEditorSheet`, like `placeNearbySheet`): Map never names Places' views.
+3. *Promotion* (`PlaceEditorModel(promoting:)`): title "Save Place"; role starts at Other (the
+   person picks Home, Work…; their privacy defaults follow); the name is what the card shows;
+   radius `max(its own, 50 m)` (100 m once private); a hidden-circle offset drawn as for a new
+   place; Save writes `source = added`, same id. The editor's Delete is not offered.
+4. *Edit* from the card: the same editor as Settings, Delete included; after a delete the card closes.
+5. *Repository:* a save that turns `detected` into a saved place sets `created_at` to that moment,
+   so the watched 19 are the 19 saved first.
+6. *The 20th:* the editor says in its footer, when this place would be past the 19 watched: "Auto
+   Mode watches your first 19 places; leaving this one won't start a drive."
+7. After a save or a delete: the card reads its page again, the markers reload, the journal
+   re-titles (`appState.journalDidChange()`).
+
+**Not in this step.** Merging overlapping detected places; a saved place back to detected ("Remove
+from Saved" deletes it, as in Settings); choosing which 19 are watched.
+
+**Tests.** The promoted place: id, source, offset non-zero, radius floor, private floor; the
+repository's `created_at` on promotion and not on an edit; `PlaceRegion.watched` order; the 20th
+footer on both sides of 19; LocalizationTests for the new strings.
+
+**Evidence.** Simulator: a detected card → Save → saved card and marker, the editor at xxxLarge,
+Vietnamese, Dark; Settings → Places lists it. Device: leaving a promoted place wakes Auto Mode.
+
+**Where.** A worktree `feat/save-place` (`main` holds another session's uncommitted changes).
+One commit: `feat(places): save a detected place from its card, edit a saved one`.
